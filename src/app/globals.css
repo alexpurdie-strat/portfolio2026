@@ -3956,7 +3956,7 @@ html[data-mode="microfilm"] .site-header__nav .text-button::after {
    and only because it is an optical instrument here: the design system's
    "nothing is blurred" is a rule about paper, and paper has no focus knob.
    Brief, and on the panel rather than on the words. */
-html[data-mode="microfilm"][data-threading] main {
+html[data-mode="microfilm"][data-threading="reel"] main {
   animation: focus-in 380ms var(--ease-settle) both;
 }
 
@@ -3972,7 +3972,7 @@ html[data-mode="microfilm"][data-threading] main {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html[data-mode="microfilm"][data-threading] main {
+  html[data-mode="microfilm"][data-threading="reel"] main {
     /* the lens still settles, it just does not defocus */
     animation: focus-in-reduced 240ms linear both;
   }
@@ -4034,6 +4034,150 @@ html[data-mode="microfilm"] .mode-switch__well {
 
   .reader__perf {
     /* too narrow to read as perforations, and it would crowd the column */
+    display: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PHASE 4 — CARTRIDGES
+
+   A case study is a cartridge: it loads with a threading sequence, its own
+   sections are its frames, and two spools show how much film is left.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── The spools ─────────────────────────────────────────────────────────────
+   Flanking the crank on the right flank, geared to it. `--wound` is 0…1 and
+   is written by the transport; the radial stop is the wound diameter, so film
+   visibly leaves the feed spool and gathers on the take-up. */
+.reader__spool {
+  position: fixed;
+  right: calc((var(--bezel) - 1.5rem) / 2);
+  width: 1.5rem;
+  height: 1.5rem;
+  z-index: 74;
+  border-radius: 50%;
+  /* the hub, then the wound film out to --wound of the radius */
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      #4a4739 0 22%,
+      /* the film itself: dense, slightly warm from the lamp behind it */
+        #2a2820 22% calc(22% + var(--wound, 0.5) * 78%),
+      rgb(0 0 0 / 0) calc(22% + var(--wound, 0.5) * 78%) 100%
+    ),
+    /* the flange the film is wound between */
+      radial-gradient(circle at 50% 50%, #8f8b77 0 96%, rgb(0 0 0 / 0) 96%);
+  box-shadow: 0 1px 3px rgb(18 16 10 / 0.45);
+}
+
+.reader__spool[data-spool="feed"] {
+  top: calc(50% - 3.6rem);
+}
+
+.reader__spool[data-spool="take-up"] {
+  top: calc(50% + 2.1rem);
+}
+
+/* ── The frame name ─────────────────────────────────────────────────────────
+   A sectioned reel says which section is under the reading line. Empty on an
+   unsectioned one, so it takes no width at all. */
+.transport__frameName {
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.transport__frameName:not(:empty)::before {
+  content: "·";
+  margin: 0 0.45em;
+  font-weight: 400;
+  opacity: 0.5;
+}
+
+/* ── Loading a cartridge ────────────────────────────────────────────────────
+   Distinct from loading a reel: a cartridge is inserted, fed, and only then
+   does the lamp reach the film. Longer than the plain focus-in but still
+   short — nobody waits to read a case study — and it never blocks input. */
+html[data-mode="microfilm"][data-threading="cartridge"] main {
+  animation: cartridge-load 620ms var(--ease-settle) both;
+}
+
+@keyframes cartridge-load {
+  /* the gate is blocked while the cartridge seats */
+  0% {
+    opacity: 0;
+    filter: blur(5px) contrast(0.8);
+    translate: 0 10px;
+  }
+  /* film catches, and the lamp finds it */
+  34% {
+    opacity: 0.35;
+    filter: blur(3.6px) contrast(0.86);
+    translate: 0 5px;
+  }
+  /* the feed judders once as the sprockets engage */
+  52% {
+    opacity: 0.8;
+    filter: blur(1.6px) contrast(0.94);
+    translate: 0 -2px;
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0) contrast(1);
+    translate: 0 0;
+  }
+}
+
+/* The gate flashes as the cartridge passes it — a mechanical event, not an
+   ambient flicker, so it happens once per load and never on a loop. */
+html[data-mode="microfilm"][data-threading="cartridge"] .reader__gate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(255 252 240 / 0.5);
+  animation: gate-flash 620ms steps(1, end) both;
+}
+
+@keyframes gate-flash {
+  0%,
+  22% {
+    opacity: 0;
+  }
+  26% {
+    opacity: 0.7;
+  }
+  30% {
+    opacity: 0;
+  }
+  44% {
+    opacity: 0.35;
+  }
+  48%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The mechanism is the decoration here. The load still reads as a load —
+     it just does not defocus, judder or flash. */
+  html[data-mode="microfilm"][data-threading="cartridge"] main {
+    animation: focus-in-reduced 300ms linear both;
+  }
+
+  html[data-mode="microfilm"][data-threading="cartridge"] .reader__gate::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  /* No flank to mount them on. */
+  .reader__spool {
+    display: none;
+  }
+
+  .transport__frameName {
+    /* the reel label already names where you are on a phone */
     display: none;
   }
 }

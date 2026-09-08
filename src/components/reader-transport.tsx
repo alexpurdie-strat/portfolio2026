@@ -23,11 +23,30 @@ import { useMode } from "@/lib/mode";
  * cost this site spent a day removing elsewhere.
  */
 
-/* A frame is a bit over half a screen — roughly a page of film. Small enough
+/*
+ * Two frame models, and a document declares which it gets.
+ *
+ * A page whose sections have been catalogued — a case study — carries
+ * [data-frame] on each one, and those *are* its frames: named, uneven, and
+ * exactly the divisions the writing already has. Everything else falls back
+ * to even slices, which needs no content structure and so is correct on the
+ * specimen page and a 404 alike.
+ *
+ * What deliberately does not happen either way is scroll snapping. Advancing
+ * frames by crank or arrow key jumps to a section; free scrolling stays free.
+ * Snapping would be the first change that alters how the writing is *read*
+ * rather than how it looks, on the surface a hiring reader spends longest on,
+ * and film being sectioned is not a reason to take the scrollbar away.
+ */
+
+/* A slice is a bit over half a screen — roughly a page of film. Small enough
    that cranking feels like it is doing something, large enough that the
    counter is not noise. */
 const FRAME_RATIO = 0.62;
 const FRAME_MIN = 320;
+
+/* Where in the viewport a frame counts as "the one being read". */
+const READING_LINE = 0.34;
 
 /* Degrees of crank per pixel of film. Tuned so a full screen is a little
    over one turn: fast enough to look driven, slow enough to read. */
@@ -59,8 +78,15 @@ export function ReaderTransport() {
 
   const crank = useRef<HTMLButtonElement | null>(null);
   const readout = useRef<HTMLSpanElement | null>(null);
+  const label = useRef<HTMLSpanElement | null>(null);
   const face = useRef<HTMLSpanElement | null>(null);
   const perfs = useRef<HTMLElement[]>([]);
+  const spools = useRef<HTMLElement[]>([]);
+  /* Last written spool step, so an unchanged value costs no repaint. */
+  const wound = useRef(-1);
+  /* Document offsets of each named frame, newest measurement wins. Rebuilt on
+     route change and resize, never per scroll frame. */
+  const marks = useRef<{ top: number; name: string }[]>([]);
 
   /* The perforation strips belong to ReaderShell, not to this component, so
      they are looked up once rather than passed down through it. */
@@ -68,29 +94,72 @@ export function ReaderTransport() {
     perfs.current = Array.from(
       document.querySelectorAll<HTMLElement>(".reader__perf"),
     );
+    spools.current = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-spool]"),
+    );
   }, []);
 
   const reel = reelFor(pathname);
   const active = mode === "microfilm";
 
+  /* Reads the named frames out of the DOM. Layout-reading, so it runs on
+     route change and resize only — never on scroll. */
+  const survey = useCallback(() => {
+    const found = Array.from(
+      document.querySelectorAll<HTMLElement>("main [data-frame]"),
+    )
+      .map((el) => ({
+        top: el.getBoundingClientRect().top + window.scrollY,
+        name: el.dataset.frame || "",
+      }))
+      .sort((a, b) => a.top - b.top);
+    /* One named frame is not a sectioned document, it is a masthead. */
+    marks.current = found.length >= 3 ? found : [];
+  }, []);
+
   /* One source of truth for "where is the film", shared by the counter, the
-     crank angle, the sprockets and the slider's ARIA. */
+     crank angle, the sprockets, the spools and the slider's ARIA. */
   const measure = useCallback(() => {
     const doc = document.documentElement;
-    const frameH = Math.max(FRAME_MIN, window.innerHeight * FRAME_RATIO);
     const travel = Math.max(0, doc.scrollHeight - window.innerHeight);
+    const y = Math.min(Math.max(window.scrollY, 0), travel);
+    const named = marks.current;
+
+    if (named.length) {
+      const line = y + window.innerHeight * READING_LINE;
+      let index = 0;
+      for (let i = 0; i < named.length; i += 1) {
+        if (named[i].top <= line) index = i;
+      }
+      /* At the end of the film you are on the last frame, whatever the
+         reading line says. A section close to the foot of the document sits
+         below the line even at maximum scroll, so without this the counter
+         stopped at 007/008 and stepping to 8 reported 7 — the unreachable
+         frame from phase 3 in a different disguise. */
+      if (y >= travel - 1) index = named.length - 1;
+      return {
+        y,
+        travel,
+        total: named.length,
+        frame: index + 1,
+        name: named[index].name,
+        stops: named.map((m) => m.top),
+      };
+    }
+
+    const frameH = Math.max(FRAME_MIN, window.innerHeight * FRAME_RATIO);
     /* Counted off *reachable* travel, not scrollHeight. Off scrollHeight the
        last screenful became frames nobody could crank to — the readout said
        005 on a reel that stopped at 003. A counter that cannot be reached is
        a counter that lies. */
     const total = Math.max(1, Math.floor(travel / frameH) + 1);
-    const y = Math.min(Math.max(window.scrollY, 0), travel);
     const frame = Math.min(total, Math.floor(y / frameH) + 1);
-    return { y, travel, frameH, total, frame };
+    const stops = Array.from({ length: total }, (_, i) => i * frameH);
+    return { y, travel, total, frame, name: "", stops };
   }, []);
 
   const paint = useCallback(() => {
-    const { y, total, frame } = measure();
+    const { y, travel, total, frame, name } = measure();
 
     /*
      * Written to the three elements that use them, never to :root.
@@ -109,6 +178,27 @@ export function ReaderTransport() {
       face.current.style.rotate = `${(y * DEG_PER_PX).toFixed(2)}deg`;
     }
 
+    /*
+     * Film remaining on the feed spool, and wound onto the take-up.
+     *
+     * Quantised to 64 steps: the spools are radial gradients, which repaint
+     * more expensively than the linear ones elsewhere, and writing a new
+     * value every frame cost a dropped frame while cranking (24.1ms spike).
+     * A 64th of a spool's radius is well under a pixel of wound film, so
+     * nothing visible is given up.
+     */
+    const through = travel > 0 ? y / travel : 0;
+    const step = Math.round(through * 64) / 64;
+    if (step !== wound.current) {
+      wound.current = step;
+      for (const spool of spools.current) {
+        spool.style.setProperty(
+          "--wound",
+          (spool.dataset.spool === "take-up" ? step : 1 - step).toFixed(4),
+        );
+      }
+    }
+
     const pad = (n: number) => String(n).padStart(3, "0");
     if (readout.current) {
       const next = `${pad(frame)}/${pad(total)}`;
@@ -118,12 +208,22 @@ export function ReaderTransport() {
         readout.current.textContent = next;
       }
     }
+    if (label.current && label.current.textContent !== name) {
+      label.current.textContent = name;
+    }
     const el = crank.current;
     if (el) {
       el.setAttribute("aria-valuemin", "1");
       el.setAttribute("aria-valuemax", String(total));
       el.setAttribute("aria-valuenow", String(frame));
-      el.setAttribute("aria-valuetext", `Frame ${frame} of ${total}`);
+      /* Named frames announce their name — "Frame 5 of 8, what it moved" is
+         worth far more to someone listening than a bare number. */
+      el.setAttribute(
+        "aria-valuetext",
+        name
+          ? `Frame ${frame} of ${total}, ${name}`
+          : `Frame ${frame} of ${total}`,
+      );
     }
   }, [measure]);
 
@@ -149,14 +249,31 @@ export function ReaderTransport() {
     };
   }, [active, paint]);
 
-  /* Re-measure when the route changes: a new reel is a different length of
-     film, so the total is wrong until we look again. */
+  /* Re-survey when the route changes: a new reel has different frames in
+     different places, and their offsets are wrong until we look again. */
   useEffect(() => {
     if (!active) return;
     /* Two frames, because the new route's content has to lay out first. */
-    const id = requestAnimationFrame(() => requestAnimationFrame(paint));
+    const id = requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        survey();
+        paint();
+      }),
+    );
     return () => cancelAnimationFrame(id);
-  }, [active, pathname, paint]);
+  }, [active, pathname, survey, paint]);
+
+  /* Reflow moves every frame, so the offsets have to be taken again. Scroll
+     does not — which is why survey is not in the scroll handler. */
+  useEffect(() => {
+    if (!active) return;
+    const onResize = () => {
+      survey();
+      paint();
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [active, survey, paint]);
 
   /* ── Drag, with inertia ──────────────────────────────────────────────────
      Pointer events, so mouse drag and touch swipe are the same code path. */
@@ -227,11 +344,25 @@ export function ReaderTransport() {
      not a courtesy. */
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      const { frameH, travel } = measure();
+      const { travel, frame, stops } = measure();
+      /* Steps frame to frame rather than by a fixed distance, so on a
+         sectioned reel the crank lands on "What it moved" instead of
+         somewhere in the middle of it. */
       const step = (n: number) => {
         e.preventDefault();
+        const target = Math.min(
+          Math.max(frame - 1 + n, 0),
+          Math.max(stops.length - 1, 0),
+        );
+        /* Named frames are positioned at their element's top, so back the
+           scroll off by the reading line to put the section under it rather
+           than at the very top edge of the gate. */
+        const top = Math.min(
+          Math.max(stops[target] - window.innerHeight * READING_LINE + 4, 0),
+          travel,
+        );
         window.scrollTo({
-          top: Math.min(Math.max(window.scrollY + n * frameH, 0), travel),
+          top,
           behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
             .matches
             ? "auto"
@@ -273,6 +404,9 @@ export function ReaderTransport() {
         <span className="transport__frameNum" ref={readout}>
           001/001
         </span>
+        {/* Empty on an unsectioned reel, so it collapses rather than
+            reserving space for a name that is never coming. */}
+        <span className="transport__frameName" ref={label} />
       </span>
 
       <button

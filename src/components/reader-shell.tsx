@@ -41,14 +41,20 @@ export function ReaderShell() {
   useEffect(() => {
     if (mode !== "microfilm") return;
     const root = document.documentElement;
+    /* A case study is a cartridge and gets the mechanical sequence; every
+       other route is a reel already on the machine and just comes to focus. */
+    const cartridge = /^\/archive\/[^/]+$/.test(pathname);
+    const kind = cartridge ? "cartridge" : "reel";
+    const ms = cartridge ? 660 : 420;
+
     delete root.dataset.threading;
     /* one frame off, so the removal lands before the re-add */
     const id = requestAnimationFrame(() => {
-      root.dataset.threading = "";
+      root.dataset.threading = kind;
     });
     const done = window.setTimeout(() => {
       delete root.dataset.threading;
-    }, 420);
+    }, ms);
     return () => {
       cancelAnimationFrame(id);
       window.clearTimeout(done);
@@ -118,6 +124,12 @@ export function ReaderShell() {
             order and was covering these completely. */}
         <div className="reader__perf reader__perf--left" />
         <div className="reader__perf reader__perf--right" />
+
+        {/* Feed above, take-up below, flanking the crank they are geared to.
+            The film visibly moves from one to the other, which is the reel
+            progress indicator the machine would actually have. */}
+        <span className="reader__spool" data-spool="feed" />
+        <span className="reader__spool" data-spool="take-up" />
 
         {/* Screws sit above the bezel edges so they read as holding the
             housing together rather than as dots on a panel. */}

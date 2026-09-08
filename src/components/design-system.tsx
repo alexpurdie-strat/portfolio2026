@@ -233,6 +233,14 @@ const TEXTURE = [
     "Scroll position is the only state the transport has. The sprocket strips travel from it, the crank rotates from it, and the frame counter reads it \u2014 so drag, swipe, scroll and the arrow keys are four inputs to one number rather than four states that can disagree. Frames are even slices of the document, not semantic blocks: real frames are evenly spaced exposures, and slicing needs no content structure, so the counter is correct on a case study, a specimen page and a 404 alike. It counts off reachable travel, never document height \u2014 a counter you cannot crank to the end of is a counter that lies.",
   ],
   [
+    "A catalogued document has named frames",
+    "Where a page\u2019s sections have already been divided \u2014 a case study \u2014 those divisions *are* its frames, and the readout names the one under the reading line: Frame 4 of 8, Account. Anything uncatalogued falls back to even slices, so the counter is correct on the specimen page and a 404 too. Frames are marked as attributes on elements that already exist rather than as wrappers, because the prose becomes display:contents on a phone and the plates interleave through it by order \u2014 a new element in that flow would break the weaving.",
+  ],
+  [
+    "Sectioned is not snapped",
+    "The crank and the arrow keys advance frame to frame, landing on a section rather than somewhere in the middle of it. Free scrolling stays free: there is no scroll-snap anywhere in either mode. Snapping would be the first thing that changed how the writing is *read* rather than how it looks, and on the surface a reader spends longest on. Film being divided into frames is not a reason to take the scrollbar away.",
+  ],
+  [
     "The one permitted blur",
     "Loading a reel brings the lens to focus, and that is the single place on this site where anything is blurred. The rule against it is a rule about paper, and paper has no focus knob. It is brief, it happens to the panel rather than the words, and reduced motion keeps the settle and drops the defocus.",
   ],
