@@ -220,7 +220,10 @@ body::after {
   margin-bottom: calc(var(--tear-slack) * -1);
   overflow: hidden;
   isolation: isolate;
-  color: #414141;
+  /* Tokened, not hardcoded: identical to #414141 in the paper world, but
+     it has to become film density in microfilm mode like everything
+     else. Hardcoded, the entire header stayed paper-grey. */
+  color: var(--foreground);
 }
 
 /* Torn-paper texture (2077×365, drawn at x -79 / y -149 — i.e. horizontally
@@ -2982,10 +2985,467 @@ button {
    unmounts, and there is no second copy of any content to drift out of sync.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* The second mode's own tokens will be declared here in Phase 2, re-binding
-   the same names the paper world uses so components need no changes. */
+/* ── The second mode's tokens ───────────────────────────────────────────────
+   These re-bind the same names the paper world uses, so every component and
+   nearly every rule in this stylesheet needs no change at all. What was warm
+   paper becomes lit ground glass; what was pencil becomes the dense areas of
+   a film frame.
+
+   The palette is a tungsten lamp behind ground glass: warm at the hot centre,
+   cooler and greyer as the light falls off. That coolness is what separates it
+   from the paper world — same warmth of source, but glass rather than fibre. */
 html[data-mode="microfilm"] {
-  /* deliberately empty until the aesthetic is chosen */
+  /* Silver halide, not sepia. The neutral grey is the whole tell that this is
+     a photographic process rather than a warm-filtered version of the paper
+     world — the lamp supplies all the warmth there is, from above. */
+  --background: #cfccc2;
+  /* The film's dense areas. Darker than the paper world's ink because the
+     lamp's falloff darkens the panel, and this has to clear AA at the corners
+     as well as at the hotspot. */
+  --foreground: #17150f;
+
+  /* Every accent desaturated to a density. Microfilm has no colour to give,
+     so a coloured accent surviving into this mode reads instantly as a filter
+     laid over a colour site rather than as a photograph of one. */
+  --accent-green: #2f2f2b;
+  --accent-green-wash: #8f8f88;
+  --accent-amber: #46443c;
+  --accent-amber-wash: #a3a099;
+  --accent-orange: #3d3b33;
+  --mark-red: #2a2823;
+
+  /* the housing */
+  --reader-case: #6b685a;
+  --reader-case-lit: #817e6e;
+  --reader-case-dark: #434136;
+  --reader-screw: #9b9782;
+
+  /* How much of the viewport the machine takes up. Thicker than a border
+     needs to be — at 2.6rem it read as a picture frame rather than as a
+     housing with something inside it. */
+  --bezel: clamp(2rem, 4.2vw, 4.4rem);
+
+  /* Cool the imagery to monochrome. A colour photograph sitting in the gate
+     gives the whole fiction away. Static, never animated, so it rasterises
+     once per image rather than per frame. */
+  --plate-film: grayscale(1) contrast(1.04) brightness(0.99);
+}
+
+/* The paper's own whiteness, compressed to a film highlight.
+   Film holds far less range than paper: a sheet that reads as bright white on
+   a desk becomes the brightest *density* on the negative, not a blown-out
+   white, and it cools toward neutral. Left at rgba(252,252,252,.965) the
+   sheets read as paper laid on a tinted ground — which is exactly what the
+   first pass looked like. */
+html[data-mode="microfilm"] .sheet__paper {
+  background-image:
+    url("/tear-top.png"),
+    linear-gradient(rgba(232, 230, 223, 0.94), rgba(232, 230, 223, 0.94));
+}
+
+/* The ground itself. body already paints --background, so this only has to
+   add the optics. */
+html[data-mode="microfilm"] body {
+  /* the paper world's dust and light layers are the wrong material here */
+  background-image: none;
+}
+
+/* Content clears the housing so nothing is ever read through the bezel. */
+html[data-mode="microfilm"] body {
+  padding-left: var(--bezel);
+  padding-right: var(--bezel);
+  padding-top: var(--bezel);
+  padding-bottom: calc(var(--bezel) * 1.9);
+}
+
+html[data-mode="microfilm"] img {
+  filter: var(--plate-film);
+}
+
+/*
+ * Film has no light greys to spend on hierarchy.
+ *
+ * The paper world separates secondary text by lightening it — 0.65 opacity on
+ * a meta row reads as quiet on bright paper. Under the lamp's falloff the same
+ * 0.65 lands on an already-darkened panel and the two converge. So secondary
+ * text stays a density here and earns its quietness from size, spacing and
+ * letterform instead, which is what a photographic process would actually do.
+ */
+html[data-mode="microfilm"] :is(.facts__meta, .metrics__of, .page__lede--empty) {
+  opacity: 0.82;
+}
+
+/* Same reason, and these were the ones that actually broke: at 0.55 on a
+   panel the lamp has already darkened, .register__eyebrow measured 3.5:1
+   against a 4.5 floor. .masthead__eyebrow cleared at 5.4:1 but only at the
+   hotspot — deeper into the falloff it would not. They are already uppercase
+   and tracked, which is the hierarchy doing the work; the lightness was
+   belt-and-braces on paper and unaffordable here. */
+html[data-mode="microfilm"]
+  :is(
+    .register__eyebrow,
+    .masthead__eyebrow,
+    .site-header__navMark,
+    .page__quote footer,
+    .ds__sectionNum,
+    .ds__aside,
+    .ds__code--dim,
+    .ds__table th,
+    .ds__demoLabel,
+    .ruler__meta,
+    .ruler__role,
+    .ruler__wght,
+    .ds__plateSet > span
+  ) {
+  opacity: 0.85;
+}
+
+/* The rubbed-out note is meant to look erased, so it keeps most of its
+   fade — but not so much that the words are gone. */
+html[data-mode="microfilm"] .mnote[data-rubbed] .mnote__text {
+  opacity: 0.7;
+}
+
+/* ── Behind the content: the light ──────────────────────────────────────────
+   Fixed, so the lamp stays with the machine while the film moves past it.
+   All three layers are pointer-events: none and none of them ever sits above
+   text — the falloff darkens the panel, not the words. */
+.reader-ground {
+  position: fixed;
+  inset: 0;
+  /* Behind the page's own content but above the body background. Must be
+     negative: a positioned element at z-index 0 paints *above* non-positioned
+     block content in the same stacking context, which would put the lamp on
+     top of the text. */
+  z-index: -1;
+  pointer-events: none;
+}
+
+html:not([data-mode="microfilm"]) .reader-ground,
+html:not([data-mode="microfilm"]) .reader-falloff,
+html:not([data-mode="microfilm"]) .reader {
+  display: none;
+}
+
+/* The lamp's warm centre. This one *is* behind the content, so it only lights
+   the exposed ground — the falloff that has to cross the whole image lives in
+   .reader__falloff, above. */
+.reader-ground__lamp {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    78% 62% at 50% 38%,
+    rgb(255 250 232 / 0.5) 0%,
+    rgb(250 244 224 / 0.22) 46%,
+    rgb(250 244 224 / 0) 78%
+  );
+}
+
+/* Dust: on the platen, in the gate, on the glass. Sharp and still, because it
+   is a physical speck sitting in focus — the one thing in the whole image that
+   is genuinely not moving. */
+.reader-ground__dust {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='620' height='620'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' seed='7'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.42'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='620' height='620' filter='url(%23p)'/%3E%3C/svg%3E");
+  background-size: 620px 620px;
+}
+
+/* Chromatic aberration, kept honest: only the last few per cent of the field,
+   where a real lens actually gives up. Two offset gradients rather than a
+   filter, so it costs a paint and nothing more. */
+.reader-ground__fringe {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      104% 100% at 49% 50%,
+      rgb(255 235 205 / 0) 88%,
+      rgb(255 214 150 / 0.13) 100%
+    ),
+    radial-gradient(
+      100% 104% at 51% 50%,
+      rgb(200 224 255 / 0) 88%,
+      rgb(150 190 255 / 0.11) 100%
+    );
+}
+
+/* ── Above the content: the glass and the housing ───────────────────────────
+   The only thing here that crosses the readable area is the sheen, at an
+   opacity low enough to measure as no contrast change. */
+.reader {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+}
+
+/*
+ * The lamp's falloff — the single thing that makes this read as projected
+ * light rather than as a tinted page.
+ *
+ * It has to be above the content, because the page paints its own opaque
+ * sheets and anything behind them is invisible. Above the content it would
+ * normally be a legibility problem; multiply is what makes it safe. Multiply
+ * scales text and ground by the same factor, so for dark-on-light the
+ * contrast *ratio* is preserved rather than eroded — measured at the four
+ * corners as well as the centre before this shipped.
+ */
+.reader-falloff {
+  position: fixed;
+  inset: 0;
+  /* between the page content and the housing */
+  z-index: 60;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  background: radial-gradient(
+    96% 78% at 50% 38%,
+    rgb(255 255 255) 0%,
+    rgb(250 249 245) 40%,
+    rgb(228 225 216) 66%,
+    rgb(198 194 183) 84%,
+    /* Was 158 — a full stop of falloff, which pushed the deepest corners
+       close to the AA floor for anything already quietened. 176 keeps the
+       lamp obvious and leaves the margin. */
+    rgb(176 172 160) 100%
+  );
+}
+
+/*
+ * The gate. A projected frame has a hard edge where the film's aperture ends,
+ * and it is the difference between "a page with a border" and "one frame in a
+ * machine". A hairline, inset just off the housing.
+ */
+.reader__gate {
+  position: absolute;
+  inset: var(--bezel);
+  bottom: calc(var(--bezel) * 1.9);
+  box-shadow:
+    /* the aperture's own edge, slightly soft because it is projected */
+    0 0 0 1px rgb(40 38 30 / 0.28),
+    0 0 6px 2px rgb(40 38 30 / 0.1) inset;
+}
+
+.reader__sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    118deg,
+    rgb(255 255 255 / 0.055) 0%,
+    rgb(255 255 255 / 0.015) 26%,
+    rgb(255 255 255 / 0) 46%,
+    rgb(255 255 255 / 0) 100%
+  );
+}
+
+/* The housing. Enamelled steel: a soft vertical gradient, a lit top edge, and
+   a hard shadow where it overhangs the glass. */
+.reader__bezel {
+  position: absolute;
+  background: linear-gradient(
+    180deg,
+    var(--reader-case-lit) 0%,
+    var(--reader-case) 46%,
+    var(--reader-case-dark) 100%
+  );
+}
+
+.reader__bezel--top,
+.reader__bezel--bottom {
+  left: 0;
+  right: 0;
+  height: var(--bezel);
+}
+
+.reader__bezel--top {
+  top: 0;
+  /* the housing overhangs the glass, so it casts down onto it */
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.16) inset,
+    0 6px 12px -3px rgb(20 18 12 / 0.4);
+}
+
+.reader__bezel--bottom {
+  bottom: 0;
+  height: calc(var(--bezel) * 1.9);
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  /* Left padding clears the mode switch, which is also bottom-left and was
+     sitting on top of the nameplate. */
+  padding: 0 clamp(0.7rem, 2vw, 1.5rem) 0 13.5rem;
+  background: linear-gradient(
+    180deg,
+    var(--reader-case-dark) 0%,
+    var(--reader-case) 34%,
+    var(--reader-case-lit) 100%
+  );
+  box-shadow:
+    0 -1px 0 rgb(255 255 255 / 0.12) inset,
+    0 -6px 12px -3px rgb(20 18 12 / 0.36);
+}
+
+.reader__bezel--left,
+.reader__bezel--right {
+  top: 0;
+  bottom: 0;
+  width: var(--bezel);
+  background: linear-gradient(
+    90deg,
+    var(--reader-case-lit) 0%,
+    var(--reader-case) 52%,
+    var(--reader-case-dark) 100%
+  );
+}
+
+.reader__bezel--left {
+  left: 0;
+  box-shadow: 5px 0 11px -3px rgb(20 18 12 / 0.34);
+}
+
+.reader__bezel--right {
+  right: 0;
+  background: linear-gradient(
+    270deg,
+    var(--reader-case-lit) 0%,
+    var(--reader-case) 52%,
+    var(--reader-case-dark) 100%
+  );
+  box-shadow: -5px 0 11px -3px rgb(20 18 12 / 0.34);
+}
+
+/* Cooling slots, punched not printed: repeating hard-edged gradient. */
+.reader__vents {
+  position: absolute;
+  top: 50%;
+  right: clamp(0.9rem, 3vw, 2.4rem);
+  translate: 0 -50%;
+  width: clamp(3.4rem, 11vw, 7rem);
+  height: 0.62rem;
+  /* Punched slots, not a dotted line: wide enough to read as an opening, with
+     a lit lower lip so each one looks cut through the steel. */
+  background: repeating-linear-gradient(
+    90deg,
+    rgb(24 22 15 / 0.62) 0 3px,
+    rgb(24 22 15 / 0) 3px 4px,
+    rgb(255 255 255 / 0.13) 4px 5px,
+    rgb(24 22 15 / 0) 5px 8px
+  );
+  border-radius: 1px;
+}
+
+/* Stamped hardware type. Small, but the site's 44px rule does not apply —
+   none of this is a control. */
+.reader__nameplate,
+.reader__tag {
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: clamp(0.44rem, 1.15vw, 0.56rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* engraved: dark ink with a lit edge under it */
+  color: #262418;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.16);
+}
+
+.reader__tag {
+  margin-left: auto;
+  opacity: 0.72;
+}
+
+.reader__nameplate-sep {
+  margin: 0 0.4em;
+  opacity: 0.5;
+}
+
+/* Power lamp on the housing, lit whenever the machine is running. */
+.reader__lamp-indicator {
+  width: 0.36rem;
+  height: 0.36rem;
+  flex: none;
+  border-radius: 50%;
+  background: #ff8422;
+  box-shadow:
+    0 0 0 1px rgb(40 18 0 / 0.5) inset,
+    0 0 7px 1px rgb(255 132 34 / 0.6);
+}
+
+/* Screws, one per corner, holding the housing to the chassis. Each is a
+   slotted head: a domed gradient with a cut across it. */
+.reader__screw {
+  position: absolute;
+  width: 0.44rem;
+  height: 0.44rem;
+  border-radius: 50%;
+  background:
+    linear-gradient(
+      132deg,
+      rgb(255 255 255 / 0.5) 0%,
+      rgb(255 255 255 / 0) 48%
+    ),
+    var(--reader-screw);
+  box-shadow:
+    0 1px 1px rgb(20 18 12 / 0.5),
+    0 -1px 1px rgb(255 255 255 / 0.2) inset;
+}
+
+/* the slot */
+.reader__screw::after {
+  content: "";
+  position: absolute;
+  inset: 45% 14%;
+  background: rgb(30 28 20 / 0.62);
+  border-radius: 1px;
+  rotate: 34deg;
+}
+
+.reader__screw--tl {
+  top: calc(var(--bezel) * 0.5);
+  left: calc(var(--bezel) * 0.5);
+  translate: -50% -50%;
+}
+
+.reader__screw--tr {
+  top: calc(var(--bezel) * 0.5);
+  right: calc(var(--bezel) * 0.5);
+  translate: 50% -50%;
+}
+
+.reader__screw--bl {
+  bottom: calc(var(--bezel) * 0.95);
+  left: calc(var(--bezel) * 0.5);
+  translate: -50% 50%;
+}
+
+.reader__screw--br {
+  bottom: calc(var(--bezel) * 0.95);
+  right: calc(var(--bezel) * 0.5);
+  translate: 50% 50%;
+}
+
+/* Phones: the machine is still present, but it cannot eat the content area,
+   so the housing thins and the hardware type goes. */
+@media (max-width: 700px) {
+  html[data-mode="microfilm"] {
+    --bezel: 0.85rem;
+  }
+
+  .reader__vents,
+  .reader__tag {
+    display: none;
+  }
+
+  .reader__nameplate {
+    font-size: 0.44rem;
+  }
+
+  .reader__screw {
+    width: 0.32rem;
+    height: 0.32rem;
+  }
 }
 
 /* ── The changeover ─────────────────────────────────────────────────────────

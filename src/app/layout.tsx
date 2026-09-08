@@ -12,6 +12,7 @@ import { PaperFilters } from "@/components/paper-filters";
 import { InlineScript } from "@/components/inline-script";
 import { ModeSwitch } from "@/components/mode-switch";
 import { PaperMotion } from "@/components/paper-motion";
+import { ReaderShell } from "@/components/reader-shell";
 import { MODE_SCRIPT, ModeProvider } from "@/lib/mode";
 import "./globals.css";
 
@@ -71,6 +72,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ModeProvider>
           <PaperFilters />
           <PaperMotion />
+          {/* Purely decorative and CSS-gated, so it renders in both modes and
+              costs nothing in Studio. It holds no content and no image
+              assets — all gradients — so there is nothing to lazy-load and
+              nothing to pop in when the machine is switched on. */}
+          <ReaderShell />
           <ModeSwitch />
           {children}
         </ModeProvider>
