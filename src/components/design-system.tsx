@@ -213,6 +213,30 @@ const TEXTURE = [
     "Every torn edge is alpha from a photographed torn sheet. Never a clip-path zig-zag, never an SVG approximation. The irregularity is the point and it cannot be faked convincingly at this scale.",
   ],
   [
+    "The second machine",
+    "There are two ways to read this site and only one set of content. Studio Mode is the paper desk. Microfilm Mode is a reader-printer: a lamp shining up through physical film, through a lens, onto ground glass. The mode is an attribute on the root element and CSS does the rest \u2014 the same components emit the same DOM in both, so parity is structural rather than promised, and switching cannot lose your place because nothing unmounts. A microform reader is an *optical* device, which is the whole reason the mode is allowed to exist: there is no phosphor, no scanline, no electron beam, so \u201cthe page is a surface, not a screen\u201d survives intact. Ground glass is a surface. The rules that follow are what that machine imposes.",
+  ],
+  [
+    "Silver, not sepia",
+    "The second mode is neutral grey and every accent desaturates to a density. A warm tint over the paper palette reads instantly as a filter laid on a colour site; a neutral one reads as a photograph of it. Imagery is greyscaled for the same reason \u2014 a colour screenshot sitting in the gate gives the fiction away in one glance. The paper\u2019s own whiteness compresses too: film holds far less range than paper, so a sheet that is near-white on the desk becomes the brightest *density* on the negative, not a blown-out white.",
+  ],
+  [
+    "Film has no light greys",
+    "The paper world separates secondary text by lightening it \u2014 an eyebrow at 0.55 opacity reads as quiet on bright paper. Under a lamp the same value lands on a panel the falloff has already darkened and the two converge; one eyebrow measured 3.5:1 against a 4.5 floor. So in the second mode quiet text stays a density and earns its quietness from size, tracking and letterform instead. Hierarchy by lightness is a luxury of reflected light.",
+  ],
+  [
+    "Light falls off, and multiplies",
+    "The lamp\u2019s hotspot and falloff is the one thing that makes the panel read as projected rather than tinted, and it has to be painted *above* the content, because the page lays down its own opaque sheets and anything behind them is invisible. It is safe there only because it multiplies: multiply scales text and ground by the same factor, so for dark-on-light the contrast ratio is preserved rather than eroded. Measured across six routes, the worst text on the panel sits at 7.9:1 against a 4.5 floor. Nothing else is ever allowed above the reading area except the glass sheen, at an opacity that measures as no change at all.",
+  ],
+  [
+    "One number moves the film",
+    "Scroll position is the only state the transport has. The sprocket strips travel from it, the crank rotates from it, and the frame counter reads it \u2014 so drag, swipe, scroll and the arrow keys are four inputs to one number rather than four states that can disagree. Frames are even slices of the document, not semantic blocks: real frames are evenly spaced exposures, and slicing needs no content structure, so the counter is correct on a case study, a specimen page and a 404 alike. It counts off reachable travel, never document height \u2014 a counter you cannot crank to the end of is a counter that lies.",
+  ],
+  [
+    "The one permitted blur",
+    "Loading a reel brings the lens to focus, and that is the single place on this site where anything is blurred. The rule against it is a rule about paper, and paper has no focus knob. It is brief, it happens to the panel rather than the words, and reduced motion keeps the settle and drops the defocus.",
+  ],
+  [
     "What survives a phone",
     "Below 1080px there is no right-hand lane, so the three things that lived in it are translated rather than dropped. A margin note becomes an interjection: still the hand, still tilted, sitting in the flow where it falls in the DOM and breaking a little out of the measure so it can never be mistaken for body copy \u2014 it used to be display:none, which meant a phone got none of the handwriting, and the handwriting is the voice. Case-study plates interleave with the paragraphs rather than queueing up after them, so evidence still arrives beside the claim it supports; both wrappers become display:contents and order does the weaving. And below 700px the hero is recomposed, not scaled: one cutout, one annotation, a larger headline, because the wide canvas places its annotations by percentage and they land near 8px when squeezed. The depth trail and the plate pile stay behind on the wide lane \u2014 there is nothing for them to be beside.",
   ],

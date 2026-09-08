@@ -1,5 +1,10 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+import { ReaderTransport } from "@/components/reader-transport";
+import { useMode } from "@/lib/mode";
+
 /*
  * The machine.
  *
@@ -23,6 +28,34 @@
  * measure as no contrast change at all.
  */
 export function ReaderShell() {
+  const { mode } = useMode();
+  const pathname = usePathname();
+
+  /*
+   * Loading a new reel: the lens comes to focus.
+   *
+   * A transient attribute rather than a class React owns, because the
+   * animation has to be able to restart on a repeat navigation to the same
+   * route — removing and re-adding the attribute is what re-triggers it.
+   */
+  useEffect(() => {
+    if (mode !== "microfilm") return;
+    const root = document.documentElement;
+    delete root.dataset.threading;
+    /* one frame off, so the removal lands before the re-add */
+    const id = requestAnimationFrame(() => {
+      root.dataset.threading = "";
+    });
+    const done = window.setTimeout(() => {
+      delete root.dataset.threading;
+    }, 420);
+    return () => {
+      cancelAnimationFrame(id);
+      window.clearTimeout(done);
+      delete root.dataset.threading;
+    };
+  }, [mode, pathname]);
+
   return (
     <>
       {/* ── behind the content ── */}
@@ -54,12 +87,18 @@ export function ReaderShell() {
       <div className="reader" aria-hidden>
         {/* the hard edge of the film's aperture */}
         <div className="reader__gate" />
+
         {/* the glass you are looking through */}
         <div className="reader__sheen" />
 
         {/* The housing. Four edges rather than one framed box, so each can
             carry its own hardware and none of them has to clip content. */}
         <div className="reader__bezel reader__bezel--top">
+          <span className="reader__tag" translate="no">
+            Accession AP&#8209;2026&#8209;0031
+            <span className="reader__nameplate-sep">·</span>
+            Catalogued 09&#183;2026
+          </span>
           <span className="reader__vents" />
         </div>
         <div className="reader__bezel reader__bezel--right" />
@@ -72,12 +111,13 @@ export function ReaderShell() {
             Reader&#8209;Printer
           </span>
           <span className="reader__lamp-indicator" />
-          <span className="reader__tag" translate="no">
-            Accession AP&#8209;2026&#8209;0031
-            <span className="reader__nameplate-sep">·</span>
-            Catalogued 09&#183;2026
-          </span>
+          <ReaderTransport />
         </div>
+
+        {/* After the bezels, not before: the housing is painted later in DOM
+            order and was covering these completely. */}
+        <div className="reader__perf reader__perf--left" />
+        <div className="reader__perf reader__perf--right" />
 
         {/* Screws sit above the bezel edges so they read as holding the
             housing together rather than as dots on a panel. */}
