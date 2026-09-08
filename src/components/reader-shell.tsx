@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { ReaderLoupe } from "@/components/reader-loupe";
 import { ReaderTransport } from "@/components/reader-transport";
 import { useMode } from "@/lib/mode";
 
@@ -74,6 +75,8 @@ export function ReaderShell() {
         {/* where the lens stops correcting: a faint warm/cool split, only in
             the last few per cent of the field */}
         <div className="reader-ground__fringe" />
+        {/* grain in the emulsion — only visible while the film is running */}
+        <div className="reader-ground__agitate" />
       </div>
 
       {/* ── above the content ── */}
@@ -89,6 +92,10 @@ export function ReaderShell() {
         opaquely straight over the page.
       */}
       <div className="reader-falloff" aria-hidden />
+
+      {/* Above the falloff and below the housing: a lens resting on the glass
+          is in front of the image, but still inside the machine. */}
+      <ReaderLoupe />
 
       <div className="reader" aria-hidden>
         {/* the hard edge of the film's aperture */}

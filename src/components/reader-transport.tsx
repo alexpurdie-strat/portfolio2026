@@ -82,8 +82,14 @@ export function ReaderTransport() {
   const face = useRef<HTMLSpanElement | null>(null);
   const perfs = useRef<HTMLElement[]>([]);
   const spools = useRef<HTMLElement[]>([]);
+  const agitate = useRef<HTMLElement | null>(null);
   /* Last written spool step, so an unchanged value costs no repaint. */
   const wound = useRef(-1);
+  /* Film speed, decayed rather than sampled: a raw per-frame delta flickers,
+     and grain that flickers reads as a rendering fault rather than as film. */
+  const speed = useRef(0);
+  const lastY = useRef(0);
+  const lastAgitation = useRef(-1);
   /* Document offsets of each named frame, newest measurement wins. Rebuilt on
      route change and resize, never per scroll frame. */
   const marks = useRef<{ top: number; name: string }[]>([]);
@@ -96,6 +102,9 @@ export function ReaderTransport() {
     );
     spools.current = Array.from(
       document.querySelectorAll<HTMLElement>("[data-spool]"),
+    );
+    agitate.current = document.querySelector<HTMLElement>(
+      ".reader-ground__agitate",
     );
   }, []);
 
@@ -199,6 +208,29 @@ export function ReaderTransport() {
       }
     }
 
+    /*
+     * Emulsion grain, driven by how fast the film is running.
+     *
+     * Rises with speed and decays toward nothing at rest, so a flick of the
+     * crank agitates the frame and it settles again on its own. Quantised
+     * like the spools — 16 steps here, because opacity is composited and
+     * cheap but a fresh value every frame is still a write nobody sees.
+     */
+    const delta = Math.abs(y - lastY.current);
+    lastY.current = y;
+    /* asymmetric on purpose: grain arrives with the motion and lingers a
+       beat behind it, the way a mechanism does */
+    speed.current =
+      delta > speed.current
+        ? delta
+        : speed.current * 0.86 + delta * 0.14;
+    const agitation = Math.min(1, speed.current / 46);
+    const rung = Math.round(agitation * 16) / 16;
+    if (rung !== lastAgitation.current && agitate.current) {
+      lastAgitation.current = rung;
+      agitate.current.style.setProperty("--agitation", rung.toFixed(3));
+    }
+
     const pad = (n: number) => String(n).padStart(3, "0");
     if (readout.current) {
       const next = `${pad(frame)}/${pad(total)}`;
@@ -232,13 +264,23 @@ export function ReaderTransport() {
   useEffect(() => {
     if (!active) return;
     let queued = false;
+    /*
+     * Scroll queues a paint; the paint keeps queueing itself while the grain
+     * is still settling. Without that tail the agitation freezes at whatever
+     * it was when the last scroll event fired and never comes back down.
+     */
+    const tick = () => {
+      queued = false;
+      paint();
+      if (speed.current > 0.4) {
+        queued = true;
+        requestAnimationFrame(tick);
+      }
+    };
     const onScroll = () => {
       if (queued) return;
       queued = true;
-      requestAnimationFrame(() => {
-        queued = false;
-        paint();
-      });
+      requestAnimationFrame(tick);
     };
     paint();
     window.addEventListener("scroll", onScroll, { passive: true });

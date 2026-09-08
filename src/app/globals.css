@@ -4181,3 +4181,137 @@ html[data-mode="microfilm"][data-threading="cartridge"] .reader__gate::after {
     display: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PHASE 5 — THE LOUPE, AND GRAIN THAT ANSWERS TO MOTION
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── The loupe ──────────────────────────────────────────────────────────────
+   A lens held against the glass. It carries the film's own crop, at the
+   film's own angle, and it is the cursor while it is held — a native arrow
+   floating inside a magnifier would give away that neither is real. */
+.loupe {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8.5rem;
+  height: 8.5rem;
+  z-index: 76;
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: 0;
+  scale: 0.92;
+  /* The glass, the brass ring it is set in, and the shadow it casts on the
+     panel it is resting against. */
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.5) inset,
+    0 0 0 3px rgb(94 90 72 / 0.85),
+    0 0 0 4px rgb(150 145 120 / 0.6),
+    0 6px 18px -4px rgb(24 22 14 / 0.55);
+  transition:
+    opacity 140ms var(--ease-press),
+    scale 180ms var(--ease-press);
+  /* Not the whole element: `translate` is written per frame by the component,
+     so it must not be part of a shorthand anything else owns. */
+}
+
+.loupe[data-holding] {
+  opacity: 1;
+  scale: 1;
+}
+
+/* The magnified film. A separate layer so the ring above can stay put while
+   the crop inside it turns to the plate's angle. */
+.loupe::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background-image: var(--lens-src, none);
+  background-repeat: no-repeat;
+  background-size: var(--lens-w, auto) var(--lens-h, auto);
+  background-position: var(--lens-x, 0) var(--lens-y, 0);
+  /* Same film response as the plate it came from, plus the little extra
+     contrast a lens gathers. */
+  filter: grayscale(1) contrast(1.14) brightness(1.03);
+  rotate: var(--lens-turn, 0deg);
+}
+
+/* A convex lens catches the lamp across its face. */
+.loupe::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    128deg,
+    rgb(255 255 255 / 0.22) 0%,
+    rgb(255 255 255 / 0.05) 30%,
+    rgb(255 255 255 / 0) 52%,
+    rgb(60 56 42 / 0.08) 100%
+  );
+}
+
+/* ── The cursor ─────────────────────────────────────────────────────────────
+   A loupe glyph on the machine's surfaces, and the native caret over anything
+   you would want to read or select. A magnifier cursor over body copy is the
+   sort of detail that wins a screenshot and loses a reader. */
+@media (hover: hover) and (pointer: fine) {
+  html[data-mode="microfilm"] body {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cg fill='none' stroke='%23201e14' stroke-width='1.6'%3E%3Ccircle cx='10.5' cy='10.5' r='6.6' fill='rgba(255,255,255,0.28)'/%3E%3Cpath d='M15.4 15.4 L22 22' stroke-linecap='round' stroke-width='2.2'/%3E%3C/g%3E%3Ccircle cx='8.3' cy='8' r='1.7' fill='rgba(255,255,255,0.55)'/%3E%3C/svg%3E")
+        10 10,
+      auto;
+  }
+
+  html[data-mode="microfilm"]
+    :is(p, h1, h2, h3, li, blockquote, pre, code, dd, dt, figcaption, label) {
+    cursor: text;
+  }
+
+  html[data-mode="microfilm"] :is(a, button, [role="slider"], summary) {
+    cursor: pointer;
+  }
+
+  html[data-mode="microfilm"] .transport__crank {
+    cursor: grab;
+  }
+
+  html[data-mode="microfilm"] .transport__crank[data-turning] {
+    cursor: grabbing;
+  }
+
+  /* While the loupe is out, it is the pointer. */
+  html[data-mode="microfilm"]:has(.loupe[data-holding]) .plate-pile__img {
+    cursor: none;
+  }
+}
+
+/* ── Grain that answers to motion ───────────────────────────────────────────
+   Two kinds, and the difference is the point. Dust on the platen and the
+   glass sits still — it is the one thing in the image genuinely not moving.
+   Grain in the emulsion belongs to the film, so it only shows while the film
+   is running, and it streaks with the direction of travel. */
+.reader-ground__agitate {
+  position: absolute;
+  inset: -8%;
+  opacity: calc(var(--agitation, 0) * 0.34);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='340'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9 0.24' numOctaves='2' seed='19'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='340' height='340' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 340px 340px;
+  /* vertical smear, because the film runs vertically */
+  scale: 1 1.4;
+  /* No will-change: opacity is composited anyway, and pinning a
+     viewport-sized noise layer to its own compositor layer for the whole
+     session costs memory to save nothing. */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Grain that appears and disappears is movement. The still dust stays. */
+  .reader-ground__agitate {
+    display: none;
+  }
+
+  .loupe {
+    transition: opacity 1ms linear;
+  }
+}
