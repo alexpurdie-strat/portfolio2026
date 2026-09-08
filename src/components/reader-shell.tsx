@@ -4,7 +4,9 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { ReaderLoupe } from "@/components/reader-loupe";
 import { ReaderTransport } from "@/components/reader-transport";
+import { SoundSwitch } from "@/components/sound-switch";
 import { useMode } from "@/lib/mode";
+import * as audio from "@/lib/reader-audio";
 
 /*
  * The machine.
@@ -52,6 +54,9 @@ export function ReaderShell() {
     /* one frame off, so the removal lands before the re-add */
     const id = requestAnimationFrame(() => {
       root.dataset.threading = kind;
+      /* A cartridge seats; a reel is already on the machine. */
+      if (cartridge) audio.thunk();
+      audio.nudgeIdle();
     });
     const done = window.setTimeout(() => {
       delete root.dataset.threading;
@@ -124,6 +129,7 @@ export function ReaderShell() {
             Reader&#8209;Printer
           </span>
           <span className="reader__lamp-indicator" />
+          <SoundSwitch />
           <ReaderTransport />
         </div>
 

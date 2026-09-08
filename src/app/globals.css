@@ -3024,6 +3024,10 @@ html[data-mode="microfilm"] {
      needs to be — at 2.6rem it read as a picture frame rather than as a
      housing with something inside it. */
   --bezel: clamp(2rem, 4.2vw, 4.4rem);
+  /* The bottom edge carries the controls, so it is deeper than the others and
+     has its own token — a phone overrides it to a floor rather than a
+     multiple. */
+  --bezel-foot: calc(var(--bezel) * 1.9);
 
   /* Cool the imagery to monochrome. A colour photograph sitting in the gate
      gives the whole fiction away. Static, never animated, so it rasterises
@@ -3055,7 +3059,7 @@ html[data-mode="microfilm"] body {
   padding-left: var(--bezel);
   padding-right: var(--bezel);
   padding-top: var(--bezel);
-  padding-bottom: calc(var(--bezel) * 1.9);
+  padding-bottom: calc(var(--bezel-foot) + 0.5rem);
 }
 
 html[data-mode="microfilm"] img {
@@ -3220,7 +3224,7 @@ html:not([data-mode="microfilm"]) .reader {
 .reader__gate {
   position: absolute;
   inset: var(--bezel);
-  bottom: calc(var(--bezel) * 1.9);
+  bottom: var(--bezel-foot);
   box-shadow:
     /* the aperture's own edge, slightly soft because it is projected */
     0 0 0 1px rgb(40 38 30 / 0.28),
@@ -3268,7 +3272,7 @@ html:not([data-mode="microfilm"]) .reader {
 
 .reader__bezel--bottom {
   bottom: 0;
-  height: calc(var(--bezel) * 1.9);
+  height: var(--bezel-foot);
   display: flex;
   align-items: center;
   gap: 0.65rem;
@@ -3431,13 +3435,13 @@ html:not([data-mode="microfilm"]) .reader {
 }
 
 .reader__screw--bl {
-  bottom: calc(var(--bezel) * 0.95);
+  bottom: calc(var(--bezel-foot) * 0.5);
   left: calc(var(--bezel) * 0.5);
   translate: -50% 50%;
 }
 
 .reader__screw--br {
-  bottom: calc(var(--bezel) * 0.95);
+  bottom: calc(var(--bezel-foot) * 0.5);
   right: calc(var(--bezel) * 0.5);
   translate: 50% 50%;
 }
@@ -3447,6 +3451,15 @@ html:not([data-mode="microfilm"]) .reader {
 @media (max-width: 700px) {
   html[data-mode="microfilm"] {
     --bezel: 0.85rem;
+    /*
+     * The bottom housing is the one edge that cannot just get thinner.
+     * At 1.9x a 0.85rem bezel it came out 26px, and a 44px control does not
+     * fit in 26px of steel — the sound switch failed its tap target and the
+     * only ways out were a dead zone over the content above it or no mute
+     * control on a phone at all. If the machine has controls, the housing has
+     * to be big enough to press them. 3.4rem costs 3% of an 844px viewport.
+     */
+    --bezel-foot: 3.4rem;
   }
 
   .reader__vents,
@@ -3723,7 +3736,7 @@ html[data-mode="microfilm"] .mode-switch__lamp {
   /* Bounded by the housing vertically. Full-height they ran straight over the
      bottom bezel, which put sprocket holes on the nameplate. */
   top: calc(var(--bezel) * 0.5);
-  bottom: calc(var(--bezel) * 1.4);
+  bottom: calc(var(--bezel-foot) * 0.75);
   width: calc(var(--bezel) * 0.46);
   overflow: hidden;
 }
@@ -4313,5 +4326,91 @@ html[data-mode="microfilm"][data-threading="cartridge"] .reader__gate::after {
 
   .loupe {
     transition: opacity 1ms linear;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PHASE 6 — SOUND
+
+   The control only. Every sound is synthesised in src/lib/reader-audio.ts —
+   no files, nothing to preload, and nothing constructed at all until this
+   switch is pressed.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sound-switch {
+  display: none;
+  align-items: center;
+  gap: 0.34rem;
+  flex: none;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid rgb(28 26 18 / 0.34);
+  border-radius: 2px;
+  background: linear-gradient(
+    178deg,
+    rgb(255 255 255 / 0.12) 0%,
+    rgb(20 19 13 / 0.12) 100%
+  );
+  /* .reader is pointer-events: none; this is a control, so it opts back in. */
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html[data-mode="microfilm"] .sound-switch {
+  display: flex;
+}
+
+.sound-switch:focus-visible {
+  outline: 2px solid #1a1810;
+  outline-offset: 3px;
+}
+
+/* A punched speaker grille, same tooling as the vents. */
+.sound-switch__grille {
+  width: 0.85rem;
+  height: 0.6rem;
+  border-radius: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgb(20 19 13 / 0.5) 0 2px,
+    rgb(255 255 255 / 0.1) 2px 3px,
+    rgb(20 19 13 / 0) 3px 4px
+  );
+}
+
+/* Dark glass off; lit when the machine is audible. */
+.sound-switch__lamp {
+  width: 0.26rem;
+  height: 0.26rem;
+  border-radius: 50%;
+  background: #4f4c3d;
+  box-shadow: 0 1px 1px rgb(0 0 0 / 0.4) inset;
+  transition:
+    background var(--dur-weight) var(--ease-ink),
+    box-shadow var(--dur-weight) var(--ease-ink);
+}
+
+.sound-switch[aria-pressed="true"] .sound-switch__lamp {
+  background: #8fdc6a;
+  box-shadow:
+    0 0 0 1px rgb(20 60 10 / 0.45),
+    0 0 6px 1px rgb(143 220 106 / 0.6);
+}
+
+@media (pointer: coarse) {
+  /* Same answer as everywhere else on this site: the plate stays small and an
+     invisible pseudo-element carries the 44px target. */
+  .sound-switch {
+    position: relative;
+  }
+
+  .sound-switch::before {
+    content: "";
+    position: absolute;
+    /* Measured: the plate is 21px tall, so it needs 11.5px each side to
+       clear 44. 0.78rem gives it with a little to spare. */
+    inset: -0.78rem -0.45rem;
+    pointer-events: auto;
   }
 }

@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
+import * as audio from "@/lib/reader-audio";
 import { useMode } from "@/lib/mode";
 
 /*
@@ -231,6 +232,10 @@ export function ReaderTransport() {
       agitate.current.style.setProperty("--agitation", rung.toFixed(3));
     }
 
+    /* The whir follows the same speed the grain does, so what you hear and
+       what you see are one measurement rather than two that can disagree. */
+    audio.setSpeed(Math.min(1, speed.current / 34));
+
     const pad = (n: number) => String(n).padStart(3, "0");
     if (readout.current) {
       const next = `${pad(frame)}/${pad(total)}`;
@@ -238,6 +243,11 @@ export function ReaderTransport() {
          every scroll frame. */
       if (readout.current.textContent !== next) {
         readout.current.textContent = next;
+        /* One detent per frame passing the gate. Driven off the readout
+           changing rather than off scroll, so the clicks land exactly where
+           the counter does. */
+        audio.click();
+        audio.nudgeIdle();
       }
     }
     if (label.current && label.current.textContent !== name) {
