@@ -4038,11 +4038,42 @@ html[data-mode="microfilm"] .mode-switch__well {
     gap: 0.55rem;
   }
 
-  /* The side bezel is 0.85rem on a phone — nothing to mount a crank on. The
-     readout stays; scroll and swipe already move the film, and the crank was
-     never the only input. */
+  /*
+   * The crank comes off the flank and into the foot.
+   *
+   * The side bezel is 0.85rem on a phone — nothing to mount a 38px dial on.
+   * Hiding it was the first answer and the wrong one: the brief says the
+   * crank *becomes* swipe-driven, not that it goes away, and native scroll
+   * alone leaves a phone with a readout it cannot touch. The foot is 54px
+   * now that it has to hold a 44px control, which is exactly enough.
+   */
   .transport__crank {
-    display: none;
+    /* `relative`, not `static`: it has to be back in the flex row *and* stay
+       a positioning context, or the hit-area pseudo-element below anchors to
+       the housing instead of the dial and the 44px target silently fails. */
+    position: relative;
+    top: auto;
+    right: auto;
+    translate: none;
+    width: 2.15rem;
+    height: 2.15rem;
+    /* it is back in the readout's flex row */
+    order: 2;
+  }
+
+  /* Same answer as every other control here: the dial stays sized to the
+     housing and an invisible pseudo-element carries the 44px target. */
+  .transport__crank::before {
+    content: "";
+    position: absolute;
+    inset: -0.35rem;
+    pointer-events: auto;
+  }
+
+  .transport {
+    /* the dial reads as the thing that drives the numbers beside it */
+    flex-direction: row-reverse;
+    gap: 0.5rem;
   }
 
   .reader__perf {

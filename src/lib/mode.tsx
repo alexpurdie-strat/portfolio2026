@@ -137,12 +137,37 @@ export function ModeProvider({ children }: { children: React.ReactNode }) {
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
+    /*
+     * Keep the reader's place across the reflow.
+     *
+     * The machine's housing occupies real space, so entering Microfilm Mode
+     * adds a bezel's worth of padding above the content and everything slides
+     * down — measured at 59px, which is a visible jump in the middle of a
+     * paragraph. Scroll position in *pixels* is preserved either way; what
+     * matters is the position in the *document*, so the shift is measured and
+     * given back.
+     *
+     * Not at the top of the page, though: there the housing legitimately
+     * consumes space and compensating would scroll the masthead under it.
+     */
+    const main = document.querySelector("main");
+    const wasTop = main?.getBoundingClientRect().top ?? 0;
+
     /* The attribute drives the whole visual change, so it flips once and
        everything downstream follows from CSS. */
     root.dataset.modeShift = reduced ? "fade" : "power";
     root.dataset.mode = next;
     writeStored(next);
     setShifting(true);
+
+    if (main) {
+      requestAnimationFrame(() => {
+        const drift = main.getBoundingClientRect().top - wasTop;
+        if (drift !== 0 && window.scrollY > Math.abs(drift)) {
+          window.scrollBy(0, drift);
+        }
+      });
+    }
 
     window.setTimeout(() => {
       delete root.dataset.modeShift;

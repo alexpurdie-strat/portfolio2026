@@ -72,13 +72,22 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ModeProvider>
           <PaperFilters />
           <PaperMotion />
-          {/* Purely decorative and CSS-gated, so it renders in both modes and
-              costs nothing in Studio. It holds no content and no image
-              assets — all gradients — so there is nothing to lazy-load and
-              nothing to pop in when the machine is switched on. */}
+          {children}
+          {/*
+            After the content, not before, and the reason is the tab order.
+            These are fixed-position overlays so DOM order does not affect
+            where they appear — but rendered first, a keyboard user reached
+            the machine's sound switch, crank and mode toggle before they
+            reached the site's own navigation. Ambient hardware comes after
+            the thing it is housing.
+
+            Purely decorative and CSS-gated otherwise, so it renders in both
+            modes and costs nothing in Studio. It holds no content and no
+            image assets — all gradients — so there is nothing to lazy-load
+            and nothing to pop in when the machine is switched on.
+          */}
           <ReaderShell />
           <ModeSwitch />
-          {children}
         </ModeProvider>
         {/* dev-only; NODE_ENV is statically replaced, so it drops out of the
             production bundle entirely */}
