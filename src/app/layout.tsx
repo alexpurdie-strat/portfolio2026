@@ -9,7 +9,10 @@ import {
 } from "./fonts";
 import { AgentationToolbar } from "@/components/agentation-toolbar";
 import { PaperFilters } from "@/components/paper-filters";
+import { InlineScript } from "@/components/inline-script";
+import { ModeSwitch } from "@/components/mode-switch";
 import { PaperMotion } from "@/components/paper-motion";
+import { MODE_SCRIPT, ModeProvider } from "@/lib/mode";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -48,17 +51,29 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      /* The default the server emits; the inline script below overrides it
+         before paint when a visitor has chosen otherwise. */
+      data-mode="studio"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${martinaPlantijn.variable} ${blankWeirdos.variable} ${blankWeirdosAlt1.variable} ${blankWeirdosAlt2.variable} ${blankWeirdosAlt3.variable} ${cutiveMono.variable} h-full antialiased`}
     >
+      <head>
+        {/* Before first paint, so a returning visitor never sees a frame of
+            the wrong machine. */}
+        <InlineScript html={MODE_SCRIPT} />
+      </head>
       <body className="min-h-full flex flex-col">
         {/* First thing in the tab order, invisible until focused. The header
             nav is four links deep on every page. */}
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <PaperFilters />
-        <PaperMotion />
-        {children}
+        <ModeProvider>
+          <PaperFilters />
+          <PaperMotion />
+          <ModeSwitch />
+          {children}
+        </ModeProvider>
         {/* dev-only; NODE_ENV is statically replaced, so it drops out of the
             production bundle entirely */}
         {process.env.NODE_ENV === "development" ? <AgentationToolbar /> : null}

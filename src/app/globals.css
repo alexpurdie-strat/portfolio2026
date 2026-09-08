@@ -111,6 +111,11 @@
   /* How long a plate takes to rise out of the stack, and therefore how long
      it stays on top before dropping back. */
   --dur-reveal: 240ms;
+  /* The machine changing over. Kept under the brief's 600ms so it reads as a
+     switch being thrown, not as a loading screen. Duplicated as
+     CHANGEOVER_MS in src/lib/mode.tsx — setTimeout cannot read a custom
+     property, so if you change one, change the other. */
+  --dur-changeover: 420ms;
 }
 
 @theme inline {
@@ -2960,5 +2965,265 @@ button {
   /* The headline is the hero on a phone, so it gets the room. */
   .headline {
     font-size: clamp(2.25rem, 11vw, 3.25rem);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TWO MACHINES
+
+   Everything below is the mode mechanism, not the microfilm aesthetic — that
+   lands in Phase 2 once the visual target is settled. What is here is the part
+   that does not depend on how the second mode looks: the switch, the
+   changeover, and the root hook the stylesheet will hang the second mode from.
+
+   The mode lives on html[data-mode], set before first paint. Components render
+   identical DOM in both modes; only this stylesheet knows the difference. So
+   switching cannot lose scroll position or in-progress state — nothing
+   unmounts, and there is no second copy of any content to drift out of sync.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* The second mode's own tokens will be declared here in Phase 2, re-binding
+   the same names the paper world uses so components need no changes. */
+html[data-mode="microfilm"] {
+  /* deliberately empty until the aesthetic is chosen */
+}
+
+/* ── The changeover ─────────────────────────────────────────────────────────
+   A full-bleed veil, painted only while the attribute is present, so it costs
+   nothing at rest. Opacity and transform only. */
+html[data-mode-shift]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  background: #0b0b0c;
+}
+
+html[data-mode-shift="power"]::after {
+  animation: changeover var(--dur-changeover) var(--ease-press) both;
+}
+
+/* Reduced motion keeps the acknowledgement — the veil still passes, it just
+   does not collapse or flash. Gentler, not absent. */
+html[data-mode-shift="fade"]::after {
+  animation: changeover-fade var(--dur-changeover) linear both;
+}
+
+@keyframes changeover {
+  /* dark floods in fast, because a switch is instant */
+  0% {
+    opacity: 0;
+    scale: 1 1;
+  }
+  38% {
+    opacity: 1;
+    scale: 1 1;
+  }
+  /* then the image collapses to a line and goes out, the way a lit surface
+     does when its light is cut */
+  72% {
+    opacity: 1;
+    scale: 1 0.004;
+  }
+  100% {
+    opacity: 0;
+    scale: 1 0.004;
+  }
+}
+
+@keyframes changeover-fade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.92;
+  }
+}
+
+/* ── The switch ─────────────────────────────────────────────────────────────
+   The only machined object on a paper desk: a steel toggle resting on the
+   page. Quiet, but out of place enough to suggest the paper is not the only
+   way to read this. */
+.mode-switch {
+  position: fixed;
+  /* Not the top-right the brief suggests: the header nav already owns that
+     corner and a fixed plate there covered the "04. Ask" link on every route.
+     Bottom-left rather than bottom-right for two reasons — bottom-right is
+     where every chat bubble and scroll-to-top button lives, and this should
+     read as a machine's control, not a widget; and the dev toolbar sits
+     there, so the switch would be unusable in the environment it gets built
+     in. Low and to one side is where a control panel belongs anyway. */
+  bottom: max(1.1rem, env(safe-area-inset-bottom));
+  left: max(1.1rem, env(safe-area-inset-left));
+  /* above the sheets and the hand, below the changeover veil */
+  z-index: 80;
+}
+
+.mode-switch__body {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.32rem 0.5rem;
+  border: 1px solid #b9b2a4;
+  border-radius: 3px;
+  /* brushed plate: a cool metal gradient over the warm page */
+  background:
+    linear-gradient(
+      175deg,
+      #e8e4dc 0%,
+      #d6d1c6 42%,
+      #c8c2b5 58%,
+      #ddd8ce 100%
+    );
+  box-shadow:
+    /* seated on the paper, with a real shadow under it */
+    0 1px 0 rgb(255 255 255 / 0.6) inset,
+    0 -1px 0 rgb(0 0 0 / 0.09) inset,
+    0 2px 5px rgb(60 50 35 / 0.19),
+    0 8px 14px -6px rgb(60 50 35 / 0.22);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    box-shadow var(--dur-press) var(--ease-press),
+    translate var(--dur-press) var(--ease-press);
+}
+
+.mode-switch__body:hover {
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.7) inset,
+    0 -1px 0 rgb(0 0 0 / 0.09) inset,
+    0 3px 7px rgb(60 50 35 / 0.22),
+    0 10px 18px -6px rgb(60 50 35 / 0.26);
+}
+
+/* Pressed: the whole plate seats down into the paper. */
+.mode-switch__body:active {
+  translate: 0 1px;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.5) inset,
+    0 2px 4px rgb(60 50 35 / 0.24) inset,
+    0 1px 2px rgb(60 50 35 / 0.18);
+}
+
+/* Must stay visible against brushed metal *and* against whatever Phase 2
+   makes the second mode, so it is drawn outside the plate. */
+.mode-switch__body:focus-visible {
+  outline: 2px solid #2b2b2b;
+  outline-offset: 3px;
+}
+
+.mode-switch__plate {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Engraved, not printed: cut into the plate with a light edge below. */
+.mode-switch__legend {
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6f6858;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.55);
+  transition: color var(--dur-weight) var(--ease-ink);
+}
+
+/* Whichever side is live reads darker, the way an engraved label does when
+   the switch points at it. */
+html[data-mode="studio"] .mode-switch__legend--studio,
+html[data-mode="microfilm"] .mode-switch__legend--film {
+  color: #2f2b23;
+}
+
+.mode-switch__well {
+  position: relative;
+  width: 2rem;
+  height: 0.85rem;
+  border-radius: 2px;
+  /* the recess the rocker sits in */
+  background: linear-gradient(180deg, #9d968a 0%, #b6b0a4 55%, #cac4b8 100%);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.3) inset,
+    0 -1px 0 rgb(255 255 255 / 0.35) inset;
+}
+
+.mode-switch__rocker {
+  position: absolute;
+  inset: 1px auto 1px 1px;
+  width: calc(50% - 1px);
+  border-radius: 1px;
+  background: linear-gradient(180deg, #fbfaf7 0%, #ddd8cd 52%, #b8b2a5 100%);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.8) inset,
+    0 1px 2px rgb(0 0 0 / 0.32);
+  /* Position is driven by the root attribute, never by React state — the
+     pre-paint script has already set it, so the rocker is on the correct side
+     in the first painted frame. */
+  translate: 0 0;
+  transition: translate var(--dur-press) var(--ease-press);
+}
+
+html[data-mode="microfilm"] .mode-switch__rocker {
+  translate: 100% 0;
+}
+
+/* Power lamp: dark glass until the machine is running. */
+.mode-switch__lamp {
+  width: 0.3rem;
+  height: 0.3rem;
+  border-radius: 50%;
+  background: #6d6558;
+  box-shadow: 0 1px 1px rgb(0 0 0 / 0.35) inset;
+  transition:
+    background var(--dur-weight) var(--ease-ink),
+    box-shadow var(--dur-weight) var(--ease-ink);
+}
+
+html[data-mode="microfilm"] .mode-switch__lamp {
+  background: #ff7a1a;
+  box-shadow:
+    0 0 0 1px rgb(120 50 0 / 0.4),
+    0 0 6px 1px rgb(255 122 26 / 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mode-switch__rocker,
+  .mode-switch__body {
+    transition-duration: 1ms;
+  }
+}
+
+/* Phones: the plate is the same object, just tucked tighter to the corner. */
+@media (max-width: 700px) {
+  .mode-switch__legend {
+    /* the engraved words are unreadable at this size and the rocker plus the
+       accessible name already carry the meaning */
+    display: none;
+  }
+
+  .mode-switch__body {
+    padding: 0.55rem 0.6rem;
+  }
+}
+
+/* The plate is a design object and inflating it to 44px would put a chunky
+   metal slab in the corner of a paper page. Same answer as the nav marks: on a
+   coarse pointer an invisible pseudo-element extends the tappable box instead.
+   Measured — the plate lands at 35px tall, so this clears 44 with room. */
+@media (pointer: coarse) {
+  .mode-switch__body {
+    position: relative;
+  }
+
+  .mode-switch__body::before {
+    content: "";
+    position: absolute;
+    inset: -0.5rem;
+    /* it is a hit area, nothing else */
+    pointer-events: auto;
   }
 }

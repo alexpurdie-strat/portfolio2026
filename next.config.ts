@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
    * `/contact` was renamed to `/ask`. A permanent redirect rather than a dead
    * link, because the old path may already be written down somewhere.
    */
+  /* Default is bottom-left, which is where the mode switch lives. Dev-only
+     either way, but a control you cannot click is a control you cannot judge. */
+  devIndicators: {
+    position: "top-left",
+  },
+
   async redirects() {
     return [{ source: "/contact", destination: "/ask", permanent: true }];
   },
