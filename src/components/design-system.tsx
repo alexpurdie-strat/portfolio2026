@@ -241,8 +241,12 @@ const TEXTURE = [
     "The crank and the arrow keys advance frame to frame, landing on a section rather than somewhere in the middle of it. Free scrolling stays free: there is no scroll-snap anywhere in either mode. Snapping would be the first thing that changed how the writing is *read* rather than how it looks, and on the surface a reader spends longest on. Film being divided into frames is not a reason to take the scrollbar away.",
   ],
   [
-    "The one permitted blur",
-    "Loading a reel brings the lens to focus, and that is the single place on this site where anything is blurred. The rule against it is a rule about paper, and paper has no focus knob. It is brief, it happens to the panel rather than the words, and reduced motion keeps the settle and drops the defocus.",
+    "Where an optical instrument is allowed to blur",
+    "The rule against blurring is a rule about paper, and paper has no focal plane. A reader has two, so the second mode has exactly two blurs and both are properties of the machine rather than effects applied to it. Loading a reel brings the lens to focus \u2014 brief, on the panel rather than the words, and reduced motion keeps the settle while dropping the defocus. And the field goes soft at its upper and lower limits, because film is curved through a gate and the parts entering and leaving the aperture sit off the focal plane. That second one is done with two masked bands of backdrop-filter rather than a filter on the content: it softens what is behind it without changing how the page renders, so text is never itself blurry \u2014 it passes *through* a soft region as the film runs. Anything else on this site that looks blurred is a bug.",
+  ],
+  [
+    "A lamp is never quite steady",
+    "The panel drifts in brightness on a slow, irregular cycle, with one deeper dip where a splice passes the gate. This is a filament with an arc across it, not a refresh rate \u2014 so it is shallow (under 2% at its peak) and slow (one cycle per eleven seconds), orders of magnitude below the three-flashes-a-second threshold. The mode switch is its stop control: it is a visible, persistent, keyboard-reachable way to end the motion, which is what a decorative loop that runs longer than five seconds owes the reader. Under reduced motion the lamp holds one steady value rather than none, so the ground does not change at all.",
   ],
   [
     "What survives a phone",

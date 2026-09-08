@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { ReaderLoupe } from "@/components/reader-loupe";
 import { ReaderTransport } from "@/components/reader-transport";
 import { SoundSwitch } from "@/components/sound-switch";
 import { useMode } from "@/lib/mode";
@@ -82,6 +81,8 @@ export function ReaderShell() {
         <div className="reader-ground__fringe" />
         {/* grain in the emulsion — only visible while the film is running */}
         <div className="reader-ground__agitate" />
+        {/* the lamp wandering */}
+        <div className="reader-ground__flicker" />
       </div>
 
       {/* ── above the content ── */}
@@ -98,13 +99,14 @@ export function ReaderShell() {
       */}
       <div className="reader-falloff" aria-hidden />
 
-      {/* Above the falloff and below the housing: a lens resting on the glass
-          is in front of the image, but still inside the machine. */}
-      <ReaderLoupe />
-
       <div className="reader" aria-hidden>
         {/* the hard edge of the film's aperture */}
         <div className="reader__gate" />
+
+        {/* Where the film leaves the focal plane on its way in and out of the
+            gate. Above the content, because it blurs what is behind it. */}
+        <div className="reader__soft reader__soft--top" />
+        <div className="reader__soft reader__soft--bottom" />
 
         {/* the glass you are looking through */}
         <div className="reader__sheen" />

@@ -4227,109 +4227,16 @@ html[data-mode="microfilm"][data-threading="cartridge"] .reader__gate::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   PHASE 5 — THE LOUPE, AND GRAIN THAT ANSWERS TO MOTION
+   PHASE 5 — GRAIN THAT ANSWERS TO MOTION
+
+   The loupe that used to live here is gone. It magnified a plate under the
+   cursor, which was a gadget bolted to the machine rather than a property of
+   it — helpful for nothing, and the first thing on the site that read as a
+   trick. What replaced it is in the same spirit and actually true of the
+   instrument: an optical field goes soft at its limits, and a lamp is never
+   quite steady.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── The loupe ──────────────────────────────────────────────────────────────
-   A lens held against the glass. It carries the film's own crop, at the
-   film's own angle, and it is the cursor while it is held — a native arrow
-   floating inside a magnifier would give away that neither is real. */
-.loupe {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 8.5rem;
-  height: 8.5rem;
-  z-index: 76;
-  pointer-events: none;
-  border-radius: 50%;
-  opacity: 0;
-  scale: 0.92;
-  /* The glass, the brass ring it is set in, and the shadow it casts on the
-     panel it is resting against. */
-  box-shadow:
-    0 0 0 1px rgb(255 255 255 / 0.5) inset,
-    0 0 0 3px rgb(94 90 72 / 0.85),
-    0 0 0 4px rgb(150 145 120 / 0.6),
-    0 6px 18px -4px rgb(24 22 14 / 0.55);
-  transition:
-    opacity 140ms var(--ease-press),
-    scale 180ms var(--ease-press);
-  /* Not the whole element: `translate` is written per frame by the component,
-     so it must not be part of a shorthand anything else owns. */
-}
-
-.loupe[data-holding] {
-  opacity: 1;
-  scale: 1;
-}
-
-/* The magnified film. A separate layer so the ring above can stay put while
-   the crop inside it turns to the plate's angle. */
-.loupe::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  background-image: var(--lens-src, none);
-  background-repeat: no-repeat;
-  background-size: var(--lens-w, auto) var(--lens-h, auto);
-  background-position: var(--lens-x, 0) var(--lens-y, 0);
-  /* Same film response as the plate it came from, plus the little extra
-     contrast a lens gathers. */
-  filter: grayscale(1) contrast(1.14) brightness(1.03);
-  rotate: var(--lens-turn, 0deg);
-}
-
-/* A convex lens catches the lamp across its face. */
-.loupe::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: linear-gradient(
-    128deg,
-    rgb(255 255 255 / 0.22) 0%,
-    rgb(255 255 255 / 0.05) 30%,
-    rgb(255 255 255 / 0) 52%,
-    rgb(60 56 42 / 0.08) 100%
-  );
-}
-
-/* ── The cursor ─────────────────────────────────────────────────────────────
-   A loupe glyph on the machine's surfaces, and the native caret over anything
-   you would want to read or select. A magnifier cursor over body copy is the
-   sort of detail that wins a screenshot and loses a reader. */
-@media (hover: hover) and (pointer: fine) {
-  html[data-mode="microfilm"] body {
-    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cg fill='none' stroke='%23201e14' stroke-width='1.6'%3E%3Ccircle cx='10.5' cy='10.5' r='6.6' fill='rgba(255,255,255,0.28)'/%3E%3Cpath d='M15.4 15.4 L22 22' stroke-linecap='round' stroke-width='2.2'/%3E%3C/g%3E%3Ccircle cx='8.3' cy='8' r='1.7' fill='rgba(255,255,255,0.55)'/%3E%3C/svg%3E")
-        10 10,
-      auto;
-  }
-
-  html[data-mode="microfilm"]
-    :is(p, h1, h2, h3, li, blockquote, pre, code, dd, dt, figcaption, label) {
-    cursor: text;
-  }
-
-  html[data-mode="microfilm"] :is(a, button, [role="slider"], summary) {
-    cursor: pointer;
-  }
-
-  html[data-mode="microfilm"] .transport__crank {
-    cursor: grab;
-  }
-
-  html[data-mode="microfilm"] .transport__crank[data-turning] {
-    cursor: grabbing;
-  }
-
-  /* While the loupe is out, it is the pointer. */
-  html[data-mode="microfilm"]:has(.loupe[data-holding]) .plate-pile__img {
-    cursor: none;
-  }
-}
 
 /* ── Grain that answers to motion ───────────────────────────────────────────
    Two kinds, and the difference is the point. Dust on the platen and the
@@ -4353,10 +4260,6 @@ html[data-mode="microfilm"][data-threading="cartridge"] .reader__gate::after {
   /* Grain that appears and disappears is movement. The still dust stays. */
   .reader-ground__agitate {
     display: none;
-  }
-
-  .loupe {
-    transition: opacity 1ms linear;
   }
 }
 
@@ -4443,5 +4346,124 @@ html[data-mode="microfilm"] .sound-switch {
        clear 44. 0.78rem gives it with a little to spare. */
     inset: -0.78rem -0.45rem;
     pointer-events: auto;
+  }
+}
+
+/* ── The field's limits ─────────────────────────────────────────────────────
+   Film is curved through a gate, so the parts entering and leaving the
+   aperture sit off the focal plane and go soft. That is a real property of the
+   instrument rather than an effect applied to it, which is why this mode is
+   allowed a blur at all: the design system's "nothing is blurred" is a rule
+   about paper, and paper has no focal plane.
+
+   Two thin strips of backdrop-filter, masked so the blur ramps from nothing at
+   the reading line to full at the housing. `backdrop-filter` rather than a
+   filter on the content: it blurs what is behind it without touching how the
+   page renders, so text is never itself blurry — it passes *through* a soft
+   region as the film runs, the way it would on the machine.
+
+   The brief's own warning against large-area backdrop-filter is why these are
+   bands and not a full-viewport layer. */
+.reader__soft {
+  position: absolute;
+  left: var(--bezel);
+  right: var(--bezel);
+  height: clamp(3.5rem, 7vh, 6rem);
+  pointer-events: none;
+  /* Lightning CSS (via @tailwindcss/postcss) rewrites this to
+     -webkit-backdrop-filter only, per the project's browser targets — so the
+     served rule has no unprefixed property and reading `backdropFilter` off
+     computed style returns "none" even though the effect renders. Check
+     `webkitBackdropFilter`, or just look at the screen. */
+  backdrop-filter: blur(2.6px);
+}
+
+.reader__soft--top {
+  top: var(--bezel);
+  /* Full against the housing and falling away fast — front-loaded on purpose
+     so the heavy softness hugs the gate edge and most of the band stays
+     readable. An even ramp put the pull-quote's first line in ~70% blur a
+     comfortable distance from the edge, which is further than a lens
+     actually gives up. */
+  mask-image: linear-gradient(
+    to bottom,
+    rgb(0 0 0) 0%,
+    rgb(0 0 0 / 0.78) 18%,
+    rgb(0 0 0 / 0.4) 44%,
+    rgb(0 0 0 / 0.12) 72%,
+    rgb(0 0 0 / 0) 100%
+  );
+}
+
+.reader__soft--bottom {
+  bottom: var(--bezel-foot);
+  mask-image: linear-gradient(
+    to top,
+    rgb(0 0 0) 0%,
+    rgb(0 0 0 / 0.78) 18%,
+    rgb(0 0 0 / 0.4) 44%,
+    rgb(0 0 0 / 0.12) 72%,
+    rgb(0 0 0 / 0) 100%
+  );
+}
+
+/* ── The lamp is never quite steady ────────────────────────────────────────
+   A projector lamp is not a refresh rate. It is a filament with an arc across
+   it, and it wanders — so this is a slow, shallow drift in brightness with
+   one deeper dip where a splice passes the gate. Irregular keyframe spacing so
+   it does not read as a loop, and never fast enough to be a flash: the
+   deepest excursion here is 2.5% over 11 seconds, orders of magnitude below
+   the three-per-second flash threshold. */
+.reader-ground__flicker {
+  position: absolute;
+  inset: 0;
+  background: rgb(255 250 232);
+  opacity: 0;
+  animation: lamp-drift 11s ease-in-out infinite;
+}
+
+@keyframes lamp-drift {
+  0% {
+    opacity: 0.004;
+  }
+  17% {
+    opacity: 0.021;
+  }
+  29% {
+    opacity: 0.007;
+  }
+  38% {
+    opacity: 0.018;
+  }
+  /* the splice */
+  43% {
+    opacity: 0;
+  }
+  44.5% {
+    opacity: 0.025;
+  }
+  46% {
+    opacity: 0.002;
+  }
+  61% {
+    opacity: 0.016;
+  }
+  78% {
+    opacity: 0.005;
+  }
+  91% {
+    opacity: 0.019;
+  }
+  100% {
+    opacity: 0.004;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* A wandering lamp is movement, however shallow. The panel holds one
+     steady value instead of none, so nothing about the ground changes. */
+  .reader-ground__flicker {
+    animation: none;
+    opacity: 0.012;
   }
 }
