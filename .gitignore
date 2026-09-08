@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# agent tooling — vendored skills (.claude/skills symlinks into .agents/);
+# skills-lock.json is the manifest that reinstalls them
+/.agents/
+/.claude/
+/skills-lock.json
