@@ -1,8 +1,116 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf7ef;
+  --foreground: #414141;
+  /* Wash over the paper scan. The tile itself now carries the ground's tone
+     (#f4f1e8), so this only trims it — raise the alpha to lighten a touch,
+     drop it to zero to sit exactly on the tile.
+
+     There is a ceiling either way: the torn sheets are the lightest thing on
+     the page and the ground has to stay clearly below them, or the layering
+     stops reading.
+
+     The tile is versioned in its filename on purpose. It was overwritten in
+     place once and browsers kept serving the old bytes from cache under the
+     same URL, so the change was invisible however many times the CSS
+     reloaded. Rename it again if the tone changes again. */
+  /* Sparse speckle for the ground — dust on a scanner platen. Discrete
+     alpha so it lands as specks rather than a haze. */
+  --ground-dust: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.55'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='1200' height='1200' filter='url(%23d)' opacity='0.8'/%3E%3C/svg%3E");
+
+  /* Accents, staged. Hues are taken from the photography itself — the pinned
+     green board reads at 85deg, the amber card at 35deg — and only the
+     saturation and value are set, so introducing them as ink keeps the page
+     and the pictures the same material. Nothing uses these yet. */
+  --accent-green: #424c32;
+  --accent-green-wash: #909e7b;
+  --accent-amber: #b87e30;
+  --accent-amber-wash: #e6b067;
+  --accent-orange: #a86225;
+
+  /* Under review — currently only the archive's correcting marks. */
+  --mark-red: #e93636;
+
+  /* Type scale — a perfect fifth (1.5) anchored on 19px body copy, which is
+     the top of the comfortable reading range for a serif at this measure.
+     The Figma frames are drawn at roughly 1.7x these sizes; the ratios between
+     steps are the design's, the absolute sizes are dialled back to read.
+       label   body / 1.35     display  body x 1.5^4
+       aside   body x 1.68     note     body x 2.0                         */
+  --text-label: clamp(0.75rem, 0.972vw, 0.875rem); /*   14px @1440 */
+  --text-body: clamp(1rem, 1.32vw, 1.1875rem); /*       19px @1440 — anchor */
+  --text-mark: clamp(0.875rem, 1.35vw, 1.2rem); /*      19px @1440 */
+  --text-subhead: calc(var(--text-body) * 1.15); /*     22px @1440 */
+  --text-lead: calc(var(--text-body) * 1.2); /*         23px @1440 */
+  --text-aside: clamp(1rem, 2.22vw, 2rem); /*           32px @1440 */
+  --text-heading: clamp(1.35rem, 2.5vw, 2.25rem); /*    36px @1440 */
+  --text-title: clamp(2.5rem, 6vw, 5.5rem); /*          86px @1440 */
+  --text-display: clamp(2.5rem, 6.67vw, 6rem); /*       96px @1440 */
+
+  /* The hand, which sits outside the published scale. */
+  --text-note: clamp(1.125rem, 2.64vw, 2.375rem); /*    38px @1440 */
+
+  /* Weight, on Martina Plantijn's 300–900 axis. Black is deliberately absent
+     here: it is reserved for the wordmark's hover, so the heaviest weight on
+     the site reads as a gesture rather than as a resting state. Headings sit
+     at 600, which carries a page without shouting at it. */
+  --wght-label: 300;
+  --wght-body: 400;
+  --wght-display: 600;
+  --wght-numeral: 700;
+  --wght-emphasis: 700;
+
+  /* ---------------------------------------------------------------------
+     The grid. Twelve columns inside a sheet that stops at 1600px and sits
+     centred, so the page has a margin on both sides at any width and the
+     column measure never has to chase the screen.
+       at 1600: 1472 inner, 11 gaps of 24, columns of ~101px
+     Content generally takes columns 1-8 and the note margin 9-12, which is
+     what gives the page its left bias without shoving anything.
+     --------------------------------------------------------------------- */
+  --grid-max: 100rem;
+  --grid-margin: clamp(1.25rem, 4vw, 4.5rem);
+  --grid-gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  --grid-cols: 12;
+  /* where content stops and the note margin starts */
+  --grid-content: 8;
+
+  /* Leading tightens as type grows. */
+  --leading-display: 0.95;
+  --leading-note: 1.2;
+  --leading-body: 1.55;
+
+  /* Motion. The design system's 00.008 table is the prose form of these.
+     Named for what they are for, not what they are made of. */
+  --ease-settle: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-unfurl: cubic-bezier(0.5, 0.02, 0.25, 1);
+  --ease-ink: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-stroke: cubic-bezier(0.33, 0.1, 0.25, 1);
+  /* Strong ease-out, for the one gesture that answers a finger. */
+  --ease-press: cubic-bezier(0.23, 1, 0.32, 1);
+
+  --dur-press: 160ms;
+  --dur-lift: 240ms;
+  --dur-weight: 160ms;
+  --dur-underline: 180ms;
+  --dur-annotation: 380ms;
+  --dur-ink: 520ms;
+  --dur-resolve: 620ms;
+  --dur-unfurl: 860ms;
+  /* the annotations wait for the pieces to start moving */
+  --delay-annotation: 180ms;
+
+  /* The ground is a warm near-white and there is no dark theme, so the browser
+     is told as much — it fixes form controls and scrollbars guessing wrong. */
+  color-scheme: light;
+
+  /* How far each case-study plate rides up over the one above it. The single
+     knob for how tight the unfurled cascade reads. */
+  --plate-lap: clamp(2rem, 4.2vw, 5.5rem);
+  /* How long a plate takes to rise out of the stack, and therefore how long
+     it stays on top before dropping back. */
+  --dur-reveal: 240ms;
 }
 
 @theme inline {
@@ -10,17 +118,2847 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-serif: var(--font-martina-plantijn);
+  --font-weirdos: var(--font-blank-weirdos);
+  --font-weirdos-alt1: var(--font-blank-weirdos-alt1);
+  --font-weirdos-alt2: var(--font-blank-weirdos-alt2);
+  --font-weirdos-alt3: var(--font-blank-weirdos-alt3);
+  --font-mono-typewriter: var(--font-cutive-mono);
 }
 
 body {
-  background: var(--background);
+  position: relative;
+  /* margin notes sit in the outer columns and tilt; clip rather than scroll */
+  overflow-x: clip;
+  background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* The ground.
+
+   Not a material. The page is a reproduction of a document rather than the
+   document itself, which is what an archive is made of, so the artefacts are
+   optical and belong to the copy: light falling away at the edges of the
+   platen, the faint colour drift of a scanner lamp across the long axis, and
+   dust picked up off the glass.
+
+   It wants to read as very nearly a solid colour. The layers are only there to
+   stop a flat field going dead — if you can pick any of them out individually,
+   it is too strong.
+
+   Falloff and cast are viewport-fixed so they behave like light in a room;
+   only the dust scrolls, because that sits on the page — see body::after for
+   why the light is a fixed element rather than a fixed attachment. */
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--background);
+  background-image: var(--ground-dust);
+  background-size: 1200px 1200px;
+  background-repeat: repeat;
+  pointer-events: none;
+}
+
+/* The light belongs to the room, so it stays put — but as a fixed *element*
+   rather than a fixed background attachment. A fixed attachment cannot be
+   scrolled by the compositor: the viewport re-rasterises every frame, measured
+   at 38.4ms per frame on Home against 16.7ms without it. A fixed element gets
+   its own layer and simply does not repaint. Identical picture, 60fps
+   instead of 25. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    radial-gradient(
+      125% 105% at 50% 48%,
+      rgba(0, 0, 0, 0) 56%,
+      rgba(58, 48, 34, 0.11) 100%
+    ),
+    linear-gradient(
+      100deg,
+      rgba(118, 138, 158, 0.055),
+      rgba(0, 0, 0, 0) 46%,
+      rgba(186, 140, 60, 0.06)
+    );
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Site header — Figma: Portfolio Moodboard, node 41:1184
+   Reference frame is 1920×216. Everything is derived from --header-h so the
+   band scales as one piece; the ratios below are <figma px> / 216.
+--------------------------------------------------------------------------- */
+
+.site-header {
+  /* Band depth. Shallower than the Figma frame's proportion — the tear
+     reads just as well with less of it, and it gives the page back its
+     first screen. */
+  --header-h: clamp(126px, 9.2vw, 210px);
+  /* Transparent room under the band so `overflow: hidden` crops the texture
+     horizontally without shearing off the tear or its shadow. */
+  --tear-slack: calc(var(--header-h) * 0.04 + 24px);
+  position: relative;
+  /* Sits above the page content so its torn edge lays over whatever paper is
+     beneath, rather than leaving the background showing through the tear. */
+  z-index: 2;
+  /* deep enough that the tilt reads as depth rather than as a trapezoid —
+     the band is very wide, and a short perspective skews its far edges */
+  perspective: 2400px;
+  width: 100%;
+  height: calc(var(--header-h) + var(--tear-slack));
+  margin-bottom: calc(var(--tear-slack) * -1);
+  overflow: hidden;
+  isolation: isolate;
+  color: #414141;
+}
+
+/* Torn-paper texture (2077×365, drawn at x -79 / y -149 — i.e. horizontally
+   centred on the frame). Anchoring to the band height keeps the tear in the
+   same place at any viewport width. */
+.site-header__texture {
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: calc(var(--header-h) * -0.6898);
+  height: calc(var(--header-h) * 1.6898);
+  /* The band has to reach the edges of any screen without getting taller, so
+     its width is set here rather than inherited from the bitmap's aspect.
+     Below the natural width it overflows and is cropped, which keeps the tear
+     at its own proportions; above it, the bitmap stretches sideways only. A
+     torn edge takes horizontal stretch without complaint — it just becomes a
+     broader tear — where vertical stretch would smear the paper grain.
+     The 104% is not slack: the bitmap's own side margins are transparent
+     where it is visible — measured at 0.44% left and 1.6% right — so a band
+     at exactly 100% leaves a sliver of bare paper at each edge.
+       9.6131 = 1.6898 (height multiple) x 4096/720 (asset aspect)          */
+  width: max(104%, calc(var(--header-h) * 9.6131));
+  transform: translateX(-50%);
+  /* hinge at the sheet's own top edge, so the torn end is the part that
+     swings down and lands last */
+  transform-origin: 50% 0;
+  /* The torn sheet is white-on-white against the paper page, so it needs a
+     cast shadow along the tear to read as a lifted edge. */
+  filter: drop-shadow(0 6px 10px rgba(40, 34, 28, 0.28))
+    drop-shadow(0 1px 2px rgba(40, 34, 28, 0.22));
+  pointer-events: none;
+  user-select: none;
+}
+
+.site-header__texture img {
+  display: block;
+  height: 100%;
+  /* fills the wrapper, so the stretch is horizontal only */
+  width: 100%;
+  max-width: none;
+  object-fit: fill;
+  /* A few columns of the tear run all the way to the asset's bottom edge.
+     Fading the last sliver stops that flat cut — and the shadow tracing it —
+     from reading as a hard rule across the page. */
+  mask-image: linear-gradient(to bottom, #000 96%, transparent 100%);
+}
+
+/* Light under the tear.
+
+   The site is built on torn edges revealing what is beneath, and until now
+   what was beneath a tear was always another sheet. This is the one place
+   something is lit under there instead.
+
+   Not a fourth depth — light is not a layer, it is what makes the layers
+   legible. And the tear stays real: this is the torn sheet's own alpha, used
+   as a mask on a warm gradient and nudged down a few pixels behind the real
+   sheet, so what escapes is a rim in exactly the shape of the photographed
+   tear. Blurred, because light does not have an edge. No procedural tear, no
+   second silhouette to keep in register.
+
+   Amber, because that is the accent the system already has for warmth.
+   Static, because nothing on this site loops. */
+
+.site-header[data-leak] {
+  /* how far the light sits below the sheet — the whole effect's one knob */
+  --leak-drop: calc(var(--header-h) * 0.055);
+}
+
+/* An edge with light under it cannot also cast at full strength. Without
+   this the amber just deepens the existing shadow and reads as a stain. */
+.site-header[data-leak] .site-header__texture {
+  filter: drop-shadow(0 5px 9px rgba(40, 34, 28, 0.15))
+    drop-shadow(0 1px 2px rgba(40, 34, 28, 0.13));
+}
+
+.site-header__leak {
+  position: absolute;
+  /* behind the texture wrapper, which sits at -1 */
+  z-index: -2;
+  /* geometry matched to .site-header__texture exactly, then dropped, so the
+     mask registers with the sheet above it */
+  left: 50%;
+  top: calc(var(--header-h) * -0.6898 + var(--leak-drop));
+  height: calc(var(--header-h) * 1.6898);
+  width: max(104%, calc(var(--header-h) * 9.6131));
+  transform: translateX(-50%);
+  /* Warm only along the torn end. Brightest at the tear, gone well before
+     the top, which is occluded by the sheet regardless. */
+  background: linear-gradient(
+    to bottom,
+    rgba(230, 176, 103, 0) 62%,
+    rgba(230, 176, 103, 0.58) 90%,
+    rgba(236, 196, 140, 0.85) 100%
+  );
+  -webkit-mask-image: url("/header-texture.png");
+  mask-image: url("/header-texture.png");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  /* light has no edge */
+  filter: blur(7px);
+  pointer-events: none;
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: calc(var(--header-h) * 0.2);
+  /* The vertical padding tracks the band, but the side gutters are floored:
+     they are a layout constant, not a function of how deep the paper is.
+     Without the floor, making the band shallower walks the wordmark towards
+     the left edge — 2.5rem holds it exactly where it sat at the old depth. */
+  padding: calc(var(--header-h) * 0.0926)
+    max(2rem, calc(var(--header-h) * 0.3194)) 0
+    max(2.5rem, calc(var(--header-h) * 0.2454));
+}
+
+.site-header__wordmark {
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-weight: 400;
+  /* Martina Plantijn's wght axis runs 300–900; hover rides it to Black. */
+  font-variation-settings: "wght" 400;
+  font-size: calc(var(--header-h) * 0.2236); /* 36 of 161 */
+  line-height: 1.2;
+  white-space: nowrap;
+  text-decoration: none;
+  color: inherit;
+  transition: font-variation-settings var(--dur-weight) var(--ease-settle);
+}
+
+.site-header__wordmark:hover,
+.site-header__wordmark:focus-visible {
+  font-variation-settings: "wght" 900;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header__wordmark {
+    transition: none;
+  }
+}
+
+.site-header__navMark {
+  margin-right: 0.45em;
+  font-style: normal;
+  font-variation-settings: "wght" var(--wght-numeral);
+  font-size: 0.62em;
+  letter-spacing: 0.02em;
+  opacity: 0.55;
+}
+
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  /* Tracks the band, but gives way to the viewport first. This is what
+     used to be solved by making the band shallower at two breakpoints,
+     which left the depth going down as the screen got wider. */
+  gap: min(calc(var(--header-h) * 0.4969), 4.5vw);
+  padding-top: calc(var(--header-h) * 0.0694);
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: calc(var(--header-h) * 0.1491); /* 24 of 161 */
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* The nav is a single row at every width, so the band steps down before the
+   four items would collide with the wordmark. */
+@media (max-width: 640px) {
+  .site-header {
+    --header-h: 140px;
+  }
+
+  /* Four italic nav items plus the wordmark cannot share a line at this width
+     without shrinking the nav past legibility, so stack them. */
+  .site-header__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px clamp(14px, 4vw, 20px) 0;
+  }
+
+  .site-header__wordmark {
+    font-size: clamp(20px, 6.5vw, 28px);
+  }
+
+  .site-header__nav {
+    gap: clamp(12px, 4.5vw, 20px);
+    padding-top: 0;
+    font-size: clamp(12px, 3.6vw, 15px);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Home — built from the two 1440-wide Figma frames (7:146 rest, 9:311 hover).
+   Every size below is <figma px> / 1440 expressed in vw, so the page is a true
+   scale of the frame at 1440 and clamps either side of it.
+--------------------------------------------------------------------------- */
+
+.site-main {
+  flex: 1;
+  /* no bottom padding: the last sheet owns the end of the page, and any
+     space here would show as ground below it */
+  padding: 0 clamp(1.15rem, 4.7917%, 6rem) 0 clamp(1.15rem, 3.9583%, 6rem);
+}
+
+/* --- the collage ---------------------------------------------------------- */
+
+.collage {
+  /* Full-bleed back out of .site-main's gutters: the scattered state runs off
+     the left edge exactly as it does in the frame. */
+  margin-inline: -4.1249% -4.9958%;
+  overflow: hidden;
+}
+
+.collage__stage {
+  position: relative;
+  aspect-ratio: 1440 / 819;
+}
+
+.collage__piece {
+  position: absolute;
+  height: auto;
+  /* Objects on a desk shift as you lean over them. This is the independent
+     `translate` property rather than more transform, so the parallax composes
+     with the scattered-state transform below without fighting its 620ms
+     choreography, and carries its own shorter timing. --par is the piece's
+     depth in px at full deflection; nothing exceeds 4. */
+  translate: calc(var(--ptr-x, 0) * var(--par, 0) * 1px)
+    calc(var(--ptr-y, 0) * var(--par, 0) * 1px);
+  /* Each piece is placed where it lands when resolved; the transform below is
+     the scattered state it starts from. Rotations are relative to the small
+     residual rotation already baked into the exported cutout. */
+  transform: translate(var(--dx), var(--dy)) rotate(var(--dr)) scale(var(--ds));
+  filter: drop-shadow(1px 3px 5px rgba(40, 34, 28, 0.13))
+    drop-shadow(0 1px 1px rgba(40, 34, 28, 0.1));
+  /* `translate` is deliberately not transitioned: the parallax is already
+     interpolated in JS, and a CSS curve on top of it is a second damping
+     stage that makes the cutouts lag the pointer. */
+  transition: transform var(--dur-resolve) var(--ease-settle);
+}
+
+/* Three torn photographs at 200-375KB apiece land the instant they decode.
+   Opacity only: the pieces already carry tuned chaos-state transforms, and a
+   scale on top would fight the 620ms resolve. No blur placeholder either —
+   these are alpha-masked cutouts, so a rectangular blur would show as a
+   rectangle behind the tear. */
+html[data-motion] .collage__piece {
+  opacity: 0;
+  transition:
+    transform var(--dur-resolve) var(--ease-settle),
+    opacity var(--dur-annotation) var(--ease-settle);
+}
+
+html[data-motion] .collage__piece[data-loaded] {
+  opacity: 1;
+}
+
+.collage__piece--tablet {
+  --par: 2.4;
+  left: 39.583%;
+  top: 31.136%;
+  width: 18.333%;
+  --dx: -117.186%;
+  --dy: -20.937%;
+  --dr: 0deg;
+  --ds: 1.3157;
+}
+
+.collage__piece--portrait {
+  --par: 4;
+  left: 7.8125%;
+  top: 31.013%;
+  width: 22.014%;
+  --dx: -12.802%;
+  --dy: -58.953%;
+  --dr: -12.85deg;
+  --ds: 1.0549;
+}
+
+.collage__piece--macbook {
+  --par: 3.2;
+  left: 67.951%;
+  top: 28.328%;
+  width: 27.049%;
+  --dx: -230.146%;
+  --dy: 19.418%;
+  --dr: 14.12deg;
+  --ds: 1.3823;
+}
+
+.chaos:hover .collage__piece,
+.chaos:focus-within .collage__piece {
+  transform: none;
+}
+
+/* --- the hand-written annotations ----------------------------------------- */
+
+.note {
+  position: absolute;
+  margin: 0;
+  font-family: var(--font-blank-weirdos-alt1), "Comic Sans MS", cursive;
+  font-size: var(--text-note);
+  line-height: var(--leading-note);
+  color: var(--foreground);
+  opacity: 0;
+  transition: opacity var(--dur-annotation) ease;
+  pointer-events: none;
+}
+
+/* Only this one belongs to the scattered state. */
+.note--refine {
+  left: 47.083%;
+  top: 15.873%;
+  width: 8.726%;
+  opacity: 1;
+  transform: rotate(5.19deg);
+  text-decoration: underline;
+  text-decoration-thickness: 0.03em;
+  text-underline-offset: 0.18em;
+}
+
+.note--inspiration {
+  left: 35.903%;
+  top: 16.972%;
+  width: 27.708%;
+  letter-spacing: -0.08em;
+}
+
+.note--explore {
+  left: 4.792%;
+  top: 67.643%;
+  width: 26.181%;
+  letter-spacing: -0.08em;
+}
+
+.note--dig {
+  left: 68.333%;
+  top: 75.946%;
+  width: 27.708%;
+  letter-spacing: -0.08em;
+  text-decoration: underline;
+  text-decoration-thickness: 0.03em;
+  text-underline-offset: 0.22em;
+}
+
+.chaos:hover .note--refine,
+.chaos:focus-within .note--refine {
+  opacity: 0;
+}
+
+.chaos:hover .note--inspiration,
+.chaos:hover .note--explore,
+.chaos:hover .note--dig,
+.chaos:focus-within .note--inspiration,
+.chaos:focus-within .note--explore,
+.chaos:focus-within .note--dig {
+  opacity: 1;
+  transition-delay: var(--delay-annotation);
+}
+
+/* --- the headline --------------------------------------------------------- */
+
+.headline {
+  margin: 0;
+  max-width: 91.25%; /* 1314 of 1440 */
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-weight: 400;
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  color: var(--foreground);
+}
+
+/* Both words occupy one grid cell so the line never reflows on hover — the
+   cell is as wide as the longer of the two. */
+.headline__slot {
+  display: inline-grid;
+  justify-items: center; /* the shorter <???> sits centred in the slot */
+  vertical-align: baseline;
+  font-family: var(--font-blank-weirdos), "Comic Sans MS", cursive;
+}
+
+.headline__word {
+  grid-area: 1 / 1;
+  transition: opacity var(--dur-annotation) ease;
+}
+
+.headline__word--resolved {
+  opacity: 0;
+}
+
+.chaos:hover .headline__word--chaos,
+.chaos:focus-within .headline__word--chaos {
+  opacity: 0;
+}
+
+.chaos:hover .headline__word--resolved,
+.chaos:focus-within .headline__word--resolved {
+  opacity: 1;
+}
+
+/* --- what I do / why ------------------------------------------------------ */
+
+.intro {
+  display: grid;
+  /* minmax(0,…) so the 66ch cap on the body cannot floor the track */
+  grid-template-columns: minmax(0, 379fr) minmax(0, 799fr);
+  column-gap: 4.847%;
+  max-width: 94.216%;
+  margin-top: 7.15vw; /* 1396 - 999 - headline block, at 1440 */
+}
+
+.intro__label {
+  margin: 0 0 0.6em;
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: var(--text-label);
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+}
+
+.intro__body {
+  margin: 0;
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-weight: 400;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  /* Cap the measure: the wide column would otherwise run to ~95 characters,
+     well past the 45-75 that stays comfortable to read. */
+  max-width: 66ch;
+}
+
+.aside {
+  width: 44.583%; /* 642 of 1440 */
+  margin: 6vw 0 0 53.333%;
+  font-family: var(--font-blank-weirdos-alt1), "Comic Sans MS", cursive;
+  font-size: var(--text-aside);
+  line-height: 1.3;
+  transform: rotate(1.2deg);
+}
+
+@media (max-width: 700px) {
+  .intro {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2rem;
+    max-width: none;
+  }
+
+  .intro__col {
+    min-width: 0;
+  }
+
+  .intro__body {
+    max-width: none;
+  }
+
+  .aside {
+    width: auto;
+    margin-left: 0;
+  }
+
+  /* The annotations are placed as a proportion of the collage; at this size
+     they land on top of the pieces. They are decorative by rule — the page
+     reads complete without them — so they come out rather than collide. */
+  .note {
+    display: none;
+  }
+}
+
+/* No hover means the reveal can never fire, so touch gets the resolved state:
+   pieces squared, annotations in, and the headline already answered. */
+@media (hover: none) {
+  .collage__piece {
+    transform: none;
+  }
+
+  .note--refine {
+    opacity: 0;
+  }
+
+  .note--inspiration,
+  .note--explore,
+  .note--dig {
+    opacity: 1;
+  }
+
+  .headline__word--chaos {
+    opacity: 0;
+  }
+
+  .headline__word--resolved {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collage__piece,
+  .note,
+  .headline__word {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Source block — metadata written as the code that would have produced the
+   interface, left unrendered. The seam: the paper metaphor failing on purpose.
+--------------------------------------------------------------------------- */
+
+.source {
+  margin: 0;
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: var(--text-label);
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+/* ---------------------------------------------------------------------------
+   Page furniture — the Column layout mode, plus the masthead sheet and the
+   register. These are the real components the design system documents.
+--------------------------------------------------------------------------- */
+
+.page {
+  /* the masthead reads this; it is the grid's margin by another name */
+  --page-gutter: var(--grid-margin);
+  --measure: 64ch;
+  /* body is a column flex container, and auto margins on a flex item switch
+     off cross-axis stretch — without an explicit width this shrink-to-fits to
+     its content rather than filling the sheet. */
+  width: 100%;
+  max-width: var(--grid-max);
+  margin: 0 auto;
+  padding: 0 var(--grid-margin) clamp(5rem, 10vw, 9rem);
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  color: var(--foreground);
+}
+
+.page p {
+  max-width: var(--measure);
+  margin: 0 0 1em;
+}
+
+/* --- masthead ------------------------------------------------------------- */
+
+/* No sheet behind it any more — the site header is already a torn band, and a
+   second one directly under it read as two stacked bands with a seam. The
+   title now sits on the paper, inside the page column, so it inherits the
+   grid's gutter and lines up with everything below it. */
+.masthead {
+  padding-top: clamp(1.5rem, 4vw, 3.5rem);
+  margin-bottom: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+.masthead__eyebrow {
+  margin: 0 0 0.35em;
+  font-size: var(--text-label);
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+
+.masthead__title {
+  margin: 0;
+  font-weight: 400;
+  font-variation-settings: "wght" var(--wght-display);
+  font-size: var(--text-title);
+  line-height: var(--leading-display);
+}
+
+/* `.page p` outranks a single class, so these carry the page scope too. */
+.page .masthead__standfirst,
+.masthead__standfirst {
+  max-width: 30ch;
+  margin: 0 0 clamp(1.5rem, 4vw, 3rem);
+  font-size: var(--text-aside);
+  font-style: italic;
+  line-height: 1.25;
+}
+
+/* --- the grid ------------------------------------------------------------- */
+
+/* A twelve-column row. Anything that needs to align to the grid rather than
+   just sit inside the column uses this. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+}
+
+/* --- register ------------------------------------------------------------- */
+
+.registers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.register {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+  padding: clamp(2rem, 4vw, 3.5rem) 0;
+}
+
+/* The shelf mark hangs in column 1, content runs 2 through 8, and the note
+   sits in its own cell at 9 through 12. */
+.register__num {
+  grid-column: 1 / 2;
+  grid-row: 1;
+}
+
+.register__body {
+  grid-column: 2 / span 7;
+  grid-row: 1;
+}
+
+.register__aside {
+  grid-column: 2 / span 7;
+  grid-row: 2;
+  margin-top: 1.5rem;
+}
+
+.register > .mnote {
+  grid-column: 9 / span 4;
+  grid-row: 1;
+}
+
+.register + .register {
+  /* torn edges divide, never rules — but a list needs some seam, so the paper
+     itself thins between entries */
+  box-shadow: inset 0 1px 0 rgba(65, 65, 65, 0.09);
+}
+
+.register__num {
+  font-variation-settings: "wght" var(--wght-numeral);
+  font-size: var(--text-mark);
+  /* the marks have to stack into a column, so the figures must not dance */
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  line-height: 1.9;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+.register__body {
+  max-width: var(--measure);
+}
+
+/* Set in the seam, not the published voice: the client is catalogued rather
+   than written, and it sits directly above a source block already in the same
+   register — so the entry's metadata reads as one unrendered whole. */
+.register__eyebrow {
+  margin: 0 0 0.5em;
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: var(--text-label);
+  font-style: normal;
+  letter-spacing: 0;
+  opacity: 0.55;
+}
+
+.register__title {
+  margin: 0 0 0.5em;
+  font-size: var(--text-heading);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.register__body p {
+  margin: 0 0 1em;
+}
+
+.register__body .register__lead {
+  font-size: calc(var(--text-body) * 1.1);
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.register__more {
+  --more-pad-x: 0.9em;
+  --more-pad-y: 0.75em;
+  display: inline-block;
+  /* Pulled back by its own horizontal padding so the label still lines up
+     with the column, and the padding reads as breathing room rather than an
+     indent. */
+  margin: 0.2em 0 0 calc(-1 * var(--more-pad-x));
+  padding: var(--more-pad-y) var(--more-pad-x);
+  font-size: var(--text-label);
+  font-style: italic;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* The inked underline is positioned against the element box, so the padding
+   has to be added back or the stroke stretches across it and sits too low.
+   Two classes to outrank .text-button::after, which is defined later. */
+.register__more.text-button::after {
+  left: calc(var(--underline-l) + var(--more-pad-x));
+  right: calc(var(--underline-r) + var(--more-pad-x));
+  bottom: calc(-0.32em + var(--more-pad-y));
+}
+
+/* A finger needs more than an eye does. */
+@media (hover: none) {
+  .register__more {
+    --more-pad-y: 1.15em;
+    --more-pad-x: 1.1em;
+  }
+}
+
+/* --- marginal note --------------------------------------------------------
+
+   These float. The anchor is zero-height so the note is out of flow entirely:
+   pinned to its place in the document, pushed out past the measure, rotated,
+   and incapable of moving anything. Written on top of the page, not into it.
+-------------------------------------------------------------------------- */
+
+.mnote {
+  position: relative;
+  display: block;
+  height: 0;
+}
+
+.mnote__inner {
+  position: absolute;
+  top: var(--mnote-nudge, 0);
+  z-index: 3;
+  /* contains the sheet's z-index: -1 so it sits behind the writing and no
+     further */
+  isolation: isolate;
+  width: max-content;
+  max-width: 21ch;
+  transform: translateY(var(--lag, 0px)) rotate(var(--mnote-tilt, -2deg));
+  pointer-events: none;
+}
+
+.mnote__text {
+  display: block;
+  font-family: var(--font-blank-weirdos-alt1), "Comic Sans MS", cursive;
+  font-size: calc(var(--text-body) * 1.05);
+  line-height: 1.25;
+}
+
+/* Column 9 of the sheet — the start of the note margin. Safe to anchor to the
+   grid now the sheet is bounded at 1600: the lane cannot run away from the
+   text as the screen widens, because the sheet stops growing.
+     8 of 12 columns plus their gaps works out at 66.667% + about one gap. */
+.mnote[data-lane="page"] .mnote__inner {
+  left: calc(66.667% + var(--grid-gap));
+  transform-origin: left top;
+}
+
+/* Already placed on the grid by its parent — it only has to fill its cell. */
+.mnote[data-lane="grid"] .mnote__inner {
+  left: 0;
+  transform-origin: left top;
+}
+
+/* Immediately past a text block that is itself capped at the measure. */
+.mnote[data-lane="text"] .mnote__inner {
+  left: calc(100% + var(--mnote-reach, 2rem));
+  transform-origin: left top;
+}
+
+/* --- smudge -------------------------------------------------------------- */
+
+/* The pen was still wet and the hand caught the last stroke. The note is
+   untouched up to the final word — that word dissolves left to right, and the
+   ink it lost drags off past it.
+
+   Two layers on the tail. The ink is masked so its definition falls away
+   toward the end rather than stopping at a hard edge. Behind it a transparent
+   copy carries a stack of offset shadows at growing distance and softness,
+   which reads as one tapering streak; text-shadow is not clipped to the box,
+   so the drag runs on past the word. */
+.mnote[data-smudge] .mnote__tail {
+  position: relative;
+  display: inline-block;
+  white-space: pre;
+}
+
+.mnote[data-smudge] .mnote__tailInk {
+  display: inline-block;
+  mask-image: linear-gradient(
+    to right,
+    #000 18%,
+    rgba(0, 0, 0, 0.58) 48%,
+    rgba(0, 0, 0, 0.16) 76%,
+    transparent 96%
+  );
+}
+
+.mnote[data-smudge] .mnote__tailDrag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: transparent;
+  white-space: pre;
+  text-shadow:
+    5px 0.8px 2px rgba(65, 65, 65, 0.4),
+    13px 1.8px 4px rgba(65, 65, 65, 0.34),
+    24px 3px 7px rgba(65, 65, 65, 0.26),
+    38px 4.4px 11px rgba(65, 65, 65, 0.18),
+    54px 5.8px 16px rgba(65, 65, 65, 0.11),
+    72px 7.2px 22px rgba(65, 65, 65, 0.06);
+  pointer-events: none;
+}
+
+/* --- rubbed out ---------------------------------------------------------- */
+
+/* Someone tried to erase this. The whole stack lives inside #rubbed-out,
+   including the blur — done here in CSS it would land after the grain and
+   wash it straight back out. Left just legible: an erased note you cannot
+   read at all is only a stain. */
+.mnote[data-rubbed] .mnote__text {
+  filter: url(#rubbed-out);
+  opacity: 0.8;
+}
+
+/* Reading it back is not the point, but a filter that fails to load should
+   still leave something faint rather than something solid. */
+@supports not (filter: url(#rubbed-out)) {
+  .mnote[data-rubbed] .mnote__text {
+    filter: blur(1.1px);
+    opacity: 0.5;
+  }
+}
+
+/* --- surface: sheet ------------------------------------------------------ */
+
+/* A torn scrap laid on the page. The scrap is one bitmap stretched to the
+   note, so this surface is for a line or two — more than that and the torn
+   edge smears. */
+.mnote[data-surface="sheet"] .mnote__inner {
+  max-width: 30ch;
+  padding: 1.15em 1.9em 1.35em;
+}
+
+.mnote[data-surface="sheet"] .mnote__inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url("/archive/strip.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  /* cast against the bitmap's alpha, so it follows the torn edge */
+  filter: drop-shadow(1px 3px 5px rgba(40, 34, 28, 0.18))
+    drop-shadow(0 1px 1px rgba(40, 34, 28, 0.12));
+}
+
+/* --- specimen ------------------------------------------------------------ */
+
+/* The design system shows the surfaces in flow; the floating behaviour is
+   documented under Layout, and a specimen that vanished on a laptop would be
+   no use. */
+.mnote[data-demo] {
+  height: auto;
+}
+
+.mnote[data-demo] .mnote__inner {
+  position: static;
+  /* absolute positioning was blockifying this; static returns it to inline,
+     where width and max-width are ignored and the scrap stretches the line */
+  display: inline-block;
+}
+
+/* Once the column fills the page there is no margin to write in, and a note
+   that has nowhere to float would have to go inline — which is the thing it
+   is not. It carries no information, so it goes. */
+/* Below the lane, a note becomes an interjection.
+   It used to be `display: none`, which meant a phone got none of the
+   handwriting — and the handwriting is the voice. So instead of hiding, it
+   drops into the flow exactly where it sits in the DOM: still the hand, still
+   tilted, but breaking a little out of the measure so it can never be mistaken
+   for body copy. */
+@media (max-width: 1080px) {
+  .mnote:not([data-demo]) {
+    /* it takes space now, rather than hanging out of flow */
+    height: auto;
+    margin: clamp(1.5rem, 5vw, 2.25rem) 0;
+  }
+
+  .mnote:not([data-demo]) .mnote__inner {
+    position: static;
+    top: auto;
+    left: auto;
+    /* wider than the 21ch of a margin, but still short of the measure */
+    width: auto;
+    max-width: 30ch;
+    /* the depth trail belongs to a lane that no longer exists */
+    translate: none;
+    /* half the tilt: at this width a 2.4deg lean starts to look like a mistake */
+    transform: rotate(calc(var(--mnote-tilt, -2deg) * 0.45));
+    /* pushed off the text's left edge, so it reads as added rather than set */
+    margin-left: clamp(0.75rem, 4vw, 2rem);
+  }
+
+  /* the register's note has a lane assignment that no longer applies */
+  .register > .mnote:not([data-demo]) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+/* The handwriting treatment on its own, for notes the canvas places itself. */
+.page .hand,
+.hand {
+  max-width: 36ch;
+  margin: 0;
+  font-family: var(--font-blank-weirdos-alt1), "Comic Sans MS", cursive;
+  font-size: calc(var(--text-body) * 1.15);
+  line-height: 1.2;
+  transform: rotate(-1.4deg);
+  transform-origin: left center;
+}
+
+/* --- metrics -------------------------------------------------------------- */
+
+.metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.metrics__value {
+  display: block;
+  /* the figures count up, so they must not change width while they do */
+  font-variant-numeric: tabular-nums;
+  font-variation-settings: "wght" var(--wght-numeral);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  line-height: 1.05;
+}
+
+.metrics__of {
+  display: block;
+  max-width: 18ch;
+  margin-top: 0.3em;
+  font-size: var(--text-label);
+  line-height: 1.4;
+  opacity: 0.75;
+}
+
+/* --- plate cluster -------------------------------------------------------- */
+
+.plates {
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Never shrink. As flex items these were being compressed to a fifth of their
+   width — 79-92% narrower than their own aspect — because the row overflowed
+   and `flex-shrink` did what it is told to do. A photograph squashed sideways
+   is worse than one that overflows, and `flex: none` means neither happens. */
+.plates .plate {
+  flex: none;
+}
+
+.plates img {
+  display: block;
+  width: auto;
+  /* Shorter than before, because a register row now carries three of these
+     rather than the two the cluster was designed around. */
+  height: clamp(4.5rem, 8vw, 7rem);
+}
+
+.plates .plate + .plate {
+  margin-left: clamp(-3.5rem, -4.5vw, -2rem);
+}
+
+.plates .plate:nth-child(1) {
+  transform: translateY(var(--lift, 0px)) rotate(-7deg);
+  z-index: 3;
+}
+
+.plates .plate:nth-child(2) {
+  transform: translateY(var(--lift, 0px)) rotate(6deg);
+  z-index: 2;
+}
+
+.plates .plate:nth-child(3) {
+  transform: translateY(var(--lift, 0px)) rotate(-3.5deg);
+  z-index: 1;
+}
+
+/* An object is a thing on a desk, so reaching for it lifts it and lengthens
+   what it casts. Objects only — a register row is the paper itself, not
+   something resting on it, and lifting it would claim a depth it does not
+   have. */
+.plates .plate {
+  transition:
+    transform var(--dur-lift) var(--ease-settle),
+    filter var(--dur-lift) ease;
+}
+
+/* Gated: a tap on a touch screen fires a false hover that then sticks. */
+@media (hover: hover) and (pointer: fine) {
+  .plates .plate:hover {
+    --lift: -4px;
+    filter: drop-shadow(0 7px 11px rgba(40, 34, 28, 0.24));
+  }
+}
+
+/* --- prose furniture ------------------------------------------------------ */
+
+.page .page__lede,
+.page__lede {
+  font-size: var(--text-lead);
+  line-height: 1.45;
+  margin-bottom: 1em;
+}
+
+.page__lede--empty {
+  font-style: italic;
+  opacity: 0.75;
+}
+
+/* Someone else's voice. Not the published serif and not the hand — a quoted
+   line from the research, set off the measure and marked with a seam so the
+   provenance is legible without a caption. */
+
+.page__quote {
+  position: relative;
+  max-width: 34ch;
+  margin: 2.75em 0 2.5em;
+  padding-left: clamp(1rem, 2.5vw, 2rem);
+  border-left: 2px solid var(--accent-green-wash);
+  font-size: var(--text-aside);
+  line-height: 1.25;
+  font-variation-settings: "wght" var(--wght-body);
+  text-wrap: balance;
+}
+
+.page__quote p {
+  margin: 0;
+}
+
+.page__quote footer {
+  margin-top: 0.9em;
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: var(--text-label);
+  line-height: 1.4;
+  opacity: 0.55;
+}
+
+.page__subhead {
+  margin: 2.5em 0 0.6em;
+  font-size: var(--text-subhead);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.facts {
+  max-width: var(--measure);
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.facts__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding: 0.7rem 0;
+  box-shadow: inset 0 -1px 0 rgba(65, 65, 65, 0.1);
+}
+
+.facts__meta {
+  font-size: var(--text-label);
+  font-style: italic;
+  opacity: 0.65;
+}
+
+/* --- a page's closing line ------------------------------------------------ */
+
+.page .page__outro,
+.page__outro {
+  margin-top: clamp(3rem, 7vw, 6rem);
+}
+
+@media (max-width: 700px) {
+  /* The numeral hangs beside the content on a wide screen and sits above it on
+     a narrow one — there is not room for both a gutter and a measure. */
+  .register {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.25rem;
+  }
+
+  .register__aside,
+  .register__body {
+    grid-column: 1;
+  }
+
+  .register__num {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .plates {
+    justify-content: flex-start;
+  }
+
+  .plates img {
+    height: clamp(4.5rem, 22vw, 7rem);
+  }
+
+  .masthead {
+    --h: clamp(7rem, 26vw, 11rem);
+  }
+
+  .facts__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Design system page — a living style guide. It uses the site's own tokens and
+   components throughout, so it can only be accurate.
+--------------------------------------------------------------------------- */
+
+.ds {
+  --ds-gutter: var(--grid-margin);
+  --ds-measure: 62ch;
+  /* see .page — auto margins on a flex item disable stretch */
+  width: 100%;
+  max-width: var(--grid-max);
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 5rem) var(--ds-gutter) clamp(5rem, 10vw, 10rem);
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  color: var(--foreground);
+}
+
+.ds p {
+  max-width: var(--ds-measure);
+  margin: 0 0 1em;
+}
+
+.ds__masthead {
+  margin-bottom: clamp(3rem, 7vw, 7rem);
+}
+
+.ds__title {
+  margin: 0 0 0.4em;
+  font-size: var(--text-display);
+  font-weight: 400;
+  font-variation-settings: "wght" var(--wght-display);
+  line-height: var(--leading-display);
+}
+
+.ds__thesis {
+  max-width: 34ch;
+  font-style: italic;
+  font-size: var(--text-aside);
+  line-height: 1.25;
+}
+
+.ds__section {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 3rem);
+  padding-top: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.ds__section + .ds__section {
+  margin-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+.ds__sectionHead {
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
+}
+
+.ds__sectionNum {
+  display: block;
+  font-variation-settings: "wght" var(--wght-numeral);
+  font-size: var(--text-label);
+  letter-spacing: 0.08em;
+  opacity: 0.5;
+}
+
+.ds__sectionTitle {
+  margin: 0.2em 0 0;
+  font-size: calc(var(--text-body) * 1.5);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.ds__subhead {
+  margin: 2.25em 0 0.6em;
+  font-size: var(--text-subhead);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.ds__lede {
+  font-size: var(--text-lead);
+  line-height: 1.45;
+}
+
+.ds__aside {
+  max-width: var(--ds-measure);
+  margin-top: 1.75em;
+  font-size: var(--text-label);
+  line-height: 1.5;
+  opacity: 0.72;
+}
+
+.ds__principles,
+.ds__swatches,
+.ds__voices {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds__swatches,
+.ds__voices {
+  margin-top: 1.5rem;
+}
+
+.ds__principle {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.ds__principleNum {
+  font-variation-settings: "wght" var(--wght-numeral);
+  font-size: calc(var(--text-body) * 1.3);
+  line-height: 1.2;
+}
+
+.ds__principleTitle {
+  margin: 0 0 0.3em;
+  font-size: calc(var(--text-body) * 1.1);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.ds__swatch {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.ds__chip {
+  height: 3.5rem;
+  border-radius: 1px;
+  /* the ink swatch would vanish on paper without an edge */
+  box-shadow: inset 0 0 0 1px rgba(40, 34, 28, 0.14);
+}
+
+.ds__swatchNote {
+  margin: 0.35em 0 0;
+  font-size: var(--text-label);
+  line-height: 1.5;
+}
+
+.ds__code {
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: 0.82em;
+}
+
+.ds__code + .ds__code {
+  margin-left: 0.9em;
+}
+
+.ds__code--dim {
+  opacity: 0.6;
+}
+
+.ds__voice {
+  margin-bottom: 2.25rem;
+}
+
+.ds__voiceHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.9rem;
+}
+
+.ds__voiceRole {
+  margin: 0;
+  font-size: calc(var(--text-body) * 1.05);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.ds__voiceDetail {
+  margin: 0.5em 0 0;
+  font-size: var(--text-label);
+  line-height: 1.55;
+}
+
+.ds__spec {
+  max-width: none;
+  margin: 0.35em 0 0;
+  line-height: 1.1;
+}
+
+.ds__spec--serif {
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+}
+
+.ds__spec--hand {
+  font-family: var(--font-blank-weirdos-alt1), "Comic Sans MS", cursive;
+  font-size: clamp(1.1rem, 2.4vw, 1.75rem);
+}
+
+.ds__spec--mono {
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+/* --- typescale ruler ----------------------------------------------------- */
+
+/* A specimen per step, each set with its own token so the ruler is the scale
+   rather than a picture of one. */
+.ruler {
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ruler__row {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr) 6rem;
+  gap: 0 1.25rem;
+  align-items: baseline;
+  padding: 0.85rem 0;
+  border-bottom: 1px dotted rgba(65, 65, 65, 0.26);
+}
+
+.ruler__meta,
+.ruler__role {
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  line-height: 1.45;
+  opacity: 0.52;
+}
+
+.ruler__meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.ruler__wght {
+  opacity: 0.72;
+}
+
+.ruler__role {
+  text-align: right;
+}
+
+.ruler__spec {
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  line-height: 1.05;
+  /* a display line is wider than any column; clipping deliberately beats
+     wrapping, which would make the ruler unreadable as a ladder */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 700px) {
+  .ruler__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.3rem;
+  }
+
+  .ruler__meta {
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+
+  .ruler__role {
+    text-align: left;
+  }
+}
+
+/* Wide content scrolls in its own container rather than pushing the page. */
+.ds__tableWrap {
+  margin-top: 1.25rem;
+  overflow-x: auto;
+}
+
+.ds__table {
+  width: 100%;
+  min-width: 30rem;
+  border-collapse: collapse;
+  font-size: var(--text-label);
+  line-height: 1.5;
+  text-align: left;
+}
+
+.ds__table th {
+  padding: 0 1rem 0.5rem 0;
+  font-style: italic;
+  font-weight: 400;
+  opacity: 0.6;
+  border-bottom: 1px solid rgba(65, 65, 65, 0.22);
+}
+
+.ds__table td {
+  padding: 0.6rem 1rem 0.6rem 0;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(65, 65, 65, 0.1);
+}
+
+.ds__plate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  margin: 1.5rem 0 2rem;
+}
+
+.ds__plate img {
+  width: auto;
+  height: clamp(7rem, 14vw, 11rem);
+  filter: drop-shadow(1px 3px 5px rgba(40, 34, 28, 0.16))
+    drop-shadow(0 1px 1px rgba(40, 34, 28, 0.1));
+}
+
+.ds__plate--pair img {
+  height: clamp(11rem, 22vw, 18rem);
+  width: auto;
+}
+
+.ds__plate--pair .plate img {
+  filter: drop-shadow(2px 5px 8px rgba(40, 34, 28, 0.18))
+    drop-shadow(0 1px 2px rgba(40, 34, 28, 0.12));
+}
+
+.ds__rules {
+  margin: 0;
+}
+
+.ds__rule {
+  margin-bottom: 1.1rem;
+  max-width: var(--ds-measure);
+}
+
+.ds__rule dt {
+  font-style: italic;
+}
+
+.ds__rule dd {
+  margin: 0.2em 0 0;
+  font-size: var(--text-label);
+  line-height: 1.55;
+}
+
+.ds__demoRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  margin: 1.5rem 0 0.5rem;
+  font-style: italic;
+  font-weight: 300;
+  font-size: calc(var(--text-body) * 1.3);
+}
+
+.ds__demoMark {
+  margin: 0.4em 0 0;
+  width: max-content;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-variation-settings: "wght" 400;
+  transition: font-variation-settings var(--dur-weight) var(--ease-settle);
+  cursor: default;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ds__demoMark:hover {
+    font-variation-settings: "wght" 900;
+  }
+}
+
+.ds__registers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.ds__quote {
+  margin: 0 0 0.75em;
+}
+
+.ds__quote--serif {
+  font-size: calc(var(--text-body) * 1.75);
+  line-height: 1.15;
+}
+
+.ds__quote--hand {
+  font-family: var(--font-blank-weirdos-alt1), "Comic Sans MS", cursive;
+  font-size: calc(var(--text-body) * 1.35);
+  line-height: 1.25;
+}
+
+.ds__open {
+  max-width: var(--ds-measure);
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.ds__open li {
+  margin-bottom: 0.9em;
+}
+
+.ds__open strong {
+  font-weight: 400;
+  font-variation-settings: "wght" var(--wght-emphasis);
+}
+
+@media (max-width: 800px) {
+  .ds__section {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ds__sectionHead {
+    position: static;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds__demoMark {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Design system — component specimens. Each demo is the real component, not a
+   picture of one, so a broken component shows up here first.
+--------------------------------------------------------------------------- */
+
+.ds__component {
+  margin: 0 0 2.75rem;
+  max-width: none;
+}
+
+.ds__componentHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.9rem;
+}
+
+.ds__componentName {
+  margin: 0;
+  font-size: calc(var(--text-body) * 1.05);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.ds__componentNote {
+  max-width: var(--ds-measure);
+  margin: 0.35em 0 0;
+  font-size: var(--text-label);
+  line-height: 1.55;
+}
+
+/* A specimen stage: a shallow well in the paper so the example reads as
+   mounted rather than as page content. */
+.ds__demo {
+  position: relative;
+  margin-top: 1rem;
+  padding: 1.75rem;
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(65, 65, 65, 0.1);
+}
+
+.ds__demoLabel--gap {
+  margin-top: 2.25rem;
+}
+
+.ds__demoLabel {
+  display: block;
+  margin-bottom: 0.9rem;
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  opacity: 0.45;
+}
+
+.ds__demoSplit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+}
+
+/* --- plate variants ------------------------------------------------------- */
+
+.ds__plates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 2.5rem;
+}
+
+.ds__plateSet {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ds__plateSet > span {
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  opacity: 0.45;
+}
+
+.ds__plateGroup {
+  display: flex;
+  align-items: flex-end;
+}
+
+.ds__plateGroup img {
+  width: auto;
+  height: 6.5rem;
+}
+
+.ds__plateGroup--scattered .plate:first-child {
+  transform: rotate(-9deg);
+  z-index: 1;
+}
+
+.ds__plateGroup--scattered .plate:last-child {
+  margin-left: -2.5rem;
+  transform: rotate(6deg);
+}
+
+.ds__plateGroup--squared {
+  gap: 1.25rem;
+}
+
+/* --- sheet ---------------------------------------------------------------- */
+
+.ds__sheet {
+  --h: 8.5rem;
+  position: relative;
+  height: calc(var(--h) + 2rem);
+  margin: 0 -1.75rem;
+  overflow: hidden;
+}
+
+.ds__sheet img {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--h) * -0.6898);
+  height: calc(var(--h) * 1.6898);
+  width: auto;
+  max-width: none;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 5px 8px rgba(40, 34, 28, 0.24))
+    drop-shadow(0 1px 2px rgba(40, 34, 28, 0.18));
+  mask-image: linear-gradient(to bottom, #000 96%, transparent 100%);
+}
+
+.ds__sheetText {
+  position: absolute;
+  left: 1.75rem;
+  top: 1.1rem;
+  margin: 0;
+  font-size: calc(var(--text-body) * 1.1);
+  font-style: italic;
+}
+
+/* --- masthead band -------------------------------------------------------- */
+
+.ds__band {
+  --h: 5.5rem;
+  position: relative;
+  height: calc(var(--h) + 1.5rem);
+  margin: 0 -1.75rem;
+  overflow: hidden;
+}
+
+.ds__band img {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--h) * -0.6898);
+  height: calc(var(--h) * 1.6898);
+  width: auto;
+  max-width: none;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 5px 8px rgba(40, 34, 28, 0.24));
+  mask-image: linear-gradient(to bottom, #000 96%, transparent 100%);
+}
+
+.ds__bandRow {
+  position: absolute;
+  inset: 0.9rem 1.75rem auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ds__bandMark {
+  margin: 0;
+  font-size: calc(var(--text-body) * 1.15);
+}
+
+.ds__bandNav {
+  display: flex;
+  gap: 1.75rem;
+  font-style: italic;
+  font-weight: 300;
+  font-size: var(--text-body);
+}
+
+/* --- numbered entry ------------------------------------------------------- */
+
+.ds__entry {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  gap: 0.75rem;
+  max-width: 30rem;
+}
+
+.ds__entryNum {
+  font-variation-settings: "wght" var(--wght-numeral);
+  font-size: var(--text-mark);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  line-height: 1.9;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+.ds__entryTitle {
+  margin: 0 0 0.4em;
+  font-size: calc(var(--text-body) * 1.25);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.ds__entryBody {
+  margin: 0 0 1em;
+  font-size: var(--text-label);
+  line-height: 1.55;
+}
+
+.ds__more {
+  font-size: var(--text-label);
+  font-style: italic;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* --- reveal pair ---------------------------------------------------------- */
+
+.ds__reveal {
+  position: relative;
+}
+
+.ds__revealStage {
+  position: relative;
+  height: 8rem;
+  margin-bottom: 1rem;
+}
+
+.ds__revealStage .plate {
+  position: absolute;
+  bottom: 0;
+  transition: transform var(--dur-resolve) var(--ease-settle);
+}
+
+.ds__revealStage .plate img {
+  width: auto;
+  height: 6.5rem;
+}
+
+.ds__revealStage .plate:nth-child(1) {
+  left: 2rem;
+  transform: translate(1.5rem, -0.5rem) rotate(-11deg) scale(1.08);
+  z-index: 2;
+}
+
+.ds__revealStage .plate:nth-child(2) {
+  left: 11rem;
+  transform: translate(-3.4rem, 0.4rem) rotate(7deg) scale(1.12);
+}
+
+.ds__reveal:hover .plate,
+.ds__reveal:focus-within .plate {
+  transform: none;
+}
+
+.ds__revealLine {
+  margin: 0;
+  font-size: calc(var(--text-body) * 1.5);
+  line-height: 1.1;
+}
+
+.ds__revealSlot {
+  display: inline-grid;
+  justify-items: center;
+  vertical-align: baseline;
+  font-family: var(--font-blank-weirdos), "Comic Sans MS", cursive;
+}
+
+.ds__revealSlot > span {
+  grid-area: 1 / 1;
+  transition: opacity var(--dur-annotation) ease;
+}
+
+.ds__revealSlot .ds__revealB {
+  opacity: 0;
+}
+
+.ds__reveal:hover .ds__revealA,
+.ds__reveal:focus-within .ds__revealA {
+  opacity: 0;
+}
+
+.ds__reveal:hover .ds__revealB,
+.ds__reveal:focus-within .ds__revealB {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds__revealStage .plate,
+  .ds__revealSlot > span {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Text button — the underline is inked on hover rather than ruled: a tapered
+   stroke wiped in from the left. Eight gestures cycle, each with its own
+   pressure profile and overshoot, so a run of links reads as separate marks
+   rather than one shape repeated.
+--------------------------------------------------------------------------- */
+
+/* rise */
+.text-button {
+  --underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 48' preserveAspectRatio='none'%3E%3Cpath d='M2.5,29.48 C45,27.18 85,24.98 126,23.63 C160,22.73 184,22.53 197.5,22.73 L197.5,24.33 C184,24.93 160,25.93 126,27.03 C85,28.08 45,29.48 2.5,30.98 Z' fill='black'/%3E%3C/svg%3E");
+  --underline-l: -0.18em;
+  --underline-r: -0.2em;
+  position: relative;
+  /* inline-block so a transform applies at all — transforms are ignored on
+     non-replaced inline boxes. Every .text-button on the site is standalone
+     (nav item, facts cell, outro line), so this costs no wrapping. */
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+  transition: transform var(--dur-press) var(--ease-press);
+}
+
+/* The site's whole vocabulary is physical — sheets lift, paper unfurls, notes
+   trail — and until now nothing answered a finger. Not gated behind
+   (hover: hover): a press is the primary feedback on touch, where it matters
+   most. */
+.text-button:active,
+.site-header__wordmark:active {
+  transform: scale(0.97);
+}
+
+.site-header__wordmark {
+  transition:
+    font-variation-settings var(--dur-weight) var(--ease-settle),
+    transform var(--dur-press) var(--ease-press);
+}
+
+/* bow */
+.text-button:nth-child(8n + 2) {
+  --underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 48' preserveAspectRatio='none'%3E%3Cpath d='M2.5,26.64 C42,24.34 80,22.64 118,22.09 C154,22.64 180,24.24 197.5,26.44 L197.5,28.34 C180,26.74 154,25.54 118,25.09 C80,25.54 42,26.84 2.5,28.54 Z' fill='black'/%3E%3C/svg%3E");
+  --underline-l: -0.16em;
+  --underline-r: -0.19em;
+}
+
+/* fall */
+.text-button:nth-child(8n + 3) {
+  --underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 48' preserveAspectRatio='none'%3E%3Cpath d='M2.5,21.86 C44,22.41 84,23.66 124,25.21 C158,26.91 182,28.41 197.5,29.66 L197.5,31.06 C182,30.31 158,29.41 124,28.31 C84,27.06 44,25.51 2.5,24.06 Z' fill='black'/%3E%3C/svg%3E");
+  --underline-l: -0.21em;
+  --underline-r: -0.17em;
+}
+
+/* easeoff */
+.text-button:nth-child(8n + 4) {
+  --underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 48' preserveAspectRatio='none'%3E%3Cpath d='M2.5,27.74 C42,25.49 80,23.79 118,22.89 C154,22.64 180,23.29 197.5,24.59 L197.5,26.69 C180,26.39 154,26.04 118,25.99 C80,26.29 42,27.39 2.5,29.14 Z' fill='black'/%3E%3C/svg%3E");
+  --underline-l: -0.15em;
+  --underline-r: -0.18em;
+}
+
+/* drift */
+.text-button:nth-child(8n + 5) {
+  --underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 48' preserveAspectRatio='none'%3E%3Cpath d='M2.5,23.41 C44,23.71 84,24.31 124,25.06 C158,25.91 182,26.71 197.5,27.61 L197.5,29.51 C182,29.21 158,28.81 124,28.06 C84,27.21 44,26.21 2.5,25.31 Z' fill='black'/%3E%3C/svg%3E");
+  --underline-l: -0.19em;
+  --underline-r: -0.16em;
+}
+
+/* level */
+.text-button:nth-child(8n + 6) {
+  --underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 48' preserveAspectRatio='none'%3E%3Cpath d='M2.5,25.92 C46,24.72 88,23.72 128,23.27 C160,23.47 182,24.37 197.5,25.67 L197.5,27.27 C182,26.77 160,26.67 128,26.67 C88,26.82 46,27.02 2.5,27.42 Z' fill='black'/%3E%3C/svg%3E");
+  --underline-l: -0.17em;
+  --underline-r: -0.21em;
+}
+
+/* lift */
+.text-button:nth-child(8n + 7) {
+  --underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 48' preserveAspectRatio='none'%3E%3Cpath d='M2.5,27.74 C46,27.09 88,26.29 128,25.29 C160,24.14 182,23.09 197.5,22.39 L197.5,24.49 C182,26.19 160,27.54 128,28.39 C88,28.79 46,28.99 2.5,29.14 Z' fill='black'/%3E%3C/svg%3E");
+  --underline-l: -0.2em;
+  --underline-r: -0.15em;
+}
+
+/* dip */
+.text-button:nth-child(8n + 8) {
+  --underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 48' preserveAspectRatio='none'%3E%3Cpath d='M2.5,23.1 C42,23.95 80,24.8 118,25.25 C154,25.05 180,24.25 197.5,23.3 L197.5,24.7 C180,26.15 154,27.55 118,28.35 C80,28.2 42,27.05 2.5,25.3 Z' fill='black'/%3E%3C/svg%3E");
+  --underline-l: -0.16em;
+  --underline-r: -0.18em;
+}
+
+.text-button::after {
+  content: "";
+  position: absolute;
+  /* Overshoots the word at both ends, the way a drawn line does. */
+  left: var(--underline-l);
+  right: var(--underline-r);
+  bottom: -0.32em;
+  height: 0.8em;
+  background-color: currentColor;
+  mask-image: var(--underline);
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path var(--dur-underline) var(--ease-stroke);
+  pointer-events: none;
+}
+
+.text-button:hover::after,
+.text-button:focus-visible::after {
+  clip-path: inset(0 0 0 0);
+}
+
+.text-button:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 4px;
+  border-radius: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-button::after {
+    transition: none;
+  }
+}
+
+/* ===========================================================================
+   Motion — physics, never decoration
+   ...
+   Everything here is gated behind `html[data-motion]`, which PaperMotion sets
+   only after it has confirmed motion is wanted. So a note is never masked
+   unless something is guaranteed to unmask it: no JS, or reduced motion, and
+   the writing is simply there.
+=========================================================================== */
+
+/* Registered so it can be transitioned — a bare custom property cannot be,
+   and the whole stroke-on depends on interpolating this one value. */
+@property --ink {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+/* Handwriting has a direction and a duration, so it arrives written rather
+   than faded in. The sweep is angled a little off horizontal so a note of two
+   or three lines resolves roughly the way a hand would cross it, and the
+   easing is a pen's: unhurried at the start, quick through the middle, slowing
+   into the last few characters. */
+html[data-motion] .mnote__text {
+  -webkit-mask-image: linear-gradient(
+    100deg,
+    #000 var(--ink),
+    transparent calc(var(--ink) + 9%)
+  );
+  mask-image: linear-gradient(
+    100deg,
+    #000 var(--ink),
+    transparent calc(var(--ink) + 9%)
+  );
+  transition: --ink var(--dur-ink) var(--ease-ink);
+}
+
+/* past 100% so the feather clears the last glyph rather than parking on it */
+html[data-motion] .mnote__inner[data-written] .mnote__text {
+  --ink: 112%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* belt and braces — PaperMotion never sets data-motion under this, so the
+     masks never apply, but the hover lift is pure CSS and has to be told */
+  .plates .plate {
+    transition: none;
+  }
+}
+
+/* --- 4: the sheet is laid down ---------------------------------------------
+   It hinges on its top edge and unfurls downward, so the torn end swings into
+   place last and overshoots flat before settling — the way a sheet let go of
+   an inch above a desk behaves. Once, on first paint. Pure CSS rather than script-gated, because unlike the
+   note masks this hides nothing — it only moves something already correct
+   where it sits, so no-JS simply gets the resting state.
+
+   `filter` appears only in the opening frame: the sheet is held higher, so it
+   casts further and softer, and the closing value is left implicit so it
+   resolves to whatever the element actually computes. That matters on Ask,
+   where the tear's light already softens the cast — the landing has to agree
+   with the page it lands on rather than overwrite it.
+--------------------------------------------------------------------------- */
+
+@keyframes sheet-laid {
+  0% {
+    /* Not yet unrolled: hinged at its top edge and held short, so the torn
+       end has real distance to travel. The tilt is what makes that travel
+       read as paper rather than as a box growing. */
+    transform: translateX(-50%) translateY(-4px) scaleY(0.93) rotateX(8deg);
+    filter: drop-shadow(0 20px 30px rgba(40, 34, 28, 0.21))
+      drop-shadow(0 3px 7px rgba(40, 34, 28, 0.15));
+  }
+  /* past flat, because a sheet let go of does not stop dead */
+  64% {
+    transform: translateX(-50%) translateY(1px) scaleY(1.011) rotateX(-1.8deg);
+  }
+  86% {
+    transform: translateX(-50%) translateY(0) scaleY(0.997) rotateX(0.6deg);
+  }
+  100% {
+    transform: translateX(-50%) translateY(0) scaleY(1) rotateX(0deg);
+  }
+}
+
+/* The paper fades up if it arrives late, so a slow connection gets a soft
+   arrival rather than a pop. Gated on data-motion so no-JS and reduced-motion
+   never leave the sheet hidden — the script that hides it is the only thing
+   that can reveal it. */
+html[data-motion] .site-header__texture img {
+  opacity: 0;
+  transition: opacity var(--dur-annotation) var(--ease-settle);
+}
+
+html[data-motion][data-paper] .site-header__texture img {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* `SiteHeader` is rendered per page rather than in the layout, so every
+     client-side navigation remounts it and would replay this. `data-laid` is
+     absent at first paint and set when the animation ends, which makes it a
+     once-per-document gesture rather than a tax on every nav click.
+
+     `data-paper` waits for the bitmap. Without it the 860ms unfurl plays on a
+     transparent box — measured on a throttled connection, the animation had
+     already finished while the image was still `naturalWidth: 0`. The one
+     deliberate entrance on the site was being spent on nothing. */
+  html[data-paper]:not([data-laid]) .site-header__texture {
+    /* Slow off the mark and then away: an eased-out curve put most of the
+       swing inside the first two frames, which read as a drop rather than
+       as something unfurling. */
+    animation: sheet-laid var(--dur-unfurl) var(--ease-unfurl);
+  }
+}
+
+/* --- register arrival -----------------------------------------------------
+   Rows come in from the right rather than up from below, at the cost of being
+   the one gesture on the site that does not run with the grain: the note
+   stroke-on sweeps at 100deg and the sheet tear at 94deg, both left to right,
+   both with reading direction. Arriving from the right margin — where the
+   annotations live — is the reading that makes it coherent.
+
+   The travel is 14px on purpose. A register row is a region of one continuous
+   sheet, not a card laid on it, so anything far enough to read as paper
+   sliding would contradict the structure. At 14px it reads as ink settling
+   onto paper that was already there.
+
+   Gated on data-motion: no JS and reduced motion both leave every row present,
+   because only the script that hides them can bring them back. Sequencing is
+   mostly the scroll's own — rows are tall enough to cross one at a time — with
+   a 60ms stagger applied in JS only to rows that arrive in the same pass.
+--------------------------------------------------------------------------- */
+
+html[data-motion] .register {
+  opacity: 0;
+  transform: translateX(14px);
+  transition:
+    opacity var(--dur-annotation) var(--ease-settle),
+    transform var(--dur-annotation) var(--ease-settle);
+}
+
+html[data-motion] .register[data-arrived] {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* The affordance that was doing nothing. The arrow is the only part of a row
+   that is allowed to move on hover, because it is pointing at where the click
+   goes rather than pretending the paper lifts. */
+.register__arrow {
+  display: inline-block;
+  transition: transform var(--dur-press) var(--ease-press);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .register__more:hover .register__arrow {
+    transform: translateX(3px);
+  }
+}
+
+.register__more:focus-visible .register__arrow {
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .register__arrow {
+    transition: none;
+  }
+}
+
+/* --- 5: weight as energy ---------------------------------------------------
+   The wordmark already rides 300-900. The shelf marks and the numerals do the
+   same on approach — a figure asserting itself, not a hover affordance. It is
+   the one gesture in the system that changes a glyph rather than moving it.
+--------------------------------------------------------------------------- */
+
+.register__num,
+.metrics__value {
+  transition: font-variation-settings var(--dur-weight) var(--ease-settle);
+}
+
+/* Focus stays ungated — a keyboard user needs the same cue, and focus is
+   never the false positive that a tap-hover is. */
+.register:focus-within .register__num {
+  font-variation-settings: "wght" 900;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .register:hover .register__num {
+    font-variation-settings: "wght" 900;
+  }
+
+  .metrics li:hover .metrics__value {
+    font-variation-settings: "wght" 900;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collage__piece {
+    transition: none;
+    translate: none;
+  }
+
+  .register__num,
+  .metrics__value {
+    transition: none;
+  }
+
+  /* the scale stays — it is feedback, not decoration — it just snaps */
+  .text-button,
+  .site-header__wordmark {
+    transition: none;
+  }
+}
+
+/* ===========================================================================
+   Torn sheets — sections, done the way the system says sections are done
+
+   "Layers, not sections": a division is a torn edge revealing the sheet
+   underneath, never a rule and never a gap showing the ground between them.
+   Each sheet lays its torn top edge over the one above it, so the page is a
+   stack of paper rather than a list of blocks.
+
+   The tear is the top edge of the header's own asset — that band is torn on
+   both edges and the header simply hides the upper one, so the dividers are
+   the same photographed paper as the masthead rather than a second tear that
+   would have to be matched to it.
+
+   The fill under the tear is rgba(252,252,252,.965) because that is what the
+   asset's paper actually measures. A flat #fff would be denser than the
+   photograph and leave a seam where the two meet.
+=========================================================================== */
+
+@property --rip {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+.sheet {
+  position: relative;
+  /* contains the paper's z-index: -1 so it stays behind this section's own
+     content and no further */
+  isolation: isolate;
+  padding: clamp(4.5rem, 8vw, 8rem) 0 clamp(3rem, 6vw, 5.5rem);
+}
+
+.sheet__paper {
+  --tear-h: clamp(38px, 4.4vw, 82px);
+  position: absolute;
+  z-index: -1;
+  /* Full bleed. The main column is padded, and a sheet inset from the page
+     edges is a card — which the system forbids outright. Breaking out keeps
+     the paper continuous to both edges. */
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  /* the tear overhangs upward, onto whatever it is laid over */
+  top: calc(var(--tear-h) * -1);
+  bottom: 0;
+  /* torn edge on top, the paper's own density below it */
+  background-image:
+    url("/tear-top.png"),
+    linear-gradient(rgba(252, 252, 252, 0.965), rgba(252, 252, 252, 0.965));
+  /* 104% because the asset's side margins are transparent — at exactly 100%
+     a sliver of ground shows at each edge, the same reason the header band
+     overscans */
+  background-size:
+    104% var(--tear-h),
+    100% calc(100% - var(--tear-h) + 1px);
+  background-position:
+    50% 0,
+    50% 100%;
+  background-repeat: no-repeat;
+  /* sheets cast long and soft along the tear */
+  filter: drop-shadow(0 5px 9px rgba(40, 34, 28, 0.15))
+    drop-shadow(0 1px 2px rgba(40, 34, 28, 0.12));
+  pointer-events: none;
+}
+
+/* Consecutive dividers must not be the same silhouette. Mirroring the paper
+   flips the tear and reverses the direction it rips in; the fill is flat and
+   the content lives in a separate element, so nothing else is affected. */
+.sheet:nth-of-type(even) .sheet__paper {
+  transform: translateX(-50%) scaleX(-1);
+}
+
+/* The hero rests on the ground and has no padding of its own to be overhung,
+   so the first sheet has to make its own clearance. */
+.site-main > .sheet:first-of-type {
+  margin-top: clamp(2.5rem, 5vw, 5.5rem);
+}
+
+/* The page ends on paper. A sheet that stops short leaves a straight cut with
+   ground beneath it, which reads as a card bottom — so the last one runs out
+   to the end of the document. */
+.sheet:last-of-type {
+  padding-bottom: clamp(5rem, 9vw, 8rem);
+}
+
+.sheet__inner {
+  width: 100%;
+  max-width: var(--grid-max);
+  margin: 0 auto;
+  padding: 0 var(--grid-margin);
+}
+
+/* --- 7: tears tear --------------------------------------------------------
+   The sheet arrives by tearing across rather than fading in. A straight wipe
+   travelling along the tear's own axis reads as propagation, because what it
+   uncovers frame by frame is the irregular edge itself — no procedural tear,
+   no second asset to register.
+
+   Only the paper is masked. The content sitting on it is never hidden, so
+   this animates the division and not the words, and a failure leaves the
+   writing exactly where it was.
+
+   It is driven by scroll position, not by a timer. The reader tears it, at
+   whatever speed they scroll, and it holds wherever they stop. Monotonic:
+   paper tears, it does not un-tear.
+--------------------------------------------------------------------------- */
+
+html[data-motion] .sheet__paper {
+  -webkit-mask-image: linear-gradient(
+    94deg,
+    #000 var(--rip),
+    transparent calc(var(--rip) + 6%)
+  );
+  mask-image: linear-gradient(
+    94deg,
+    #000 var(--rip),
+    transparent calc(var(--rip) + 6%)
+  );
+}
+
+/* ===========================================================================
+   The plate pile — case study imagery down the open lane
+
+   A case study's prose is capped at --measure, which on a wide sheet leaves
+   most of the right-hand side empty. That space is where the margin note
+   already lives, so the plates go under it and run down the rest.
+
+   The spread layout below is the DOM's own and needs no script: plates in
+   normal flow, each at its resting angle. PaperMotion transforms them *away*
+   from this into a pile and back, which means no JS, a thrown error or a
+   reduced-motion preference all leave a plain readable column of screens
+   rather than a heap in the corner.
+=========================================================================== */
+
+.case {
+  display: grid;
+  /* prose keeps its measure; the plates take whatever is left */
+  grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr);
+  column-gap: clamp(2rem, 5vw, 5.5rem);
+  align-items: start;
+}
+
+.case__prose {
+  min-width: 0;
+}
+
+.plate-pile {
+  position: relative;
+  /* Its own stacking context, so the plates' z-indices stack against each
+     other and nothing else. Without this the inline order (5, 4, 3…) competed
+     with the margin note's z-index 3 and the top plates won — the hand has to
+     sit over everything, always. */
+  z-index: 0;
+  /* Pulled up above the first line of published text, into the space beside
+     the standfirst that the note used to occupy. The pile is scaled and
+     rotated while closed, so its visual top sits higher again than this box. */
+  margin-top: clamp(-5.5rem, -4vw, -3rem);
+  display: flex;
+  flex-direction: column;
+  /* No gap. Plates overlap into a cascade — measured against the home
+     collage, whose resolved pieces sit in a tight row rather than spaced out.
+     Separated plates read as a list of screenshots; overlapped ones read as a
+     pile that has been fanned open. */
+  gap: 0;
+}
+
+.plate-pile__item + .plate-pile__item {
+  margin-top: calc(var(--plate-lap) * -1);
+}
+
+.plate-pile__item {
+  margin: 0;
+  /* Wider than before and fanned by transform rather than by layout, so the
+     lane's width does the work without the run getting taller. */
+  width: 78%;
+  z-index: var(--plate-z, 1);
+  /* z-index changes instantly, and stays that way. Deferring the drop back
+     so a plate stayed forward while its lift settled would have been the
+     nicer thing, but `transition: z-index` does not run here at all — an
+     isolated test reports zero animations for it. The easing the eye reads
+     comes from the lift below, not from the stacking order. */
+  /* Resting position — a placed thing is never quite square to the page, and
+     no two are placed the same way — plus the shove from the cursor.
+     Deliberately NOT transitioned: --push-* is written per frame, and a curve
+     on top of that is a second damping stage that makes the paper feel like
+     it is dragging behind the pointer. The weight comes from easing the value
+     in JS instead.
+
+     `translate`, `rotate` and `scale` are reserved for the unfurl, so the
+     push rides in `transform` where it cannot collide with it. */
+  transform: translate(var(--push-x, 0px), var(--push-y, 0px))
+    translateX(var(--plate-rest-x, 0)) rotate(var(--plate-rest, 0deg));
+}
+
+/* Hovering a plate brings it out of the stack. The cascade overlaps by about
+   a third, so part of every plate below the first is covered — this is the
+   only way to see a covered one whole. The lift lives on the image rather
+   than the figure so it can carry its own transition without smearing the
+   per-frame push above. */
+@media (hover: hover) and (pointer: fine) {
+  .plate-pile__item:hover {
+    z-index: 99;
+  }
+
+  /* Set for a beat after the cursor leaves, so the plate is flat again before
+     it goes back under its neighbours. See PaperMotion — this cannot be a
+     transition, because `z-index` does not transition here. */
+  .plate-pile__item[data-recent] {
+    z-index: 98;
+  }
+
+  /* A lift as well as a scale: rising off the desk reads as coming forward,
+     where scale alone reads as zooming. */
+  .plate-pile__item:hover .plate-pile__img {
+    transform: translateY(-5px) scale(1.035);
+    filter: drop-shadow(3px 11px 20px rgba(40, 34, 28, 0.28))
+      drop-shadow(0 2px 4px rgba(40, 34, 28, 0.15));
+  }
+}
+
+.plate-pile__item[data-tall] {
+  width: 50%;
+}
+
+.plate-pile__item:nth-child(6n + 1) {
+  --plate-rest: -1.8deg;
+  --plate-rest-x: 0%;
+}
+.plate-pile__item:nth-child(6n + 2) {
+  --plate-rest: 1.4deg;
+  --plate-rest-x: 22%;
+}
+.plate-pile__item:nth-child(6n + 3) {
+  --plate-rest: -0.9deg;
+  --plate-rest-x: 6%;
+}
+.plate-pile__item:nth-child(6n + 4) {
+  --plate-rest: 2.1deg;
+  --plate-rest-x: 18%;
+}
+.plate-pile__item:nth-child(6n + 5) {
+  --plate-rest: -1.3deg;
+  --plate-rest-x: 2%;
+}
+.plate-pile__item:nth-child(6n) {
+  --plate-rest: 0.8deg;
+  --plate-rest-x: 14%;
+}
+
+.plate-pile__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition:
+    transform var(--dur-reveal) var(--ease-settle),
+    filter var(--dur-reveal) var(--ease-settle);
+  /* objects cast short and tight against their silhouette */
+  filter: drop-shadow(1px 3px 6px rgba(40, 34, 28, 0.16))
+    drop-shadow(0 1px 2px rgba(40, 34, 28, 0.1));
+}
+
+/* The plates arrive one at a time, so the pile assembles rather than appears.
+   Gated on data-motion: only the script that hides them can put them back. */
+/* This has to restate the lift's transitions, not just add opacity: the
+   shorthand replaces whatever the base rule set, and being the more specific
+   selector it won. The reveal snapped at both ends until this listed them. */
+html[data-motion] .plate-pile__img {
+  opacity: 0;
+  transition:
+    opacity var(--dur-annotation) var(--ease-settle),
+    transform var(--dur-reveal) var(--ease-settle),
+    filter var(--dur-reveal) var(--ease-settle);
+}
+
+html[data-motion] .plate-pile__item[data-loaded] .plate-pile__img {
+  opacity: 1;
+}
+
+/* Below the note's own breakpoint the lane does not exist, so the plates stop
+   being a pile and become what they are underneath: a column of screens after
+   the writing. Static, full width, no stacking. */
+@media (max-width: 1080px) {
+  /* One column, and both wrappers dissolve so their children become siblings
+     of the same flex column. That is what lets the plates weave between the
+     paragraphs instead of queueing up after them. */
+  .case {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .case__prose,
+  .plate-pile {
+    display: contents;
+  }
+
+  /* The weave. Prose takes the odd steps, plates the even ones, so a plate
+     lands after roughly every block of argument. Anything past the body —
+     metrics, disciplines, front matter, the outro — sits after all of it. */
+  .case__prose > * {
+    order: 10;
+  }
+  .case__prose > .page__lede {
+    order: 1;
+  }
+  .case__prose > .page__quote {
+    order: 2;
+  }
+  .case__prose > p:nth-of-type(2) {
+    order: 3;
+  }
+  .case__prose > p:nth-of-type(3) {
+    order: 5;
+  }
+  .case__prose > p:nth-of-type(4) {
+    order: 7;
+  }
+  .plate-pile__item:nth-child(1) {
+    order: 4;
+  }
+  .plate-pile__item:nth-child(2) {
+    order: 6;
+  }
+  .plate-pile__item:nth-child(3) {
+    order: 8;
+  }
+  .plate-pile__item:nth-child(4) {
+    order: 9;
+  }
+  .plate-pile__item:nth-child(n + 5) {
+    order: 11;
+  }
+
+  /* the cascade's overlap and fan belong to the lane */
+  .plate-pile__item {
+    width: auto;
+    margin: clamp(1.25rem, 4vw, 2rem) 0;
+    transform: rotate(calc(var(--plate-rest, 0deg) * 0.5));
+  }
+
+  .plate-pile__item + .plate-pile__item {
+    margin-top: clamp(1.25rem, 4vw, 2rem);
+  }
+
+  .plate-pile {
+    margin-top: clamp(3rem, 8vw, 5rem);
+    gap: clamp(2rem, 5vw, 3.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The raise stays — it uncovers content rather than decorating it — and
+     only the easing goes. */
+  .plate-pile__img {
+    transition: none;
+  }
+}
+
+/* ===========================================================================
+   Interface guidelines — the parts that are not visual
+=========================================================================== */
+
+/* No 300ms wait for a second tap that is never coming. */
+a,
+button,
+.text-button,
+.plate-pile__item,
+.plates .plate {
+  touch-action: manipulation;
+}
+
+/* The default grey flash is nobody's decision. This is: a whisper of the
+   accent, so a tap registers without a box appearing over the paper. */
+a,
+button {
+  -webkit-tap-highlight-color: rgba(184, 126, 48, 0.18);
+}
+
+/* The header is full bleed and the page runs to both edges, so a notch or a
+   home indicator would otherwise crop them. */
+.site-header__inner {
+  padding-right: max(
+    max(2rem, calc(var(--header-h) * 0.3194)),
+    env(safe-area-inset-right)
+  );
+  padding-left: max(
+    max(2.5rem, calc(var(--header-h) * 0.2454)),
+    env(safe-area-inset-left)
+  );
+}
+
+.page,
+.site-main {
+  padding-right: max(var(--grid-margin), env(safe-area-inset-right));
+  padding-left: max(var(--grid-margin), env(safe-area-inset-left));
+}
+
+/* Available to the screen reader, absent from the page. Used to give the
+   code-seam device a plain-language twin. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Headings should not leave a word alone on the last line. */
+.masthead__title,
+.register__title,
+.page__subhead,
+.intro__label {
+  text-wrap: balance;
+}
+
+/* The skip link. Off-screen until focused, then a plain sheet pinned to the
+   top-left — deliberately unstyled-looking, because it is a utility and not
+   part of the composition. */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  /* 44px minimum, like everything else that gets tapped */
+  padding: 0.9rem 1.25rem;
+  transform: translateY(-120%);
+  background: #fff;
+  color: var(--foreground);
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: var(--text-label);
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(40, 34, 28, 0.22);
+  transition: transform var(--dur-press) var(--ease-press);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* The route you are on. The nav is a set of shelf marks, so the mark is what
+   changes weight rather than the label — the same gesture the wordmark and the
+   register marks already use. */
+.site-header__nav a[aria-current="page"] {
+  font-variation-settings: "wght" var(--wght-emphasis);
+}
+
+.site-header__nav a[aria-current="page"] .site-header__navMark {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+}
+
+/* A 44px hit target on touch, without moving anything.
+   Measured at 390px: 26-27 links and buttons under 44px tall. Growing them
+   with padding would push the header and the prose around, so on a coarse
+   pointer only, an invisible pseudo-element extends the tappable box past the
+   text. `::after` is the inked underline, so this rides on `::before`. */
+@media (pointer: coarse) {
+  .text-button,
+  .site-header__wordmark,
+  .register__more {
+    position: relative;
+  }
+
+  .text-button::before,
+  .site-header__wordmark::before,
+  .register__more::before {
+    content: "";
+    position: absolute;
+    /* Measured, not guessed: at -0.75rem the nav links came out 41px. The
+       line box is ~17px, so this clears 44 with a little to spare, and a
+       touch sideways so adjacent nav marks do not share an edge. */
+    inset: -0.95rem -0.4rem;
+    /* it is a hit area, nothing else */
+    pointer-events: auto;
+  }
+}
+
+/* ===========================================================================
+   The hero, composed for a phone
+
+   The desktop hero is a fixed-ratio canvas: three cutouts placed at absolute
+   percentages with four handwritten annotations pinned around them. Scaled to
+   390px the annotations land near 8px and the cutouts lose all their detail.
+
+   So the phone gets a different composition of the same idea rather than a
+   squeezed copy of the wide one: one cutout, one annotation, the headline.
+   The other two cutouts and three annotations are removed from the layout —
+   they are decorative repetitions of a point already made.
+=========================================================================== */
+
+@media (max-width: 700px) {
+  .collage__stage {
+    /* taller than it is wide, and no longer the 1440x819 desktop frame */
+    aspect-ratio: 4 / 3;
+  }
+
+  /* Keep the one that shows real work; the other two say the same thing. */
+  .collage__piece--tablet,
+  .collage__piece--portrait {
+    display: none;
+  }
+
+  .collage__piece--macbook {
+    left: 4%;
+    top: 6%;
+    width: 76%;
+    /* the scattered-state offsets were composed for the wide frame */
+    --dx: 0%;
+    --dy: 0%;
+    --dr: -3deg;
+    --ds: 1;
+  }
+
+  /* One annotation, placed against the cutout rather than at a percentage of
+     a frame that no longer has those proportions.
+
+     Explicit about `display` and `opacity` because two earlier rules already
+     have opinions here: a narrow breakpoint hides `.note` outright, and an
+     `@media (hover: none)` block hands touch the resolved state with these
+     three shown and `refine` hidden. That logic is right for the full canvas
+     and wrong for this one — the three it reveals point at cutouts that are
+     no longer on the page. */
+  .note--inspiration,
+  .note--explore,
+  .note--dig {
+    display: none;
+    opacity: 0;
+  }
+
+  .note--refine {
+    display: block;
+    /* no hover to wait for */
+    opacity: 1;
+    top: auto;
+    right: 4%;
+    bottom: 6%;
+    left: auto;
+    /* The base rule sets a percentage width for the wide canvas. Left auto
+       plus that width plus right 4% resolved to a 36px box and the word came
+       out clipped to "Refin". Sized to its own text instead. */
+    width: max-content;
+    max-width: 60%;
+    /* readable, which is the whole reason this block exists */
+    font-size: clamp(1.15rem, 6.5vw, 1.75rem);
+  }
+
+  /* The headline is the hero on a phone, so it gets the room. */
+  .headline {
+    font-size: clamp(2.25rem, 11vw, 3.25rem);
+  }
 }
