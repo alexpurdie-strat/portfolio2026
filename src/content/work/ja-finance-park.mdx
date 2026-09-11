@@ -1,84 +1,164 @@
 ## Why it mattered
 
-Junior Achievement runs Finance Park and BizTown as physical simulations: students
-walk into a built environment and make financial decisions inside it. The software
-is not the experience — it is the thing in their hands while the experience happens.
+Finance Park is Junior Achievement's capstone. Students are handed an adult
+persona — a job, a salary, a credit score, a family — and asked to build and
+balance a month's household budget. It runs as a 4.5-hour live simulation for
+7th to 10th graders, and JA puts the program at around half a million students
+a year across the United States. That is JA's reach, not mine. My work is the
+platform those sites run on.
 
-<Todo>The business problem in two or three sentences: what was failing about the
-existing platform, and what it was costing JA.</Todo>
+The previous platform had not been executed well and was in poor shape. JA had
+promised its network a rebuild, and wanted to use it to raise consistency and
+quality across 99+ locations at the same time.
 
-JA's own overview puts the program at around half a million students a year.
-That is JA's number and JA's reach, not mine — my work covers the platform those
-sites run.
+What made that urgent rather than merely overdue: the relationship between
+JA's national team and the ELC teams who actually deliver the simulations was
+already strained, the relaunch was funded by an Eli Lilly grant, and the thing
+at risk if it went badly was a worse experience for students at the exact
+center of JA's purpose.
 
 ## The hard part
 
-The rebuild had stalled before I joined it. <Todo>What specifically had stalled it —
-scope, alignment, technical debt, or the client's internal structure? This is the
-section a design leader reads most closely, so it needs the real constraint.</Todo>
+I joined three months into the timeline. The team was spinning its wheels on
+user flows and could not find alignment.
 
-The organization was siloed, and the brief arrived as a feature list rather than
-a problem.
+They were a genuinely talented web platform team whose expertise was mostly
+marketing sites, which meant they approached the work page by page rather than
+by function — and this was a 120-page interactive product with nine months to a
+pilot. Around that sat native iOS and Android requirements, regulatory
+alignment tied to the grant, a large and siloed client organization going
+through its own transformation, and a legacy platform with a decade of
+assumptions attached to it.
 
-<Aside kind="helped">
-  <Todo>Where AI genuinely helped on this project, in one or two sentences. Be
-  specific about the task, not the tool.</Todo>
-</Aside>
+The hardest constraint was not technical. As agency of record we had
+contractual commitments, and the client carried strong preferences formed by
+their past experience of this product. Those preferences regularly ran against
+what we would have recommended. Different stakeholders in an organization
+mid-transformation meant the narrative of what mattered kept moving.
 
 ## Key decisions
 
 ### A backlog, not a shopping list
 
-The RFP arrived as a list of features to build. I reframed it into a prioritized
-backlog split across MVP, alpha and beta — so the question stopped being "which of
-these do we build" and became "what is the smallest thing that teaches us the
-most". The stalled team started shipping.
+<Aside kind="helped">
+  <Todo>Where AI genuinely helped on this project. Be specific about the task,
+  not the tool — the backlog work, the flows, the QA passes, wherever it
+  actually earned its place.</Todo>
+</Aside>
 
-<Todo>The rejected alternative: what was the other way forward, and why was it
-wrong? And one thing you loved and killed.</Todo>
+The RFP arrived as a list of features to build. I reframed it as a prioritized
+backlog of grouped feature sets, and worked the groupings until the client was
+willing to sort them into MVP, alpha and beta — separating what the product
+needed from what people wanted.
+
+The team had never worked this way. To some of them it read as a slowdown, and
+it was not a popular move. I was the newest person on a stalled project and had
+very little relational capital to spend on it. But once effort had somewhere to
+focus, the wheels found ground, and we moved from arguing about flow documents
+into wireframing, prototyping and actually designing the thing.
+
+**The alternative I rejected** was the obvious one: accept the shopping list and
+work through it in order. That would have spent the same nine months treating a
+brand moment and a core budgeting flow as equally urgent, which is how the
+first three months had already gone.
+
+### What I killed
+
+I come from agile. The team ran linear, phase-based delivery, and I could not
+have both.
+
+So we kept the linear phases as deployment batches and applied an MVP-first
+hierarchy *inside* each one. A waterfall-agile hybrid, and not one I would
+defend in the abstract — but shifting the team from a page frame to a feature
+frame was most of the lever I needed, and insisting on the rest would have cost
+me the part that mattered.
 
 ### Ask why, not what
 
-<Todo>The lock-screen debate. You flagged this as the moment the interview
-approach changed — what was being argued about, what question you asked instead,
-and what it revealed.</Todo>
+Students hit a lock screen while their classmates caught up to the same point
+in the flow. We wanted that screen to earn its keep: education, partner
+moments, something interactive.
 
-<Aside kind="limit">
-  <Todo>Where AI fell short here. Your strongest answer elsewhere was that AI
-  speeds delivery but cannot supply definitional clarity — if that applies to this
-  project, say so concretely.</Todo>
-</Aside>
+The client kept pulling it back. Eight rounds later we landed on a
+dopamine-driven game moment, and internally that felt like a loss.
+
+It was not. Their preference was consistent the whole way through — keep
+students engaged and on task, don't hand them a reason to look somewhere else.
+We had been asking stakeholders *what* they wanted on that screen and getting
+answers we then argued with. When I started asking *why* instead, the
+underlying need came out in one conversation rather than eight, and later
+features aligned in far fewer rounds.
 
 ## Where research changed the plan
 
-<Todo>One place where what you learned forced a change of direction. Required —
-this is the section that separates a case study from a portfolio page.</Todo>
+The client consistently assumed a more juvenile mindset in their students than
+our research supported. We kept finding evidence for a more capable audience
+and kept designing against a preference for a simpler one.
+
+In an agency relationship that tension does not always resolve in research's
+favor, and it often did not here.
 
 ## What went wrong
 
-<Todo>Required, not optional. What you would do differently. The honest version.</Todo>
+The real lesson was not about the product.
+
+I joined as the product lead on a team that believed its process was already
+sound. They had not built anything this complex before and read their
+difficulty as a function of the size of the task rather than the shape of the
+approach. I could see blind spots in it, and I held my perspective back until I
+judged it would carry — but influencing people who have not asked to be
+influenced is delicate work, and under the pressure of being a new hire on a
+stalled project I did not treat it as delicately as I should have.
+
+**What I would do differently:** secure buy-in before enacting the change
+rather than letting results earn it retroactively. I have been circling an idea
+I call *empowering the expertise in the room* — contextualizing a change so
+that the people affected can see their own hand in what it makes possible. I
+applied it to the client. I should have applied it to my own team first.
+
+<Aside kind="limit">
+  The wireframes below are the clearest example I have of AI applied without
+  judgment. The tool was not the problem — it did what it was asked. Nobody had
+  asked whether the change was right, and by then the process had not left room
+  for anyone to.
+</Aside>
+
+**And something concrete that didn't survive:** my final wireframes for the
+summary and rewards section that closes the experience. Deadline pressure, plus
+unspoken client assumptions my process had not done enough to surface, produced
+a wave of late change requests — which culminated in my wireframes being
+modified by AI, badly, by someone else. We shipped the client's vision in the
+high-fidelity comps. The frustration is real but the cause was mine: a client
+who could not see their own expertise in the work.
 
 ## Outcome
 
-- Piloted April 2026 with **10,000+ students**
-- Full release **August 2026**
-- Running in **99+ Junior Achievement sites**
-- A **100+ screen** experience <Todo>Your intake says "100+ screens" in one place
-  and "120+ pages" in another. Pick the one you can defend.</Todo>
-- Led to a follow-on engagement <Todo>Confirm whether the ~$1M figure can be
-  disclosed. If not, "a follow-on engagement" stands on its own.</Todo>
+- Full strategy, design and build in **10 months**, pilot at **9**
+- A **120+ page** interactive experience
+- Piloted **April 2026** with **10,000+ students**; full release **August 2026**
+- Running in **99+ ELC locations**
+- Shipped in three stages — pilot, alpha, full release
+- Unlocked headcount for continued simulations and reduced strain on the ELC
+  teams, which opens the door to expanded operations
+- Led to the client signing a further **$1M engagement** with the agency
 
-<Aside kind="checked">
-  <Todo>What you checked by hand that AI produced. This note is the one a
-  skeptical reviewer will look for.</Todo>
-</Aside>
+> And all of the new UI elements, animations, UX improvements — just
+> incredible. I'm honestly blown away. This is the best thing we've ever built
+> in Whiteboard's history. While we were testing, the Charlotte VP of Education
+> came through to tell us how much the students, parents and educators are all
+> blown away by it. Parents keep asking if they can download it to take home.
 
-<Todo>Pilot data, if JA will share any: session completion rate, site-staff or
-volunteer feedback, parent download requests, support issues compared with the old
-platform. One number here changes this case study from "shipped" to "shipped and
-worked".</Todo>
+*— CEO, Whiteboard. Internal, at launch.*
 
 ## Credits
 
-Final UI by Whiteboard's design team. <Todo>Name the disciplines of the other
-people involved — engineering, content, JA's own staff — and what each owned.</Todo>
+A Whiteboard team of 13: three designers, two creative directors, an account
+lead, two project managers and four developers.
+
+**Mine:** feature documentation and definitional clarity, strategic planning,
+user flows, architecture, heuristic pillars, archetype documentation,
+interviews and observation studies, wireframes, UI strategy, and QA through
+launch — the discovery and low-fidelity framing of the platform end to end.
+
+**Theirs:** the final high-fidelity design and the build, and the initial
+personas and user flows that predated me.

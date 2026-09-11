@@ -39,20 +39,20 @@ export const WORK: WorkEntry[] = ([
       slug: "ja-finance-park",
       title: "JA Finance Park & BizTown",
       subtitle:
-        "Turned a stalled platform rebuild into a shipped product running in 99+ Junior Achievement sites.",
+        "Unstalled a 120-page platform rebuild and shipped it to 99+ Junior Achievement sites in 10 months.",
       client: "Junior Achievement",
       agency: "Whiteboard",
       years: "2025–2026",
       role: "Lead platform strategist",
-      team: "TODO(alex): team size and disciplines",
-      platform: "Tablet-first web platform, used in physical simulation sites",
+      team: "13 at Whiteboard — 3 designers, 2 creative directors, 4 developers, 2 PMs, account lead",
+      platform: "Tablet companion app, native and web, used inside a 4.5-hour live simulation",
       status: "live" as const,
       featured: true,
       order: 1,
       challenge:
-        "How do you rebuild a platform that 99+ sites already depend on, without stopping a single one of them?",
+        "How do you restart a stalled rebuild when you are the newest person on the team and nobody asked you to change how they work?",
       product:
-        "A tablet platform that runs the Finance Park and BizTown simulations — the software students use while they are standing in the room.",
+        "The tablet companion for Finance Park — the software a student holds while they are standing in the simulation, deciding whether they can afford the apartment.",
     },
   },
 ] satisfies WorkEntry[]).sort((a, b) => a.meta.order - b.meta.order);
