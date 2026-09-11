@@ -1,3 +1,5 @@
+import { asset } from "@/lib/asset";
+import headerTexture from "@/assets/header-texture.png";
 import Image from "next/image";
 import { MarginNote } from "@/components/margin-note";
 
@@ -211,42 +213,6 @@ const TEXTURE = [
   [
     "Tears are real",
     "Every torn edge is alpha from a photographed torn sheet. Never a clip-path zig-zag, never an SVG approximation. The irregularity is the point and it cannot be faked convincingly at this scale.",
-  ],
-  [
-    "The second machine",
-    "There are two ways to read this site and only one set of content. Studio Mode is the paper desk. Microfilm Mode is a reader-printer: a lamp shining up through physical film, through a lens, onto ground glass. The mode is an attribute on the root element and CSS does the rest \u2014 the same components emit the same DOM in both, so parity is structural rather than promised, and switching cannot lose your place because nothing unmounts. A microform reader is an *optical* device, which is the whole reason the mode is allowed to exist: there is no phosphor, no scanline, no electron beam, so \u201cthe page is a surface, not a screen\u201d survives intact. Ground glass is a surface. The rules that follow are what that machine imposes.",
-  ],
-  [
-    "Silver, not sepia",
-    "The second mode is neutral grey and every accent desaturates to a density. A warm tint over the paper palette reads instantly as a filter laid on a colour site; a neutral one reads as a photograph of it. Imagery is greyscaled for the same reason \u2014 a colour screenshot sitting in the gate gives the fiction away in one glance. The paper\u2019s own whiteness compresses too: film holds far less range than paper, so a sheet that is near-white on the desk becomes the brightest *density* on the negative, not a blown-out white.",
-  ],
-  [
-    "Film has no light greys",
-    "The paper world separates secondary text by lightening it \u2014 an eyebrow at 0.55 opacity reads as quiet on bright paper. Under a lamp the same value lands on a panel the falloff has already darkened and the two converge; one eyebrow measured 3.5:1 against a 4.5 floor. So in the second mode quiet text stays a density and earns its quietness from size, tracking and letterform instead. Hierarchy by lightness is a luxury of reflected light.",
-  ],
-  [
-    "Light falls off, and multiplies",
-    "The lamp\u2019s hotspot and falloff is the one thing that makes the panel read as projected rather than tinted, and it has to be painted *above* the content, because the page lays down its own opaque sheets and anything behind them is invisible. It is safe there only because it multiplies: multiply scales text and ground by the same factor, so for dark-on-light the contrast ratio is preserved rather than eroded. Measured across six routes, the worst text on the panel sits at 7.9:1 against a 4.5 floor. Nothing else is ever allowed above the reading area except the glass sheen, at an opacity that measures as no change at all.",
-  ],
-  [
-    "One number moves the film",
-    "Scroll position is the only state the transport has. The sprocket strips travel from it, the crank rotates from it, and the frame counter reads it \u2014 so drag, swipe, scroll and the arrow keys are four inputs to one number rather than four states that can disagree. Frames are even slices of the document, not semantic blocks: real frames are evenly spaced exposures, and slicing needs no content structure, so the counter is correct on a case study, a specimen page and a 404 alike. It counts off reachable travel, never document height \u2014 a counter you cannot crank to the end of is a counter that lies.",
-  ],
-  [
-    "A catalogued document has named frames",
-    "Where a page\u2019s sections have already been divided \u2014 a case study \u2014 those divisions *are* its frames, and the readout names the one under the reading line: Frame 4 of 8, Account. Anything uncatalogued falls back to even slices, so the counter is correct on the specimen page and a 404 too. Frames are marked as attributes on elements that already exist rather than as wrappers, because the prose becomes display:contents on a phone and the plates interleave through it by order \u2014 a new element in that flow would break the weaving.",
-  ],
-  [
-    "Sectioned is not snapped",
-    "The crank and the arrow keys advance frame to frame, landing on a section rather than somewhere in the middle of it. Free scrolling stays free: there is no scroll-snap anywhere in either mode. Snapping would be the first thing that changed how the writing is *read* rather than how it looks, and on the surface a reader spends longest on. Film being divided into frames is not a reason to take the scrollbar away.",
-  ],
-  [
-    "Where an optical instrument is allowed to blur",
-    "The rule against blurring is a rule about paper, and paper has no focal plane. A reader has two, so the second mode has exactly two blurs and both are properties of the machine rather than effects applied to it. Loading a reel brings the lens to focus \u2014 brief, on the panel rather than the words, and reduced motion keeps the settle while dropping the defocus. And the field goes soft at its upper and lower limits, because film is curved through a gate and the parts entering and leaving the aperture sit off the focal plane. That second one is done with two masked bands of backdrop-filter rather than a filter on the content: it softens what is behind it without changing how the page renders, so text is never itself blurry \u2014 it passes *through* a soft region as the film runs. Anything else on this site that looks blurred is a bug.",
-  ],
-  [
-    "A lamp is never quite steady",
-    "The panel drifts in brightness on a slow, irregular cycle, with one deeper dip where a splice passes the gate. This is a filament with an arc across it, not a refresh rate \u2014 so it is shallow (under 2% at its peak) and slow (one cycle per eleven seconds), orders of magnitude below the three-flashes-a-second threshold. The mode switch is its stop control: it is a visible, persistent, keyboard-reachable way to end the motion, which is what a decorative loop that runs longer than five seconds owes the reader. Under reduced motion the lamp holds one steady value rather than none, so the ground does not change at all.",
   ],
   [
     "What survives a phone",
@@ -632,17 +598,17 @@ export function DesignSystem() {
         </p>
         <div className="ds__plate ds__plate--pair">
           <span className="plate">
-            <Image src="/archive/stack.png" alt="" width={653} height={1237} />
+            <Image src={asset("/archive/stack.png")} alt="" width={653} height={1237} />
           </span>
           <span
             className="plate plate--lit"
             style={
               {
-                "--plate-src": 'url("/archive/stack.png")',
+                "--plate-src": `url("${asset("/archive/stack.png")}")`,
               } as React.CSSProperties
             }
           >
-            <Image src="/archive/stack.png" alt="" width={653} height={1237} />
+            <Image src={asset("/archive/stack.png")} alt="" width={653} height={1237} />
           </span>
         </div>
       </Section>
@@ -686,7 +652,7 @@ export function DesignSystem() {
               <div className="ds__plateGroup ds__plateGroup--scattered">
                 <span className="plate">
                   <Image
-                    src="/collage-portrait.png"
+                    src={asset("/collage-portrait.png")}
                     alt=""
                     width={634}
                     height={550}
@@ -694,7 +660,7 @@ export function DesignSystem() {
                 </span>
                 <span className="plate">
                   <Image
-                    src="/collage-tablet.png"
+                    src={asset("/collage-tablet.png")}
                     alt=""
                     width={528}
                     height={621}
@@ -707,7 +673,7 @@ export function DesignSystem() {
               <div className="ds__plateGroup ds__plateGroup--squared">
                 <span className="plate">
                   <Image
-                    src="/collage-portrait.png"
+                    src={asset("/collage-portrait.png")}
                     alt=""
                     width={634}
                     height={550}
@@ -715,7 +681,7 @@ export function DesignSystem() {
                 </span>
                 <span className="plate">
                   <Image
-                    src="/collage-tablet.png"
+                    src={asset("/collage-tablet.png")}
                     alt=""
                     width={528}
                     height={621}
@@ -734,10 +700,8 @@ export function DesignSystem() {
           <span className="ds__demoLabel">.ds__sheet</span>
           <div className="ds__sheet">
             <Image
-              src="/header-texture.png"
+              src={headerTexture}
               alt=""
-              width={4096}
-              height={720}
               /* Demonstration copies of the masthead's own asset. They
                  need `sizes`, or Next requests a 4096-wide variant for a
                  band a few hundred pixels tall, and `eager` because one
@@ -758,10 +722,8 @@ export function DesignSystem() {
           <span className="ds__demoLabel">.ds__band</span>
           <div className="ds__band">
             <Image
-              src="/header-texture.png"
+              src={headerTexture}
               alt=""
-              width={4096}
-              height={720}
               /* Demonstration copies of the masthead's own asset. They
                  need `sizes`, or Next requests a 4096-wide variant for a
                  band a few hundred pixels tall, and `eager` because one
@@ -877,7 +839,7 @@ export function DesignSystem() {
             <div className="ds__revealStage">
               <span className="plate">
                 <Image
-                  src="/collage-portrait.png"
+                  src={asset("/collage-portrait.png")}
                   alt=""
                   width={634}
                   height={550}
@@ -885,7 +847,7 @@ export function DesignSystem() {
               </span>
               <span className="plate">
                 <Image
-                  src="/collage-tablet.png"
+                  src={asset("/collage-tablet.png")}
                   alt=""
                   width={528}
                   height={621}

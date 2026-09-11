@@ -1,3 +1,4 @@
+import { asset } from "@/lib/asset";
 import Image from "next/image";
 
 /**
@@ -45,7 +46,7 @@ export function HomeHero() {
             <Image
               key={p.key}
               className={`collage__piece collage__piece--${p.key}`}
-              src={p.src}
+              src={asset(p.src)}
               alt={p.alt}
               width={p.width}
               height={p.height}

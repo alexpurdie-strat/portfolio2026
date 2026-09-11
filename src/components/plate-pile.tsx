@@ -1,3 +1,4 @@
+import { asset } from "@/lib/asset";
 import Image from "next/image";
 import type { Entry } from "@/content/work";
 
@@ -41,7 +42,7 @@ export function PlatePile({ plates }: { plates: Entry["plates"] }) {
         >
           <Image
             className="plate-pile__img"
-            src={plate.src}
+            src={asset(plate.src)}
             alt={plate.alt}
             width={plate.width}
             height={plate.height}

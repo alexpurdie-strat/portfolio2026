@@ -41,13 +41,11 @@ export function CaseStudy({ entry }: { entry: Entry }) {
       <div className="case">
         <div className="case__prose">
           {entry.standfirst ? (
-            <p className="page__lede" data-frame="Summary">
-              {entry.standfirst}
-            </p>
+            <p className="page__lede">{entry.standfirst}</p>
           ) : null}
 
           {entry.quote ? (
-            <blockquote className="page__quote" data-frame="Testimony">
+            <blockquote className="page__quote">
               <p>&ldquo;{entry.quote.text}&rdquo;</p>
               <footer>
                 <span aria-hidden translate="no">
@@ -58,15 +56,8 @@ export function CaseStudy({ entry }: { entry: Entry }) {
             </blockquote>
           ) : null}
 
-          {entry.body.map((para, i) => (
-            <p
-              key={para.slice(0, 32)}
-              /* Only the first paragraph opens a frame: the account is one
-                 stretch of film, not one frame per paragraph. */
-              data-frame={i === 0 ? "Account" : undefined}
-            >
-              {para}
-            </p>
+          {entry.body.map((para) => (
+            <p key={para.slice(0, 32)}>{para}</p>
           ))}
 
           {entry.status === "unwritten" ? (
@@ -77,9 +68,7 @@ export function CaseStudy({ entry }: { entry: Entry }) {
 
           {entry.metrics.length ? (
             <>
-              <h2 className="page__subhead" data-frame="What it moved">
-                What it moved
-              </h2>
+              <h2 className="page__subhead">What it moved</h2>
               <ul className="metrics">
                 {entry.metrics.map((m) => (
                   <li key={m.of}>
@@ -95,21 +84,17 @@ export function CaseStudy({ entry }: { entry: Entry }) {
 
           {entry.disciplines.length ? (
             <>
-              <h2 className="page__subhead" data-frame="Disciplines">
-                Disciplines
-              </h2>
+              <h2 className="page__subhead">Disciplines</h2>
               <p>{entry.disciplines.join(" · ")}</p>
             </>
           ) : null}
 
-          <h2 className="page__subhead" data-frame="Front matter">
-            Front matter
-          </h2>
+          <h2 className="page__subhead">Front matter</h2>
           <pre className="source" translate="no">
             {frontMatter}
           </pre>
 
-          <p className="page__outro" data-frame="End of reel">
+          <p className="page__outro">
             <Link className="text-button" href="/archive">
               <span aria-hidden>←</span> Back to the archive
             </Link>
