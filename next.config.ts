@@ -1,3 +1,4 @@
+import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -15,6 +16,9 @@ const isProduction = process.env.NODE_ENV === "production";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 const nextConfig: NextConfig = {
+  /* Case studies and essays are .mdx in src/content, so copy edits never
+     require touching a component. */
+  pageExtensions: ["ts", "tsx", "mdx"],
   /*
    * Every route here is already static or SSG — no route handlers, no server
    * actions, no cookies() or headers() — so the whole site exports to plain
@@ -52,4 +56,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withMDX = createMDX({});
+
+export default withMDX(nextConfig);

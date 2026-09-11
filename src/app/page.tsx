@@ -1,94 +1,100 @@
-import { HomeHero } from "@/components/home-hero";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { CaseCard } from "@/components/case-card";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { Todo } from "@/components/todo";
+import { FEATURED } from "@/content/work";
 
-/**
- * The hero sits on the ground. Everything after it is a torn sheet laid over
- * the last, which is what the design system means by "layers, not sections" —
- * and what gives the tear-on-arrival gesture somewhere to live.
- *
- * The three sheets below the intro are placeholders. Copy is scaffolding.
- */
+/* Plain text, not a logo wall. Every benchmark in the framework states
+   credentials flatly; none of them uses logos. */
+const CLIENTS = [
+  "The Home Depot",
+  "ITV",
+  "BBC",
+  "NHS",
+  "M&S",
+  "TED",
+  "LEGO",
+  "Junior Achievement",
+  "AdventHealth",
+  "Chick-fil-A",
+];
+
+export const metadata: Metadata = {
+  title: "Alex Purdie — Product designer and strategist",
+  description:
+    "Leads teams building platforms where digital systems meet real people doing real work. Junior Achievement, ITV, The Home Depot, NHS.",
+};
+
 export default function Home() {
   return (
     <>
       <SiteHeader />
-      <main id="main" className="site-main">
-        <HomeHero />
-
-        <section className="sheet">
-          <span className="sheet__paper" aria-hidden />
-          <div className="sheet__inner">
-            <div className="intro">
-              <div className="intro__col">
-                <h2 className="intro__label">What I do</h2>
-                <p className="intro__body">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et
-                  massa mi. Aliquam in hendrerit urna. Pellentesque sit amet
-                  sapien fringilla, mattis ligula consectetur, ultrices mauris.
-                  Maecenas vitae mattis tellus. Nullam quis imperdiet augue.
-                </p>
-              </div>
-              <div className="intro__col">
-                <h2 className="intro__label">Why</h2>
-                <p className="intro__body">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et
-                  massa mi. Aliquam in hendrerit urna. Pellentesque sit amet
-                  sapien fringilla, mattis ligula consectetur, ultrices mauris.
-                  Maecenas vitae mattis tellus. Nullam quis imperdiet augue.
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </p>
-              </div>
-            </div>
-          </div>
+      <main id="main" className="page">
+        <section className="section hero">
+          {/* The belief is the page's heading, not decoration above one —
+              rendered as an h1 because that is what it is. The page had no h1
+              at all when this was a paragraph. */}
+          <h1 className="hero__belief">
+            Giving people what they want and giving them what they need aren’t
+            the same thing. I design for the difference.
+          </h1>
+          <p className="lede hero__bio measure">
+            Alex Purdie is a product designer and strategist who leads teams
+            building platforms where digital systems meet real people doing real
+            work. Formerly Head of Product Design at 100 Shapes in London.
+          </p>
+          <p className="hero__now label">
+            <Todo>Current role and availability — one line.</Todo>
+          </p>
         </section>
 
-        <section className="sheet">
-          <span className="sheet__paper" aria-hidden />
-          <div className="sheet__inner">
-            <div className="intro">
-              <div className="intro__col">
-                <h2 className="intro__label">Selected work</h2>
-                <p className="intro__body">
-                  Placeholder. Three or four entries pulled from the archive,
-                  led by the ones that carry numbers — Enterprise first.
-                </p>
-              </div>
-              <div className="intro__col">
-                <h2 className="intro__label">What it moved</h2>
-                <p className="intro__body">
-                  Placeholder. The figures, without the write-ups: tasks a
-                  month, hours saved, processes streamlined, stores affected.
-                </p>
-              </div>
-            </div>
-          </div>
+        <hr className="rule" />
+
+        <section className="section clients" aria-labelledby="clients-heading">
+          <h2 id="clients-heading" className="label">
+            Selected clients
+          </h2>
+          <p className="clients__list">{CLIENTS.join(" · ")}</p>
         </section>
 
-        <section className="sheet">
-          <span className="sheet__paper" aria-hidden />
-          <div className="sheet__inner">
-            <div className="intro">
-              <div className="intro__col">
-                <h2 className="intro__label">How I work</h2>
-                <p className="intro__body">
-                  Placeholder. The claims from Approach, condensed to whichever
-                  three survive being said out loud.
-                </p>
-              </div>
-              <div className="intro__col">
-                <h2 className="intro__label">Ask</h2>
-                <p className="intro__body">
-                  Placeholder. One line and one link, pointing at the page where
-                  the light comes through the tear.
-                </p>
-              </div>
-            </div>
-            <p className="aside">
-              *Emphasize this, really sell that people are the core of it all.
-            </p>
+        <hr className="rule" />
+
+        <section className="section work" aria-labelledby="work-heading">
+          <h2 id="work-heading" className="label">
+            Selected work
+          </h2>
+          <div className="work__grid">
+            {FEATURED.map((w) => (
+              <CaseCard key={w.meta.slug} meta={w.meta} />
+            ))}
           </div>
+          <p className="work__more">
+            <Todo>
+              Three more featured case studies — ITV, Your Move, 100 Shapes —
+              plus the library index.
+            </Todo>
+          </p>
+        </section>
+
+        <hr className="rule" />
+
+        <section className="section contact" aria-labelledby="contact-heading">
+          <h2 id="contact-heading" className="label">
+            Contact
+          </h2>
+          <p className="contact__line measure">
+            If you want someone to help decide what to build, and then hold the
+            bar while it ships,{" "}
+            <Link className="tap" href="/contact">
+              let’s talk
+            </Link>
+            .
+          </p>
         </section>
       </main>
+      <SiteFooter />
     </>
   );
 }

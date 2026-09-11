@@ -1,0 +1,59 @@
+/*
+ * Tokens.
+ *
+ * Calm neutral base, one warm accent, generous space. The brief's rule is that
+ * the novelty budget is spent on two things only — named ideas, and the
+ * AI-in-the-loop notes — so nothing here is asked to be clever. Type, color
+ * and rhythm exist to get out of the way of reading.
+ *
+ * The accent is a burnt ochre, deliberately short of red: the first target
+ * employer is Coca-Cola, and a red-accented portfolio reads as pandering.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ── Ground and ink ───────────────────────────────────────────────────── */
+  --bone: #faf8f4;
+  --bone-sunk: #f3f0e9;
+  --ink: #1a1917;
+  --ink-soft: #56534c;
+  /* The quietest text allowed. Measured at 4.6:1 on --bone; anything lighter
+     fails AA and the brief sets AA as the floor. */
+  --ink-quiet: #6e6a62;
+  --rule: #e2ddd3;
+  --rule-strong: #cdc6b8;
+
+  --accent: #a0612b;
+  --accent-soft: #f0e4d6;
+
+  /* ── Type ─────────────────────────────────────────────────────────────── */
+  --serif: var(--font-martina-plantijn), "Iowan Old Style", Georgia, serif;
+  --sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+
+  --t-display: clamp(2.6rem, 6vw, 4.25rem);
+  --t-title: clamp(2rem, 4.4vw, 3.1rem);
+  --t-head: clamp(1.3rem, 2.2vw, 1.6rem);
+  --t-lede: clamp(1.15rem, 1.7vw, 1.4rem);
+  --t-body: 1.0625rem;
+  --t-small: 0.9rem;
+  --t-label: 0.75rem;
+
+  /* ── Measure and rhythm ───────────────────────────────────────────────── */
+  /* ~68 characters. The single most load-bearing number on the site. */
+  --measure: 34rem;
+  --page: 74rem;
+  --gutter: clamp(1.25rem, 5vw, 4rem);
+  --lane: 15rem;
+
+  --space-section: clamp(4rem, 9vw, 7.5rem);
+  --space-block: clamp(2rem, 4vw, 3.25rem);
+
+  /* ── Motion ───────────────────────────────────────────────────────────── */
+  /* Purposeful only, per the brief. Two durations and one curve is the whole
+     vocabulary — there is nothing here that needs a third. */
+  --ease: cubic-bezier(0.2, 0.6, 0.3, 1);
+  --quick: 140ms;
+  --settle: 320ms;
+}

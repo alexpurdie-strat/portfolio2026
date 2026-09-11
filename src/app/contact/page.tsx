@@ -2,20 +2,17 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Todo } from "@/components/todo";
 
-export const metadata = { title: "About — Alex Purdie" };
+export const metadata = { title: "Contact — Alex Purdie" };
 
-export default function About() {
+export default function Page() {
   return (
     <>
       <SiteHeader />
       <main id="main" className="page">
         <section className="section measure">
-          <h1 className="page-title">About.</h1>
-          <p className="lede">
-            <Todo>
-              Timeline format: the career spine plus life, with the
-              anti-positioning line.
-            </Todo>
+          <h1 className="page-title">Contact.</h1>
+          <p>
+            <Todo>This page is not written yet.</Todo>
           </p>
         </section>
       </main>
