@@ -111,6 +111,11 @@
   /* How long a plate takes to rise out of the stack, and therefore how long
      it stays on top before dropping back. */
   --dur-reveal: 240ms;
+  /* The machine changing over. Kept under the brief's 600ms so it reads as a
+     switch being thrown, not as a loading screen. Duplicated as
+     CHANGEOVER_MS in src/lib/mode.tsx — setTimeout cannot read a custom
+     property, so if you change one, change the other. */
+  --dur-changeover: 420ms;
 }
 
 @theme inline {
@@ -215,7 +220,10 @@ body::after {
   margin-bottom: calc(var(--tear-slack) * -1);
   overflow: hidden;
   isolation: isolate;
-  color: #414141;
+  /* Tokened, not hardcoded: identical to #414141 in the paper world, but
+     it has to become film density in microfilm mode like everything
+     else. Hardcoded, the entire header stayed paper-grey. */
+  color: var(--foreground);
 }
 
 /* Torn-paper texture (2077×365, drawn at x -79 / y -149 — i.e. horizontally
@@ -2960,5 +2968,1502 @@ button {
   /* The headline is the hero on a phone, so it gets the room. */
   .headline {
     font-size: clamp(2.25rem, 11vw, 3.25rem);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TWO MACHINES
+
+   Everything below is the mode mechanism, not the microfilm aesthetic — that
+   lands in Phase 2 once the visual target is settled. What is here is the part
+   that does not depend on how the second mode looks: the switch, the
+   changeover, and the root hook the stylesheet will hang the second mode from.
+
+   The mode lives on html[data-mode], set before first paint. Components render
+   identical DOM in both modes; only this stylesheet knows the difference. So
+   switching cannot lose scroll position or in-progress state — nothing
+   unmounts, and there is no second copy of any content to drift out of sync.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── The second mode's tokens ───────────────────────────────────────────────
+   These re-bind the same names the paper world uses, so every component and
+   nearly every rule in this stylesheet needs no change at all. What was warm
+   paper becomes lit ground glass; what was pencil becomes the dense areas of
+   a film frame.
+
+   The palette is a tungsten lamp behind ground glass: warm at the hot centre,
+   cooler and greyer as the light falls off. That coolness is what separates it
+   from the paper world — same warmth of source, but glass rather than fibre. */
+html[data-mode="microfilm"] {
+  /* Silver halide, not sepia. The neutral grey is the whole tell that this is
+     a photographic process rather than a warm-filtered version of the paper
+     world — the lamp supplies all the warmth there is, from above. */
+  --background: #cfccc2;
+  /* The film's dense areas. Darker than the paper world's ink because the
+     lamp's falloff darkens the panel, and this has to clear AA at the corners
+     as well as at the hotspot. */
+  --foreground: #17150f;
+
+  /* Every accent desaturated to a density. Microfilm has no colour to give,
+     so a coloured accent surviving into this mode reads instantly as a filter
+     laid over a colour site rather than as a photograph of one. */
+  --accent-green: #2f2f2b;
+  --accent-green-wash: #8f8f88;
+  --accent-amber: #46443c;
+  --accent-amber-wash: #a3a099;
+  --accent-orange: #3d3b33;
+  --mark-red: #2a2823;
+
+  /* the housing */
+  --reader-case: #6b685a;
+  --reader-case-lit: #817e6e;
+  --reader-case-dark: #434136;
+  --reader-screw: #9b9782;
+
+  /* How much of the viewport the machine takes up. Thicker than a border
+     needs to be — at 2.6rem it read as a picture frame rather than as a
+     housing with something inside it. */
+  --bezel: clamp(2rem, 4.2vw, 4.4rem);
+  /* The bottom edge carries the controls, so it is deeper than the others and
+     has its own token — a phone overrides it to a floor rather than a
+     multiple. */
+  --bezel-foot: calc(var(--bezel) * 1.9);
+
+  /* Cool the imagery to monochrome. A colour photograph sitting in the gate
+     gives the whole fiction away. Static, never animated, so it rasterises
+     once per image rather than per frame. */
+  --plate-film: grayscale(1) contrast(1.04) brightness(0.99);
+}
+
+/* The paper's own whiteness, compressed to a film highlight.
+   Film holds far less range than paper: a sheet that reads as bright white on
+   a desk becomes the brightest *density* on the negative, not a blown-out
+   white, and it cools toward neutral. Left at rgba(252,252,252,.965) the
+   sheets read as paper laid on a tinted ground — which is exactly what the
+   first pass looked like. */
+html[data-mode="microfilm"] .sheet__paper {
+  background-image:
+    url("/tear-top.png"),
+    linear-gradient(rgba(232, 230, 223, 0.94), rgba(232, 230, 223, 0.94));
+}
+
+/* The ground itself. body already paints --background, so this only has to
+   add the optics. */
+html[data-mode="microfilm"] body {
+  /* the paper world's dust and light layers are the wrong material here */
+  background-image: none;
+}
+
+/* Content clears the housing so nothing is ever read through the bezel. */
+html[data-mode="microfilm"] body {
+  padding-left: var(--bezel);
+  padding-right: var(--bezel);
+  padding-top: var(--bezel);
+  padding-bottom: calc(var(--bezel-foot) + 0.5rem);
+}
+
+html[data-mode="microfilm"] img {
+  filter: var(--plate-film);
+}
+
+/*
+ * Film has no light greys to spend on hierarchy.
+ *
+ * The paper world separates secondary text by lightening it — 0.65 opacity on
+ * a meta row reads as quiet on bright paper. Under the lamp's falloff the same
+ * 0.65 lands on an already-darkened panel and the two converge. So secondary
+ * text stays a density here and earns its quietness from size, spacing and
+ * letterform instead, which is what a photographic process would actually do.
+ */
+html[data-mode="microfilm"] :is(.facts__meta, .metrics__of, .page__lede--empty) {
+  opacity: 0.82;
+}
+
+/* Same reason, and these were the ones that actually broke: at 0.55 on a
+   panel the lamp has already darkened, .register__eyebrow measured 3.5:1
+   against a 4.5 floor. .masthead__eyebrow cleared at 5.4:1 but only at the
+   hotspot — deeper into the falloff it would not. They are already uppercase
+   and tracked, which is the hierarchy doing the work; the lightness was
+   belt-and-braces on paper and unaffordable here. */
+html[data-mode="microfilm"]
+  :is(
+    .register__eyebrow,
+    .masthead__eyebrow,
+    .site-header__navMark,
+    .page__quote footer,
+    .ds__sectionNum,
+    .ds__aside,
+    .ds__code--dim,
+    .ds__table th,
+    .ds__demoLabel,
+    .ruler__meta,
+    .ruler__role,
+    .ruler__wght,
+    .ds__plateSet > span
+  ) {
+  opacity: 0.85;
+}
+
+/* The rubbed-out note is meant to look erased, so it keeps most of its
+   fade — but not so much that the words are gone. */
+html[data-mode="microfilm"] .mnote[data-rubbed] .mnote__text {
+  opacity: 0.7;
+}
+
+/* ── Behind the content: the light ──────────────────────────────────────────
+   Fixed, so the lamp stays with the machine while the film moves past it.
+   All three layers are pointer-events: none and none of them ever sits above
+   text — the falloff darkens the panel, not the words. */
+.reader-ground {
+  position: fixed;
+  inset: 0;
+  /* Behind the page's own content but above the body background. Must be
+     negative: a positioned element at z-index 0 paints *above* non-positioned
+     block content in the same stacking context, which would put the lamp on
+     top of the text. */
+  z-index: -1;
+  pointer-events: none;
+}
+
+html:not([data-mode="microfilm"]) .reader-ground,
+html:not([data-mode="microfilm"]) .reader-falloff,
+html:not([data-mode="microfilm"]) .reader {
+  display: none;
+}
+
+/* The lamp's warm centre. This one *is* behind the content, so it only lights
+   the exposed ground — the falloff that has to cross the whole image lives in
+   .reader__falloff, above. */
+.reader-ground__lamp {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    78% 62% at 50% 38%,
+    rgb(255 250 232 / 0.5) 0%,
+    rgb(250 244 224 / 0.22) 46%,
+    rgb(250 244 224 / 0) 78%
+  );
+}
+
+/* Dust: on the platen, in the gate, on the glass. Sharp and still, because it
+   is a physical speck sitting in focus — the one thing in the whole image that
+   is genuinely not moving. */
+.reader-ground__dust {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='620' height='620'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' seed='7'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.42'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='620' height='620' filter='url(%23p)'/%3E%3C/svg%3E");
+  background-size: 620px 620px;
+}
+
+/* Chromatic aberration, kept honest: only the last few per cent of the field,
+   where a real lens actually gives up. Two offset gradients rather than a
+   filter, so it costs a paint and nothing more. */
+.reader-ground__fringe {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      104% 100% at 49% 50%,
+      rgb(255 235 205 / 0) 88%,
+      rgb(255 214 150 / 0.13) 100%
+    ),
+    radial-gradient(
+      100% 104% at 51% 50%,
+      rgb(200 224 255 / 0) 88%,
+      rgb(150 190 255 / 0.11) 100%
+    );
+}
+
+/* ── Above the content: the glass and the housing ───────────────────────────
+   The only thing here that crosses the readable area is the sheen, at an
+   opacity low enough to measure as no contrast change. */
+.reader {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+}
+
+/*
+ * The lamp's falloff — the single thing that makes this read as projected
+ * light rather than as a tinted page.
+ *
+ * It has to be above the content, because the page paints its own opaque
+ * sheets and anything behind them is invisible. Above the content it would
+ * normally be a legibility problem; multiply is what makes it safe. Multiply
+ * scales text and ground by the same factor, so for dark-on-light the
+ * contrast *ratio* is preserved rather than eroded — measured at the four
+ * corners as well as the centre before this shipped.
+ */
+.reader-falloff {
+  position: fixed;
+  inset: 0;
+  /* between the page content and the housing */
+  z-index: 60;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  background: radial-gradient(
+    96% 78% at 50% 38%,
+    rgb(255 255 255) 0%,
+    rgb(250 249 245) 40%,
+    rgb(228 225 216) 66%,
+    rgb(198 194 183) 84%,
+    /* Was 158 — a full stop of falloff, which pushed the deepest corners
+       close to the AA floor for anything already quietened. 176 keeps the
+       lamp obvious and leaves the margin. */
+    rgb(176 172 160) 100%
+  );
+}
+
+/*
+ * The gate. A projected frame has a hard edge where the film's aperture ends,
+ * and it is the difference between "a page with a border" and "one frame in a
+ * machine". A hairline, inset just off the housing.
+ */
+.reader__gate {
+  position: absolute;
+  inset: var(--bezel);
+  bottom: var(--bezel-foot);
+  box-shadow:
+    /* the aperture's own edge, slightly soft because it is projected */
+    0 0 0 1px rgb(40 38 30 / 0.28),
+    0 0 6px 2px rgb(40 38 30 / 0.1) inset;
+}
+
+.reader__sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    118deg,
+    rgb(255 255 255 / 0.055) 0%,
+    rgb(255 255 255 / 0.015) 26%,
+    rgb(255 255 255 / 0) 46%,
+    rgb(255 255 255 / 0) 100%
+  );
+}
+
+/* The housing. Enamelled steel: a soft vertical gradient, a lit top edge, and
+   a hard shadow where it overhangs the glass. */
+.reader__bezel {
+  position: absolute;
+  background: linear-gradient(
+    180deg,
+    var(--reader-case-lit) 0%,
+    var(--reader-case) 46%,
+    var(--reader-case-dark) 100%
+  );
+}
+
+.reader__bezel--top,
+.reader__bezel--bottom {
+  left: 0;
+  right: 0;
+  height: var(--bezel);
+}
+
+.reader__bezel--top {
+  top: 0;
+  /* the housing overhangs the glass, so it casts down onto it */
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.16) inset,
+    0 6px 12px -3px rgb(20 18 12 / 0.4);
+}
+
+.reader__bezel--bottom {
+  bottom: 0;
+  height: var(--bezel-foot);
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  /* Left padding clears the mode switch, which is also bottom-left and was
+     sitting on top of the nameplate. Right padding clears the crank's flank
+     and stops the frame counter running off the edge — it was cut to
+     "FRAME 00". */
+  padding: 0 calc(var(--bezel) + 0.6rem) 0 13.5rem;
+  background: linear-gradient(
+    180deg,
+    var(--reader-case-dark) 0%,
+    var(--reader-case) 34%,
+    var(--reader-case-lit) 100%
+  );
+  box-shadow:
+    0 -1px 0 rgb(255 255 255 / 0.12) inset,
+    0 -6px 12px -3px rgb(20 18 12 / 0.36);
+}
+
+.reader__bezel--left,
+.reader__bezel--right {
+  top: 0;
+  bottom: 0;
+  width: var(--bezel);
+  background: linear-gradient(
+    90deg,
+    var(--reader-case-lit) 0%,
+    var(--reader-case) 52%,
+    var(--reader-case-dark) 100%
+  );
+}
+
+.reader__bezel--left {
+  left: 0;
+  box-shadow: 5px 0 11px -3px rgb(20 18 12 / 0.34);
+}
+
+.reader__bezel--right {
+  right: 0;
+  background: linear-gradient(
+    270deg,
+    var(--reader-case-lit) 0%,
+    var(--reader-case) 52%,
+    var(--reader-case-dark) 100%
+  );
+  box-shadow: -5px 0 11px -3px rgb(20 18 12 / 0.34);
+}
+
+/* Cooling slots, punched not printed: repeating hard-edged gradient. */
+.reader__vents {
+  position: absolute;
+  top: 50%;
+  right: clamp(0.9rem, 3vw, 2.4rem);
+  translate: 0 -50%;
+  width: clamp(3.4rem, 11vw, 7rem);
+  height: 0.62rem;
+  /* Punched slots, not a dotted line: wide enough to read as an opening, with
+     a lit lower lip so each one looks cut through the steel. */
+  background: repeating-linear-gradient(
+    90deg,
+    rgb(24 22 15 / 0.62) 0 3px,
+    rgb(24 22 15 / 0) 3px 4px,
+    rgb(255 255 255 / 0.13) 4px 5px,
+    rgb(24 22 15 / 0) 5px 8px
+  );
+  border-radius: 1px;
+}
+
+/* Stamped hardware type. Small, but the site's 44px rule does not apply —
+   none of this is a control. */
+.reader__nameplate,
+.reader__tag {
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: clamp(0.44rem, 1.15vw, 0.56rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* engraved: dark ink with a lit edge under it */
+  color: #262418;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.16);
+}
+
+.reader__tag {
+  opacity: 0.72;
+}
+
+.reader__bezel--top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(0.7rem, 2vw, 1.5rem);
+}
+
+/* The vents were absolutely positioned against the top edge; in a flex row
+   they place themselves. */
+.reader__vents {
+  position: static;
+  translate: none;
+  flex: none;
+}
+
+.reader__nameplate-sep {
+  margin: 0 0.4em;
+  opacity: 0.5;
+}
+
+/* Power lamp on the housing, lit whenever the machine is running. */
+.reader__lamp-indicator {
+  width: 0.36rem;
+  height: 0.36rem;
+  flex: none;
+  border-radius: 50%;
+  background: #ff8422;
+  box-shadow:
+    0 0 0 1px rgb(40 18 0 / 0.5) inset,
+    0 0 7px 1px rgb(255 132 34 / 0.6);
+}
+
+/* Screws, one per corner, holding the housing to the chassis. Each is a
+   slotted head: a domed gradient with a cut across it. */
+.reader__screw {
+  position: absolute;
+  width: 0.44rem;
+  height: 0.44rem;
+  border-radius: 50%;
+  background:
+    linear-gradient(
+      132deg,
+      rgb(255 255 255 / 0.5) 0%,
+      rgb(255 255 255 / 0) 48%
+    ),
+    var(--reader-screw);
+  box-shadow:
+    0 1px 1px rgb(20 18 12 / 0.5),
+    0 -1px 1px rgb(255 255 255 / 0.2) inset;
+}
+
+/* the slot */
+.reader__screw::after {
+  content: "";
+  position: absolute;
+  inset: 45% 14%;
+  background: rgb(30 28 20 / 0.62);
+  border-radius: 1px;
+  rotate: 34deg;
+}
+
+.reader__screw--tl {
+  top: calc(var(--bezel) * 0.5);
+  left: calc(var(--bezel) * 0.5);
+  translate: -50% -50%;
+}
+
+.reader__screw--tr {
+  top: calc(var(--bezel) * 0.5);
+  right: calc(var(--bezel) * 0.5);
+  translate: 50% -50%;
+}
+
+.reader__screw--bl {
+  bottom: calc(var(--bezel-foot) * 0.5);
+  left: calc(var(--bezel) * 0.5);
+  translate: -50% 50%;
+}
+
+.reader__screw--br {
+  bottom: calc(var(--bezel-foot) * 0.5);
+  right: calc(var(--bezel) * 0.5);
+  translate: 50% 50%;
+}
+
+/* Phones: the machine is still present, but it cannot eat the content area,
+   so the housing thins and the hardware type goes. */
+@media (max-width: 700px) {
+  html[data-mode="microfilm"] {
+    --bezel: 0.85rem;
+    /*
+     * The bottom housing is the one edge that cannot just get thinner.
+     * At 1.9x a 0.85rem bezel it came out 26px, and a 44px control does not
+     * fit in 26px of steel — the sound switch failed its tap target and the
+     * only ways out were a dead zone over the content above it or no mute
+     * control on a phone at all. If the machine has controls, the housing has
+     * to be big enough to press them. 3.4rem costs 3% of an 844px viewport.
+     */
+    --bezel-foot: 3.4rem;
+  }
+
+  .reader__vents,
+  .reader__tag {
+    display: none;
+  }
+
+  .reader__nameplate {
+    font-size: 0.44rem;
+  }
+
+  .reader__screw {
+    width: 0.32rem;
+    height: 0.32rem;
+  }
+}
+
+/* ── The changeover ─────────────────────────────────────────────────────────
+   A full-bleed veil, painted only while the attribute is present, so it costs
+   nothing at rest. Opacity and transform only. */
+html[data-mode-shift]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  background: #0b0b0c;
+}
+
+html[data-mode-shift="power"]::after {
+  animation: changeover var(--dur-changeover) var(--ease-press) both;
+}
+
+/* Reduced motion keeps the acknowledgement — the veil still passes, it just
+   does not collapse or flash. Gentler, not absent. */
+html[data-mode-shift="fade"]::after {
+  animation: changeover-fade var(--dur-changeover) linear both;
+}
+
+@keyframes changeover {
+  /* dark floods in fast, because a switch is instant */
+  0% {
+    opacity: 0;
+    scale: 1 1;
+  }
+  38% {
+    opacity: 1;
+    scale: 1 1;
+  }
+  /* then the image collapses to a line and goes out, the way a lit surface
+     does when its light is cut */
+  72% {
+    opacity: 1;
+    scale: 1 0.004;
+  }
+  100% {
+    opacity: 0;
+    scale: 1 0.004;
+  }
+}
+
+@keyframes changeover-fade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.92;
+  }
+}
+
+/* ── The switch ─────────────────────────────────────────────────────────────
+   The only machined object on a paper desk: a steel toggle resting on the
+   page. Quiet, but out of place enough to suggest the paper is not the only
+   way to read this. */
+.mode-switch {
+  position: fixed;
+  /* Not the top-right the brief suggests: the header nav already owns that
+     corner and a fixed plate there covered the "04. Ask" link on every route.
+     Bottom-left rather than bottom-right for two reasons — bottom-right is
+     where every chat bubble and scroll-to-top button lives, and this should
+     read as a machine's control, not a widget; and the dev toolbar sits
+     there, so the switch would be unusable in the environment it gets built
+     in. Low and to one side is where a control panel belongs anyway. */
+  bottom: max(1.1rem, env(safe-area-inset-bottom));
+  left: max(1.1rem, env(safe-area-inset-left));
+  /* above the sheets and the hand, below the changeover veil */
+  z-index: 80;
+}
+
+.mode-switch__body {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.32rem 0.5rem;
+  border: 1px solid #b9b2a4;
+  border-radius: 3px;
+  /* brushed plate: a cool metal gradient over the warm page */
+  background:
+    linear-gradient(
+      175deg,
+      #e8e4dc 0%,
+      #d6d1c6 42%,
+      #c8c2b5 58%,
+      #ddd8ce 100%
+    );
+  box-shadow:
+    /* seated on the paper, with a real shadow under it */
+    0 1px 0 rgb(255 255 255 / 0.6) inset,
+    0 -1px 0 rgb(0 0 0 / 0.09) inset,
+    0 2px 5px rgb(60 50 35 / 0.19),
+    0 8px 14px -6px rgb(60 50 35 / 0.22);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    box-shadow var(--dur-press) var(--ease-press),
+    translate var(--dur-press) var(--ease-press);
+}
+
+.mode-switch__body:hover {
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.7) inset,
+    0 -1px 0 rgb(0 0 0 / 0.09) inset,
+    0 3px 7px rgb(60 50 35 / 0.22),
+    0 10px 18px -6px rgb(60 50 35 / 0.26);
+}
+
+/* Pressed: the whole plate seats down into the paper. */
+.mode-switch__body:active {
+  translate: 0 1px;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.5) inset,
+    0 2px 4px rgb(60 50 35 / 0.24) inset,
+    0 1px 2px rgb(60 50 35 / 0.18);
+}
+
+/* Must stay visible against brushed metal *and* against whatever Phase 2
+   makes the second mode, so it is drawn outside the plate. */
+.mode-switch__body:focus-visible {
+  outline: 2px solid #2b2b2b;
+  outline-offset: 3px;
+}
+
+.mode-switch__plate {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Engraved, not printed: cut into the plate with a light edge below. */
+.mode-switch__legend {
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6f6858;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.55);
+  transition: color var(--dur-weight) var(--ease-ink);
+}
+
+/* Whichever side is live reads darker, the way an engraved label does when
+   the switch points at it. */
+html[data-mode="studio"] .mode-switch__legend--studio,
+html[data-mode="microfilm"] .mode-switch__legend--film {
+  color: #2f2b23;
+}
+
+.mode-switch__well {
+  position: relative;
+  width: 2rem;
+  height: 0.85rem;
+  border-radius: 2px;
+  /* the recess the rocker sits in */
+  background: linear-gradient(180deg, #9d968a 0%, #b6b0a4 55%, #cac4b8 100%);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.3) inset,
+    0 -1px 0 rgb(255 255 255 / 0.35) inset;
+}
+
+.mode-switch__rocker {
+  position: absolute;
+  inset: 1px auto 1px 1px;
+  width: calc(50% - 1px);
+  border-radius: 1px;
+  background: linear-gradient(180deg, #fbfaf7 0%, #ddd8cd 52%, #b8b2a5 100%);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.8) inset,
+    0 1px 2px rgb(0 0 0 / 0.32);
+  /* Position is driven by the root attribute, never by React state — the
+     pre-paint script has already set it, so the rocker is on the correct side
+     in the first painted frame. */
+  translate: 0 0;
+  transition: translate var(--dur-press) var(--ease-press);
+}
+
+html[data-mode="microfilm"] .mode-switch__rocker {
+  translate: 100% 0;
+}
+
+/* Power lamp: dark glass until the machine is running. */
+.mode-switch__lamp {
+  width: 0.3rem;
+  height: 0.3rem;
+  border-radius: 50%;
+  background: #6d6558;
+  box-shadow: 0 1px 1px rgb(0 0 0 / 0.35) inset;
+  transition:
+    background var(--dur-weight) var(--ease-ink),
+    box-shadow var(--dur-weight) var(--ease-ink);
+}
+
+html[data-mode="microfilm"] .mode-switch__lamp {
+  background: #ff7a1a;
+  box-shadow:
+    0 0 0 1px rgb(120 50 0 / 0.4),
+    0 0 6px 1px rgb(255 122 26 / 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mode-switch__rocker,
+  .mode-switch__body {
+    transition-duration: 1ms;
+  }
+}
+
+/* Phones: the plate is the same object, just tucked tighter to the corner. */
+@media (max-width: 700px) {
+  .mode-switch__legend {
+    /* the engraved words are unreadable at this size and the rocker plus the
+       accessible name already carry the meaning */
+    display: none;
+  }
+
+  .mode-switch__body {
+    padding: 0.55rem 0.6rem;
+  }
+}
+
+/* The plate is a design object and inflating it to 44px would put a chunky
+   metal slab in the corner of a paper page. Same answer as the nav marks: on a
+   coarse pointer an invisible pseudo-element extends the tappable box instead.
+   Measured — the plate lands at 35px tall, so this clears 44 with room. */
+@media (pointer: coarse) {
+  .mode-switch__body {
+    position: relative;
+  }
+
+  .mode-switch__body::before {
+    content: "";
+    position: absolute;
+    inset: -0.5rem;
+    /* it is a hit area, nothing else */
+    pointer-events: auto;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PHASE 3 — THE TRANSPORT
+
+   Film moving past a lamp. Sprocket strips travel with scroll, a crank turns
+   with them, and a counter reads the position. All three come off one number
+   written by src/components/reader-transport.tsx, so the film, the handle and
+   the readout cannot drift apart.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Sprockets ──────────────────────────────────────────────────────────────
+   The single strongest signal that this is film rather than a page: perforations
+   that actually move. Fixed strips just inside the housing, translated by
+   scroll — a GPU transform on two thin elements, so it costs a composite and
+   nothing more. */
+.reader__perf {
+  position: absolute;
+  /* Bounded by the housing vertically. Full-height they ran straight over the
+     bottom bezel, which put sprocket holes on the nameplate. */
+  top: calc(var(--bezel) * 0.5);
+  bottom: calc(var(--bezel-foot) * 0.75);
+  width: calc(var(--bezel) * 0.46);
+  overflow: hidden;
+}
+
+.reader__perf--left {
+  left: calc(var(--bezel) * 0.27);
+}
+
+.reader__perf--right {
+  right: calc(var(--bezel) * 0.27);
+}
+
+/* Driven by background-position rather than a transform, on purpose: a
+   repeating gradient tiles for ever, so the film can run any distance without
+   a modulo to keep the offset bounded. The cost is a paint per frame on two
+   ~25px-wide strips, which is nothing. */
+.reader__perf::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Bright, not dark. A sprocket hole is an absence of film, so the lamp
+     shines straight through it — on the housing it reads as a lit slot with a
+     shadowed lower lip. Dark holes on dark steel were invisible, which is the
+     physically wrong way round as well as the illegible one. */
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgb(20 19 13 / 0.55) 0 2px,
+    rgb(247 243 226 / 0.62) 2px 13px,
+    rgb(255 252 240 / 0.3) 13px 15px,
+    rgb(20 19 13 / 0.4) 15px 17px,
+    rgb(20 19 13 / 0) 17px 34px
+  );
+  background-position-y: calc(var(--film-y, 0px) * -1);
+  /* the holes are rounded, so the strip is masked rather than square-cut */
+  border-radius: 2px;
+}
+
+/* ── The transport panel, on the bottom housing ─────────────────────────────
+   This is also the answer to a bottom bezel that was 112px of empty steel:
+   the hardware that belongs there is the hardware that moves the film. */
+.transport {
+  display: none;
+  align-items: center;
+  gap: clamp(0.7rem, 2vw, 1.4rem);
+  margin-left: auto;
+}
+
+html[data-mode="microfilm"] .transport {
+  display: flex;
+}
+
+.transport__reel,
+.transport__frame {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex: none;
+  font-family: var(--font-cutive-mono), ui-monospace, monospace;
+  font-size: clamp(0.46rem, 1.15vw, 0.58rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #262418;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.16);
+}
+
+.transport__reelMark,
+.transport__frameKey {
+  opacity: 0.68;
+}
+
+.transport__reelLabel {
+  /* the one thing on the housing that is about the content, not the machine */
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+/* Figures in a counter must not reflow as they change. */
+.transport__frameNum {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+/* ── The crank ──────────────────────────────────────────────────────────────
+   A knurled dial with a handle. Turned by scroll, and turnable itself: drag,
+   swipe, or the arrow keys on a real focusable slider. */
+/*
+ * On the side of the machine, not in the status bar.
+ *
+ * A reader's crank is mounted on the housing's flank and turns about a
+ * horizontal axis — putting it there reads as a machine in a way a small dial
+ * in a readout strip never did. It also leaves the bottom-right corner, where
+ * the dev toolbar sits: at 34px in the status bar the toolbar was swallowing
+ * every pointer event and the crank could not be dragged at all.
+ */
+.transport__crank {
+  position: fixed;
+  right: calc((var(--bezel) - 2.4rem) / 2);
+  top: 50%;
+  translate: 0 -50%;
+  /* above the housing it is mounted on */
+  z-index: 75;
+  /* .reader is pointer-events: none so the housing never blocks the page;
+     this is the one thing inside it that is a control, so it opts back in. */
+  pointer-events: auto;
+  flex: none;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: grab;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.transport__crank[data-turning] {
+  cursor: grabbing;
+}
+
+.transport__crank:focus-visible {
+  outline: 2px solid #1a1810;
+  outline-offset: 3px;
+}
+
+.transport__crankFace {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  /* knurled rim over a domed centre */
+  background:
+    repeating-conic-gradient(
+      from 0deg,
+      rgb(0 0 0 / 0.22) 0deg 3deg,
+      rgb(255 255 255 / 0.14) 3deg 6deg
+    ),
+    radial-gradient(
+      circle at 38% 32%,
+      #cfcab6 0%,
+      #a9a48f 46%,
+      #77735f 78%,
+      #565342 100%
+    );
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.22) inset,
+    0 2px 4px rgb(18 16 10 / 0.5);
+  /* `rotate` is written straight to this element's style by the transport.
+     Its own property rather than `transform`, so it never collides with the
+     translate the handle uses. */
+}
+
+/* Without a handle a spinning knurl is ambiguous — this is the part your eye
+   tracks to see that it turned. */
+.transport__crankHandle {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  translate: -50% 0;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #f0ecdd, #8d8974 70%, #4f4c3d);
+  box-shadow: 0 1px 2px rgb(18 16 10 / 0.55);
+}
+
+/* The crank is decoration in reduced-motion terms — but it is also a readout,
+   and a readout that lies is worse than one that moves. It keeps turning; what
+   goes is the inertia after release, handled in the component. */
+
+/* ── The reel selector ──────────────────────────────────────────────────────
+   The same four nav links, restyled as cartridges. No new DOM and no second
+   copy of the labels: the archival tag is chrome, so it lives in CSS. */
+html[data-mode="microfilm"] .site-header__nav {
+  gap: clamp(0.45rem, 1.4vw, 1rem);
+}
+
+html[data-mode="microfilm"] .site-header__nav .text-button {
+  /* a cartridge: a squat label plate with a spine down one side */
+  padding: 0.42rem 0.6rem 0.42rem 0.72rem;
+  background: linear-gradient(
+    172deg,
+    rgb(255 255 255 / 0.34) 0%,
+    rgb(210 205 190 / 0.26) 100%
+  );
+  border: 1px solid rgb(40 38 28 / 0.26);
+  border-left-width: 3px;
+  border-radius: 1px 3px 3px 1px;
+  box-shadow: 0 1px 2px rgb(40 38 28 / 0.14);
+  transition:
+    background var(--dur-weight) var(--ease-ink),
+    box-shadow var(--dur-weight) var(--ease-ink),
+    translate var(--dur-press) var(--ease-press);
+}
+
+html[data-mode="microfilm"] .site-header__nav .text-button:hover {
+  /* a cartridge easing out of the rack */
+  translate: 0 -1px;
+  background: linear-gradient(
+    172deg,
+    rgb(255 255 255 / 0.5) 0%,
+    rgb(215 210 196 / 0.3) 100%
+  );
+  box-shadow: 0 3px 6px -1px rgb(40 38 28 / 0.2);
+}
+
+/* The one that is loaded reads as seated, not raised. */
+html[data-mode="microfilm"] .site-header__nav .text-button[aria-current="page"] {
+  translate: 0 1px;
+  border-left-color: #1a1810;
+  background: linear-gradient(
+    172deg,
+    rgb(150 146 130 / 0.3) 0%,
+    rgb(120 116 102 / 0.24) 100%
+  );
+  box-shadow: 0 1px 3px rgb(40 38 28 / 0.28) inset;
+}
+
+/* The paper world's inked underline is a pen gesture; a cartridge does not
+   get underlined. */
+html[data-mode="microfilm"] .site-header__nav .text-button::after {
+  display: none;
+}
+
+/* ── Focus-in on route change ───────────────────────────────────────────────
+   A lens being brought to focus. This is the one place the site permits blur,
+   and only because it is an optical instrument here: the design system's
+   "nothing is blurred" is a rule about paper, and paper has no focus knob.
+   Brief, and on the panel rather than on the words. */
+html[data-mode="microfilm"][data-threading="reel"] main {
+  animation: focus-in 380ms var(--ease-settle) both;
+}
+
+@keyframes focus-in {
+  from {
+    opacity: 0.55;
+    filter: blur(2.4px) contrast(0.88);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0) contrast(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-mode="microfilm"][data-threading="reel"] main {
+    /* the lens still settles, it just does not defocus */
+    animation: focus-in-reduced 240ms linear both;
+  }
+
+  @keyframes focus-in-reduced {
+    from {
+      opacity: 0.7;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* ── The switch, against steel rather than paper ────────────────────────────
+   It was designed warm, to sit on paper. Against the housing that warmth read
+   as a different object borrowed from somewhere else. */
+html[data-mode="microfilm"] .mode-switch__body {
+  border-color: #4f4c3e;
+  background: linear-gradient(
+    175deg,
+    #b3af9c 0%,
+    #9d9986 42%,
+    #8e8a77 58%,
+    #a8a491 100%
+  );
+}
+
+html[data-mode="microfilm"] .mode-switch__legend {
+  color: #33301f;
+}
+
+html[data-mode="microfilm"] .mode-switch__legend--film {
+  color: #14130a;
+}
+
+html[data-mode="microfilm"] .mode-switch__well {
+  background: linear-gradient(180deg, #6f6c5a 0%, #837f6c 55%, #97937f 100%);
+}
+
+/* Phones: the reel label and the crank are what matter; the machine's own
+   part number is not worth the width. */
+@media (max-width: 700px) {
+  .transport__reelMark,
+  .transport__frameKey {
+    display: none;
+  }
+
+  .transport {
+    gap: 0.55rem;
+  }
+
+  /*
+   * The crank comes off the flank and into the foot.
+   *
+   * The side bezel is 0.85rem on a phone — nothing to mount a 38px dial on.
+   * Hiding it was the first answer and the wrong one: the brief says the
+   * crank *becomes* swipe-driven, not that it goes away, and native scroll
+   * alone leaves a phone with a readout it cannot touch. The foot is 54px
+   * now that it has to hold a 44px control, which is exactly enough.
+   */
+  .transport__crank {
+    /* `relative`, not `static`: it has to be back in the flex row *and* stay
+       a positioning context, or the hit-area pseudo-element below anchors to
+       the housing instead of the dial and the 44px target silently fails. */
+    position: relative;
+    top: auto;
+    right: auto;
+    translate: none;
+    width: 2.15rem;
+    height: 2.15rem;
+    /* it is back in the readout's flex row */
+    order: 2;
+  }
+
+  /* Same answer as every other control here: the dial stays sized to the
+     housing and an invisible pseudo-element carries the 44px target. */
+  .transport__crank::before {
+    content: "";
+    position: absolute;
+    inset: -0.35rem;
+    pointer-events: auto;
+  }
+
+  .transport {
+    /* the dial reads as the thing that drives the numbers beside it */
+    flex-direction: row-reverse;
+    gap: 0.5rem;
+  }
+
+  .reader__perf {
+    /* too narrow to read as perforations, and it would crowd the column */
+    display: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PHASE 4 — CARTRIDGES
+
+   A case study is a cartridge: it loads with a threading sequence, its own
+   sections are its frames, and two spools show how much film is left.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── The spools ─────────────────────────────────────────────────────────────
+   Flanking the crank on the right flank, geared to it. `--wound` is 0…1 and
+   is written by the transport; the radial stop is the wound diameter, so film
+   visibly leaves the feed spool and gathers on the take-up. */
+.reader__spool {
+  position: fixed;
+  right: calc((var(--bezel) - 1.5rem) / 2);
+  width: 1.5rem;
+  height: 1.5rem;
+  z-index: 74;
+  border-radius: 50%;
+  /* the hub, then the wound film out to --wound of the radius */
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      #4a4739 0 22%,
+      /* the film itself: dense, slightly warm from the lamp behind it */
+        #2a2820 22% calc(22% + var(--wound, 0.5) * 78%),
+      rgb(0 0 0 / 0) calc(22% + var(--wound, 0.5) * 78%) 100%
+    ),
+    /* the flange the film is wound between */
+      radial-gradient(circle at 50% 50%, #8f8b77 0 96%, rgb(0 0 0 / 0) 96%);
+  box-shadow: 0 1px 3px rgb(18 16 10 / 0.45);
+}
+
+.reader__spool[data-spool="feed"] {
+  top: calc(50% - 3.6rem);
+}
+
+.reader__spool[data-spool="take-up"] {
+  top: calc(50% + 2.1rem);
+}
+
+/* ── The frame name ─────────────────────────────────────────────────────────
+   A sectioned reel says which section is under the reading line. Empty on an
+   unsectioned one, so it takes no width at all. */
+.transport__frameName {
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.transport__frameName:not(:empty)::before {
+  content: "·";
+  margin: 0 0.45em;
+  font-weight: 400;
+  opacity: 0.5;
+}
+
+/* ── Loading a cartridge ────────────────────────────────────────────────────
+   Distinct from loading a reel: a cartridge is inserted, fed, and only then
+   does the lamp reach the film. Longer than the plain focus-in but still
+   short — nobody waits to read a case study — and it never blocks input. */
+html[data-mode="microfilm"][data-threading="cartridge"] main {
+  animation: cartridge-load 620ms var(--ease-settle) both;
+}
+
+@keyframes cartridge-load {
+  /* the gate is blocked while the cartridge seats */
+  0% {
+    opacity: 0;
+    filter: blur(5px) contrast(0.8);
+    translate: 0 10px;
+  }
+  /* film catches, and the lamp finds it */
+  34% {
+    opacity: 0.35;
+    filter: blur(3.6px) contrast(0.86);
+    translate: 0 5px;
+  }
+  /* the feed judders once as the sprockets engage */
+  52% {
+    opacity: 0.8;
+    filter: blur(1.6px) contrast(0.94);
+    translate: 0 -2px;
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0) contrast(1);
+    translate: 0 0;
+  }
+}
+
+/* The gate flashes as the cartridge passes it — a mechanical event, not an
+   ambient flicker, so it happens once per load and never on a loop. */
+html[data-mode="microfilm"][data-threading="cartridge"] .reader__gate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(255 252 240 / 0.5);
+  animation: gate-flash 620ms steps(1, end) both;
+}
+
+@keyframes gate-flash {
+  0%,
+  22% {
+    opacity: 0;
+  }
+  26% {
+    opacity: 0.7;
+  }
+  30% {
+    opacity: 0;
+  }
+  44% {
+    opacity: 0.35;
+  }
+  48%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The mechanism is the decoration here. The load still reads as a load —
+     it just does not defocus, judder or flash. */
+  html[data-mode="microfilm"][data-threading="cartridge"] main {
+    animation: focus-in-reduced 300ms linear both;
+  }
+
+  html[data-mode="microfilm"][data-threading="cartridge"] .reader__gate::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  /* No flank to mount them on. */
+  .reader__spool {
+    display: none;
+  }
+
+  .transport__frameName {
+    /* the reel label already names where you are on a phone */
+    display: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PHASE 5 — GRAIN THAT ANSWERS TO MOTION
+
+   The loupe that used to live here is gone. It magnified a plate under the
+   cursor, which was a gadget bolted to the machine rather than a property of
+   it — helpful for nothing, and the first thing on the site that read as a
+   trick. What replaced it is in the same spirit and actually true of the
+   instrument: an optical field goes soft at its limits, and a lamp is never
+   quite steady.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ── Grain that answers to motion ───────────────────────────────────────────
+   Two kinds, and the difference is the point. Dust on the platen and the
+   glass sits still — it is the one thing in the image genuinely not moving.
+   Grain in the emulsion belongs to the film, so it only shows while the film
+   is running, and it streaks with the direction of travel. */
+.reader-ground__agitate {
+  position: absolute;
+  inset: -8%;
+  opacity: calc(var(--agitation, 0) * 0.34);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='340'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9 0.24' numOctaves='2' seed='19'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='340' height='340' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 340px 340px;
+  /* vertical smear, because the film runs vertically */
+  scale: 1 1.4;
+  /* No will-change: opacity is composited anyway, and pinning a
+     viewport-sized noise layer to its own compositor layer for the whole
+     session costs memory to save nothing. */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Grain that appears and disappears is movement. The still dust stays. */
+  .reader-ground__agitate {
+    display: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PHASE 6 — SOUND
+
+   The control only. Every sound is synthesised in src/lib/reader-audio.ts —
+   no files, nothing to preload, and nothing constructed at all until this
+   switch is pressed.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sound-switch {
+  display: none;
+  align-items: center;
+  gap: 0.34rem;
+  flex: none;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid rgb(28 26 18 / 0.34);
+  border-radius: 2px;
+  background: linear-gradient(
+    178deg,
+    rgb(255 255 255 / 0.12) 0%,
+    rgb(20 19 13 / 0.12) 100%
+  );
+  /* .reader is pointer-events: none; this is a control, so it opts back in. */
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html[data-mode="microfilm"] .sound-switch {
+  display: flex;
+}
+
+.sound-switch:focus-visible {
+  outline: 2px solid #1a1810;
+  outline-offset: 3px;
+}
+
+/* A punched speaker grille, same tooling as the vents. */
+.sound-switch__grille {
+  width: 0.85rem;
+  height: 0.6rem;
+  border-radius: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgb(20 19 13 / 0.5) 0 2px,
+    rgb(255 255 255 / 0.1) 2px 3px,
+    rgb(20 19 13 / 0) 3px 4px
+  );
+}
+
+/* Dark glass off; lit when the machine is audible. */
+.sound-switch__lamp {
+  width: 0.26rem;
+  height: 0.26rem;
+  border-radius: 50%;
+  background: #4f4c3d;
+  box-shadow: 0 1px 1px rgb(0 0 0 / 0.4) inset;
+  transition:
+    background var(--dur-weight) var(--ease-ink),
+    box-shadow var(--dur-weight) var(--ease-ink);
+}
+
+.sound-switch[aria-pressed="true"] .sound-switch__lamp {
+  background: #8fdc6a;
+  box-shadow:
+    0 0 0 1px rgb(20 60 10 / 0.45),
+    0 0 6px 1px rgb(143 220 106 / 0.6);
+}
+
+@media (pointer: coarse) {
+  /* Same answer as everywhere else on this site: the plate stays small and an
+     invisible pseudo-element carries the 44px target. */
+  .sound-switch {
+    position: relative;
+  }
+
+  .sound-switch::before {
+    content: "";
+    position: absolute;
+    /* Measured: the plate is 21px tall, so it needs 11.5px each side to
+       clear 44. 0.78rem gives it with a little to spare. */
+    inset: -0.78rem -0.45rem;
+    pointer-events: auto;
+  }
+}
+
+/* ── The field's limits ─────────────────────────────────────────────────────
+   Film is curved through a gate, so the parts entering and leaving the
+   aperture sit off the focal plane and go soft. That is a real property of the
+   instrument rather than an effect applied to it, which is why this mode is
+   allowed a blur at all: the design system's "nothing is blurred" is a rule
+   about paper, and paper has no focal plane.
+
+   Two thin strips of backdrop-filter, masked so the blur ramps from nothing at
+   the reading line to full at the housing. `backdrop-filter` rather than a
+   filter on the content: it blurs what is behind it without touching how the
+   page renders, so text is never itself blurry — it passes *through* a soft
+   region as the film runs, the way it would on the machine.
+
+   The brief's own warning against large-area backdrop-filter is why these are
+   bands and not a full-viewport layer. */
+.reader__soft {
+  position: absolute;
+  left: var(--bezel);
+  right: var(--bezel);
+  height: clamp(3.5rem, 7vh, 6rem);
+  pointer-events: none;
+  /* Lightning CSS (via @tailwindcss/postcss) rewrites this to
+     -webkit-backdrop-filter only, per the project's browser targets — so the
+     served rule has no unprefixed property and reading `backdropFilter` off
+     computed style returns "none" even though the effect renders. Check
+     `webkitBackdropFilter`, or just look at the screen. */
+  backdrop-filter: blur(2.6px);
+}
+
+.reader__soft--top {
+  top: var(--bezel);
+  /* Full against the housing and falling away fast — front-loaded on purpose
+     so the heavy softness hugs the gate edge and most of the band stays
+     readable. An even ramp put the pull-quote's first line in ~70% blur a
+     comfortable distance from the edge, which is further than a lens
+     actually gives up. */
+  mask-image: linear-gradient(
+    to bottom,
+    rgb(0 0 0) 0%,
+    rgb(0 0 0 / 0.78) 18%,
+    rgb(0 0 0 / 0.4) 44%,
+    rgb(0 0 0 / 0.12) 72%,
+    rgb(0 0 0 / 0) 100%
+  );
+}
+
+.reader__soft--bottom {
+  bottom: var(--bezel-foot);
+  mask-image: linear-gradient(
+    to top,
+    rgb(0 0 0) 0%,
+    rgb(0 0 0 / 0.78) 18%,
+    rgb(0 0 0 / 0.4) 44%,
+    rgb(0 0 0 / 0.12) 72%,
+    rgb(0 0 0 / 0) 100%
+  );
+}
+
+/* ── The lamp is never quite steady ────────────────────────────────────────
+   A projector lamp is not a refresh rate. It is a filament with an arc across
+   it, and it wanders — so this is a slow, shallow drift in brightness with
+   one deeper dip where a splice passes the gate. Irregular keyframe spacing so
+   it does not read as a loop, and never fast enough to be a flash: the
+   deepest excursion here is 2.5% over 11 seconds, orders of magnitude below
+   the three-per-second flash threshold. */
+.reader-ground__flicker {
+  position: absolute;
+  inset: 0;
+  background: rgb(255 250 232);
+  opacity: 0;
+  animation: lamp-drift 11s ease-in-out infinite;
+}
+
+@keyframes lamp-drift {
+  0% {
+    opacity: 0.004;
+  }
+  17% {
+    opacity: 0.021;
+  }
+  29% {
+    opacity: 0.007;
+  }
+  38% {
+    opacity: 0.018;
+  }
+  /* the splice */
+  43% {
+    opacity: 0;
+  }
+  44.5% {
+    opacity: 0.025;
+  }
+  46% {
+    opacity: 0.002;
+  }
+  61% {
+    opacity: 0.016;
+  }
+  78% {
+    opacity: 0.005;
+  }
+  91% {
+    opacity: 0.019;
+  }
+  100% {
+    opacity: 0.004;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* A wandering lamp is movement, however shallow. The panel holds one
+     steady value instead of none, so nothing about the ground changes. */
+  .reader-ground__flicker {
+    animation: none;
+    opacity: 0.012;
   }
 }

@@ -7,6 +7,18 @@ const nextConfig: NextConfig = {
    * `/contact` was renamed to `/ask`. A permanent redirect rather than a dead
    * link, because the old path may already be written down somewhere.
    */
+  /*
+   * Off entirely rather than repositioned.
+   *
+   * Microfilm Mode's housing occupies all four edges of the viewport, so
+   * there is no corner left for a floating dev badge to sit in without
+   * covering hardware — at top-left it sat on the accession tag, at
+   * bottom-left on the mode switch. Compile and runtime errors still surface
+   * in the console and in the terminal, which is where they were being read
+   * from anyway.
+   */
+  devIndicators: false,
+
   async redirects() {
     return [{ source: "/contact", destination: "/ask", permanent: true }];
   },
