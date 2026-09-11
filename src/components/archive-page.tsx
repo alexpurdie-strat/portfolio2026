@@ -1,3 +1,4 @@
+import { asset } from "@/lib/asset";
 import Image from "next/image";
 import { MarginNote } from "@/components/margin-note";
 import { PageMasthead } from "@/components/page-masthead";
@@ -59,7 +60,7 @@ export function ArchivePage() {
                   {entry.plates.slice(0, 3).map((pl) => (
                     <span className="plate" key={pl.src}>
                       <Image
-                        src={pl.src}
+                        src={asset(pl.src)}
                         alt={pl.alt}
                         width={pl.width}
                         height={pl.height}

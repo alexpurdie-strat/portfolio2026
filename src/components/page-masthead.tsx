@@ -9,21 +9,14 @@ export function PageMasthead({
   eyebrow,
   title,
   standfirst,
-  frame = "Title",
 }: {
   eyebrow?: string;
   title: string;
   standfirst?: string;
-  /* Names this block as a frame for the microfilm transport. It is an
-     attribute on an element that already exists rather than a wrapper,
-     because the prose becomes `display: contents` on a phone and the plates
-     interleave through it by `order` — a new element in that flow would
-     break the weaving. */
-  frame?: string;
 }) {
   return (
     <>
-      <header className="masthead" data-frame={frame}>
+      <header className="masthead">
         {eyebrow ? <p className="masthead__eyebrow">{eyebrow}</p> : null}
         <h1 className="masthead__title">{title}</h1>
       </header>

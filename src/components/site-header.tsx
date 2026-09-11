@@ -1,3 +1,4 @@
+import headerTexture from "@/assets/header-texture.png";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteNav } from "@/components/site-nav";
@@ -17,10 +18,8 @@ export function SiteHeader({ leak = false }: { leak?: boolean }) {
           edge rather than the asset's flat bottom cut. */}
       <div className="site-header__texture">
         <Image
-          src="/header-texture.png"
+          src={headerTexture}
           alt=""
-          width={4096}
-          height={720}
           sizes="(max-width: 640px) 400vw, 120vw"
           priority
         />

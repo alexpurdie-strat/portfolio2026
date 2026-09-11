@@ -2,26 +2,44 @@ import type { NextConfig } from "next";
 
 const isProduction = process.env.NODE_ENV === "production";
 
+/*
+ * The site is deployed to GitHub Pages, which serves files and nothing else.
+ *
+ * `basePath` comes from the environment rather than being hardcoded, because a
+ * project page lives under /portfolio2026 while `next dev` and a local
+ * `next build` want to run at the root. The deploy workflow sets it; nothing
+ * else does, so local work is unaffected.
+ */
+/* NEXT_PUBLIC_ so the same value is readable from src/lib/asset.ts, which
+   has to prefix paths into public/ that Next passes through untouched. */
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 const nextConfig: NextConfig = {
   /*
-   * `/contact` was renamed to `/ask`. A permanent redirect rather than a dead
-   * link, because the old path may already be written down somewhere.
+   * Every route here is already static or SSG — no route handlers, no server
+   * actions, no cookies() or headers() — so the whole site exports to plain
+   * files. `next build` now writes ./out.
    */
+  output: "export",
+  basePath,
   /*
-   * Off entirely rather than repositioned.
-   *
-   * Microfilm Mode's housing occupies all four edges of the viewport, so
-   * there is no corner left for a floating dev badge to sit in without
-   * covering hardware — at top-left it sat on the accession tag, at
-   * bottom-left on the mode switch. Compile and runtime errors still surface
-   * in the console and in the terminal, which is where they were being read
-   * from anyway.
+   * Trailing slashes so each route exports as a directory with an index.html
+   * rather than a bare .html file. Static hosts resolve /about/ unambiguously;
+   * extensionless /about depends on the host guessing.
    */
-  devIndicators: false,
-
-  async redirects() {
-    return [{ source: "/contact", destination: "/ask", permanent: true }];
+  trailingSlash: true,
+  images: {
+    /*
+     * The optimiser is a server, and there is no server. Sources are already
+     * sized for their use, so this ships them as they are.
+     */
+    unoptimized: true,
   },
+  /*
+   * `/contact` was renamed to `/ask`. This used to be a redirects() entry,
+   * which is a server feature and does not survive `output: export` — the
+   * replacement is a static page at public/contact/index.html that bounces.
+   */
   turbopack: {
     /*
      * `agentation` is a development-only visual feedback toolbar. Guarding the
