@@ -56,7 +56,7 @@ export default function Home() {
             none: stating who you are not for reads as confidence and filters
             the inbound. Alex's own words, cut to about half the length. */}
         <section className="section not-for" aria-labelledby="not-for-heading">
-          <h2 id="not-for-heading" className="label">
+          <h2 id="not-for-heading" className="label section-head">
             Who I’m not for
           </h2>
           <p className="not-for__line measure">
@@ -73,7 +73,7 @@ export default function Home() {
         <hr className="rule" />
 
         <section className="section clients" aria-labelledby="clients-heading">
-          <h2 id="clients-heading" className="label">
+          <h2 id="clients-heading" className="label section-head">
             Selected clients
           </h2>
           <p className="clients__list">{CLIENTS.join(" · ")}</p>
@@ -82,7 +82,7 @@ export default function Home() {
         <hr className="rule" />
 
         <section className="section work" aria-labelledby="work-heading">
-          <h2 id="work-heading" className="label">
+          <h2 id="work-heading" className="label section-head">
             Selected work
           </h2>
           <div className="work__grid">
@@ -101,7 +101,7 @@ export default function Home() {
         <hr className="rule" />
 
         <section className="section contact" aria-labelledby="contact-heading">
-          <h2 id="contact-heading" className="label">
+          <h2 id="contact-heading" className="label section-head">
             Contact
           </h2>
           <p className="contact__line measure">

@@ -14,8 +14,12 @@
   color-scheme: light;
 
   /* ── Ground and ink ───────────────────────────────────────────────────── */
-  --bone: #faf8f4;
-  --bone-sunk: #f3f0e9;
+  /* Warmer and a shade deeper than white. A page that is #fff with black text
+     has no temperature, and temperature is where the 40% warmth in a 60/40
+     brief actually lives. */
+  --bone: #f7f4ec;
+  --bone-sunk: #efeade;
+  --bone-deep: #e8e2d2;
   --ink: #1a1917;
   --ink-soft: #56534c;
   /* The quietest text allowed. Measured at 4.6:1 on --bone; anything lighter
@@ -24,8 +28,11 @@
   --rule: #e2ddd3;
   --rule-strong: #cdc6b8;
 
-  --accent: #a0612b;
-  --accent-soft: #f0e4d6;
+  /* One accent, but it has to do structural work rather than sit on a hover
+     state: section rules, numerals, the question at the top of a case study. */
+  --accent: #9c5a24;
+  --accent-soft: #f2e6d7;
+  --accent-line: #d8bd9c;
 
   /* ── Type ─────────────────────────────────────────────────────────────── */
   --serif: var(--font-martina-plantijn), "Iowan Old Style", Georgia, serif;
@@ -34,7 +41,12 @@
 
   --t-display: clamp(2.6rem, 6vw, 4.25rem);
   --t-title: clamp(2rem, 4.4vw, 3.1rem);
-  --t-head: clamp(1.3rem, 2.2vw, 1.6rem);
+  /* The missing middle. Section heads were 1.3rem against a 4.25rem display —
+     a scale with a top and a bottom and nothing in between has no rhythm, and
+     every page read as one big thing followed by a lot of small things. */
+  --t-section: clamp(1.6rem, 3vw, 2.15rem);
+  --t-metric: clamp(2.1rem, 4.5vw, 3rem);
+  --t-head: clamp(1.25rem, 2vw, 1.45rem);
   --t-lede: clamp(1.15rem, 1.7vw, 1.4rem);
   --t-body: 1.0625rem;
   --t-small: 0.9rem;

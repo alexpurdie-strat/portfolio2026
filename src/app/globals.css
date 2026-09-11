@@ -625,3 +625,174 @@ a:hover {
     width: calc(var(--measure) + var(--lane) + 3rem);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WARMTH AND STRUCTURE
+
+   The first pass had a top and a bottom to its type scale and nothing between,
+   an accent that only appeared on hover, and a flat ground. That is not
+   restraint, it is absence. These rules are the 40% of a 60/40 brief.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* A ground with temperature. Two very wide, very low-contrast washes so the
+   page has a direction of light rather than being one flat fill. */
+body {
+  background-image:
+    radial-gradient(
+      120% 80% at 12% 0%,
+      rgb(255 253 247 / 0.85) 0%,
+      rgb(255 253 247 / 0) 62%
+    ),
+    radial-gradient(
+      100% 70% at 100% 100%,
+      rgb(214 200 176 / 0.22) 0%,
+      rgb(214 200 176 / 0) 60%
+    );
+  background-attachment: scroll;
+}
+
+/* ── Section headers ───────────────────────────────────────────────────────
+   A label, a short accent rule, and real size. The rule is the only piece of
+   pure decoration on the site and it earns its place by making sections
+   findable when scanning rather than reading. */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-head::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--accent-line) 0%,
+    var(--rule) 40%,
+    rgb(0 0 0 / 0) 100%
+  );
+}
+
+/* Prose headings inside a case study get the same treatment, so the reading
+   column has landmarks. */
+.case__body h2 {
+  font-size: var(--t-section);
+  margin-top: var(--space-section);
+  margin-bottom: 1rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--rule);
+  position: relative;
+}
+
+.case__body h2::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 3.5rem;
+  height: 1px;
+  background: var(--accent);
+}
+
+.case__body h3 {
+  font-size: var(--t-head);
+  font-style: italic;
+  color: var(--ink);
+  margin-top: 2.25rem;
+}
+
+/* ── Metrics ───────────────────────────────────────────────────────────────
+   Scale first, explanation second. */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  margin: var(--space-block) 0;
+  padding: var(--space-block) 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  max-width: none;
+  width: min(var(--page), 100%);
+}
+
+@media (min-width: 1100px) {
+  .metrics {
+    width: calc(var(--measure) + var(--lane) + 3rem);
+  }
+}
+
+.metric__value {
+  font-size: var(--t-metric);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  /* The one place a number is allowed to be the loudest thing on the page. */
+  color: var(--ink);
+}
+
+.metric__of {
+  margin: 0.55rem 0 0;
+  font-family: var(--sans);
+  font-size: var(--t-small);
+  line-height: 1.45;
+  color: var(--ink-soft);
+  max-width: 16rem;
+}
+
+/* ── The framing strip, with the question carrying weight ─────────────── */
+.framing {
+  background: var(--bone-sunk);
+  border-top: 1px solid var(--accent-line);
+  border-bottom: 1px solid var(--rule);
+  padding-inline: clamp(1.25rem, 3vw, 2.5rem);
+  margin-inline: clamp(-1.25rem, -3vw, -2.5rem);
+}
+
+.framing__challenge {
+  font-size: var(--t-section);
+  font-style: italic;
+  color: var(--ink);
+}
+
+/* ── Principles with presence ──────────────────────────────────────────── */
+.principle__num {
+  color: var(--accent);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+}
+
+.principle__name {
+  font-size: var(--t-section);
+}
+
+.principle:first-of-type {
+  border-top-color: var(--accent-line);
+}
+
+/* ── The hero belief, with the accent under it ─────────────────────────── */
+.hero__belief {
+  padding-bottom: var(--space-block);
+  border-bottom: 1px solid var(--accent-line);
+  margin-bottom: var(--space-block);
+}
+
+/* Pull quotes in a case study read as testimony, not as body copy. */
+.case__body blockquote {
+  margin: var(--space-block) 0;
+  padding-left: 1.25rem;
+  border-left: 2px solid var(--accent-line);
+  font-size: var(--t-lede);
+  line-height: 1.45;
+  font-style: italic;
+  color: var(--ink);
+}
+
+.case__body blockquote + p em,
+.case__body blockquote + p {
+  font-family: var(--sans);
+  font-size: var(--t-small);
+  color: var(--ink-quiet);
+  font-style: normal;
+}
