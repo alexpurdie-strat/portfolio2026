@@ -489,3 +489,68 @@ a:hover {
   color: var(--accent);
   font-weight: 600;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PRINCIPLES
+
+   Novelty spend number one. A numbered list where every idea carries its
+   proof, so none of them can sit as an assertion.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.principles {
+  list-style: none;
+  margin: var(--space-block) 0 0;
+  padding: 0;
+  counter-reset: none;
+}
+
+.principle {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 0 1rem;
+  padding-block: var(--space-block);
+  border-top: 1px solid var(--rule);
+  max-width: 46rem;
+}
+
+.principle__num {
+  margin: 0.4rem 0 0;
+}
+
+.principle__name {
+  font-size: var(--t-head);
+  margin-bottom: 0.5rem;
+}
+
+.principle__body {
+  color: var(--ink-soft);
+  max-width: var(--measure);
+  margin-bottom: 0.75rem;
+}
+
+.principle__proof {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: var(--t-small);
+}
+
+@media (max-width: 600px) {
+  .principle {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+}
+
+.not-for__line {
+  font-size: var(--t-lede);
+  line-height: 1.5;
+  margin-top: 1rem;
+}
+
+.not-for__line:last-child {
+  color: var(--ink);
+}
+
+.not-for__line:first-of-type {
+  color: var(--ink-quiet);
+}

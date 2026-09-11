@@ -52,6 +52,26 @@ export default function Home() {
 
         <hr className="rule" />
 
+        {/* Anti-positioning. The framework rates this highly and the site had
+            none: stating who you are not for reads as confidence and filters
+            the inbound. Alex's own words, cut to about half the length. */}
+        <section className="section not-for" aria-labelledby="not-for-heading">
+          <h2 id="not-for-heading" className="label">
+            Who I’m not for
+          </h2>
+          <p className="not-for__line measure">
+            If you want wireframes every Tuesday without the thinking behind
+            them, I’m not your designer. If you want research as a masthead
+            rather than something that steers, I’m not either.
+          </p>
+          <p className="not-for__line measure">
+            If you want someone to help decide what to build, and then hold the
+            bar while it ships — that’s the work I’m for.
+          </p>
+        </section>
+
+        <hr className="rule" />
+
         <section className="section clients" aria-labelledby="clients-heading">
           <h2 id="clients-heading" className="label">
             Selected clients
