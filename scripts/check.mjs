@@ -46,6 +46,10 @@ for (const file of files) {
     if (!draft && /<Todo>/.test(line) && !file.endsWith("todo.tsx")) {
       problems.push(`${at}  unresolved <Todo> marker`);
     }
+    /* A reserved image slot is a placeholder by another name. */
+    if (!draft && /<Slot\b/.test(line) && !file.endsWith("slot.tsx")) {
+      problems.push(`${at}  unfilled <Slot> — image still missing`);
+    }
     if (/href="#"/.test(line)) problems.push(`${at}  dead link href="#"`);
     if (isContent && /<img(?![^>]*\balt=)/.test(line)) problems.push(`${at}  <img> without alt`);
     for (const w of UK) {

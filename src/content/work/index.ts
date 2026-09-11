@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import ItvStudiosPortal from "./itv-studios-portal.mdx";
 import JaFinancePark from "./ja-finance-park.mdx";
 
 /*
@@ -53,6 +54,29 @@ export const WORK: WorkEntry[] = ([
         "How do you restart a stalled rebuild when you are the newest person on the team and nobody asked you to change how they work?",
       product:
         "The tablet companion for Finance Park — the software a student holds while they are standing in the simulation, deciding whether they can afford the apartment.",
+    },
+  },
+  {
+    Body: ItvStudiosPortal,
+    meta: {
+      slug: "itv-studios-portal",
+      title: "ITV Studios Portal",
+      subtitle:
+        "Systemized how ITV delivers its shows, then built the design system and governance to hold it.",
+      client: "ITV Studios",
+      agency: "100 Shapes",
+      years: "2021–2024",
+      role: "Embedded product designer, then design system lead",
+      team: "TODO(alex): ITV internal development teams plus who from 100 Shapes",
+      platform:
+        "Web platform for production managers, planning through post-transmission",
+      status: "live" as const,
+      featured: true,
+      order: 2,
+      challenge:
+        "What do you build for someone with nine thousand things to do, when the one they forget is the one that matters?",
+      product:
+        "Studios Portal — a single point of origin for production tasks, replacing a set of processes that had never been designed as a set.",
     },
   },
 ] satisfies WorkEntry[]).sort((a, b) => a.meta.order - b.meta.order);

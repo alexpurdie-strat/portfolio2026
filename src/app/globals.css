@@ -554,3 +554,74 @@ a:hover {
 .not-for__line:first-of-type {
   color: var(--ink-quiet);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   IMAGE SLOTS
+
+   A reserved place for an image that does not exist yet. It holds the real
+   aspect ratio so the page reads at its true length, and it says what belongs
+   there. Deliberately calm rather than alarming — these are a working state,
+   not an error — but the production build refuses while any remain.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.slot {
+  margin: var(--space-block) 0;
+}
+
+.slot__frame {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--bone-sunk);
+}
+
+.slot__frame img {
+  object-fit: cover;
+}
+
+.slot__brief {
+  position: relative;
+  padding: clamp(0.9rem, 2vw, 1.4rem);
+  max-width: 34rem;
+}
+
+.slot__tag {
+  color: var(--accent);
+  margin: 0 0 0.3rem;
+}
+
+.slot__text {
+  font-family: var(--sans);
+  font-size: var(--t-small);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 0;
+  /* legible over the hatch */
+  background: var(--bone);
+  box-shadow: 0 0 0 6px var(--bone);
+  border-radius: 1px;
+}
+
+.slot__caption {
+  font-family: var(--sans);
+  font-size: var(--t-small);
+  color: var(--ink-quiet);
+  margin-top: 0.7rem;
+  max-width: var(--measure);
+}
+
+/* Context shots break the reading column; detail shots stay inside it. */
+.slot[data-wide] {
+  max-width: none;
+  width: min(var(--page), 100%);
+}
+
+@media (min-width: 1100px) {
+  .slot[data-wide] {
+    /* out into the same lane the asides use */
+    width: calc(var(--measure) + var(--lane) + 3rem);
+  }
+}
