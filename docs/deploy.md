@@ -160,7 +160,10 @@ npx wrangler secret put SITE_PASSWORD
 npx wrangler secret put COOKIE_SECRET
 ```
 
-The first is the password that goes on the resume. The second signs the cookie
+The first is the password that goes on the resume. It is compared after
+normalizing both sides — trimmed, lowercased, and with `https://`, `www.` and a
+trailing slash removed — so a password that reads as a URL can be typed the way
+anyone would type it. Write the secret however it reads best on the page. The second signs the cookie
 so nobody who guesses its format can forge one — it is never typed by a person,
 so make it long. One generated for you, unused, valid to paste:
 

@@ -45,6 +45,25 @@ async function sign(secret: string, data: string): Promise<string> {
     .join("");
 }
 
+/*
+ * A password read off a resume arrives in a dozen shapes. If it is a URL, one
+ * reader types the protocol, another adds www, a third lands a trailing slash,
+ * and a phone capitalises the first letter on its own. None of those are wrong
+ * answers, and a gate that treats them as wrong turns a formality into a
+ * closed door.
+ *
+ * Both sides go through this, so the stored secret can be written however it
+ * reads best on the page.
+ */
+function normalize(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/\/+$/, "");
+}
+
 /* Compares in time that does not depend on where the strings first differ. A
    naive === leaks the answer one character at a time to anyone patient. */
 function safeEqual(a: string, b: string): boolean {
@@ -131,7 +150,7 @@ function lockPage(error: boolean, next: string): Response {
 </head><body>
 <main>
   <h1>Alex <em>Purdie</em></h1>
-  <p class="lede">This portfolio is password protected. The password is on my resume &mdash; if you have it, you are in the right place.</p>
+  <p class="lede">This portfolio is password protected. The password is on my resume &mdash; if you have that in front of you, you already have this.</p>
   <form method="POST">
     <input type="hidden" name="next" value="${next.replace(/"/g, "&quot;")}">
     <label for="pw">Password</label>
@@ -176,7 +195,7 @@ export default {
       /* Only same-origin paths, so the form cannot be used as an open redirect. */
       const target = next.startsWith("/") && !next.startsWith("//") ? next : "/";
 
-      if (safeEqual(supplied, env.SITE_PASSWORD)) {
+      if (safeEqual(normalize(supplied), normalize(env.SITE_PASSWORD))) {
         const expiry = String(Date.now() + MAX_AGE * 1000);
         const ticket = `${expiry}.${await sign(env.COOKIE_SECRET, expiry)}`;
         return new Response(null, {
