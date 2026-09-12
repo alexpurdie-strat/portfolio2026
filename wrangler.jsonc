@@ -1,0 +1,27 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  // A Worker that serves static files and nothing else. There is no "main",
+  // because there is no server: `next build` with output: "export" produces a
+  // directory of HTML, and this uploads it.
+  //
+  // This file's real job is to exist. Without a wrangler config, `wrangler
+  // deploy` runs its own auto-configuration, detects Next.js, assumes a
+  // server-rendered app, and installs the OpenNext adapter — which then looks
+  // for .next/standalone and fails, because a static export never produces one.
+  // The build was fine every time; the deploy step was rebuilding it wrong.
+  "name": "portfolio2026",
+  "compatibility_date": "2026-09-11",
+
+  "assets": {
+    "directory": "./out",
+
+    // Serves out/404.html for anything unmatched, which is the page Next
+    // exports for that purpose. Not "single-page-application" — this is a
+    // multi-page static site and that setting would answer every bad URL
+    // with the home page and a 200.
+    "not_found_handling": "404-page"
+  },
+
+  "observability": { "enabled": true }
+}

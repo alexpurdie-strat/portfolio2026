@@ -1,5 +1,6 @@
-# Cloudflare Pages reads this at deploy time.
-# https://developers.cloudflare.com/pages/configuration/headers/
+# Read by Cloudflare at deploy time — Workers Static Assets honors this file
+# the same way Pages does. Inert on any host that does not.
+# https://developers.cloudflare.com/workers/static-assets/headers/
 
 /*
   # No framing, no MIME sniffing, no referrer leakage to other origins.

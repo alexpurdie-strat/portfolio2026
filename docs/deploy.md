@@ -95,30 +95,49 @@ writes its own MX and SPF, replacing the records above. The contact address in
 `src/content/site.ts` is a Gmail account; change it only once a test message has
 actually arrived.
 
-### 3. Create the Pages project
+### 3. Create the project
 
-Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** →
-**Connect to Git** → authorize GitHub → pick `portfolio2026`.
-
-Build settings:
+Cloudflare dashboard → **Workers & Pages** → **Create** → **Import a
+repository** → `portfolio2026`.
 
 | Field | Value |
 |---|---|
 | Production branch | `main` |
-| Framework preset | **None** — the presets add flags this build does not want |
 | Build command | `npm run build` |
-| Build output directory | `out` |
-| Root directory | *(leave blank)* |
-
-Environment variables → add one, for **Production** and **Preview**:
-
-| Name | Value |
-|---|---|
-| `NODE_VERSION` | `22` |
+| Deploy command | `npx wrangler deploy` |
+| Env var | `NODE_VERSION` = `22` |
 
 Do **not** set `NEXT_PUBLIC_BASE_PATH`. It exists for subdirectory hosting; on
 a domain root it must stay unset or every asset path gains a prefix that is not
 there.
+
+**`wrangler.jsonc` in the repo is not optional, and it is not really
+configuration.** Its job is to exist. With no wrangler config present,
+`wrangler deploy` runs its own auto-detection, sees Next.js, assumes a
+server-rendered app, and installs the OpenNext adapter — which then looks for
+`.next/standalone` and dies, because `output: "export"` never produces one. The
+symptom is a build log where `next build` succeeds cleanly and *then* a second
+Next build starts and fails. Nothing is wrong with the build; the deploy step
+is rebuilding it as a different kind of application.
+
+The config declares a Worker with no `main` — assets and nothing else:
+
+```jsonc
+"assets": {
+  "directory": "./out",
+  "not_found_handling": "404-page"
+}
+```
+
+`404-page` serves `out/404.html`, which Next exports for exactly this.
+`single-page-application` would be wrong here: this is a multi-page static
+site, and that setting answers every bad URL with the home page and a 200.
+
+Verify a change to any of this locally before pushing, which costs nothing:
+
+```
+npm run build && npx wrangler deploy --dry-run
+```
 
 ### 4. Attach the domain
 
