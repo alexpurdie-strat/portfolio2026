@@ -113,17 +113,41 @@ video {
 
    Tall enough to clear the nav's baseline with room, and carrying a hairline so
    the band has an edge rather than just stopping. */
+/* Was a paper band behind the nav. The nav is gated off and the page now
+   washes through a tint, so a strip of flat paper across the top would read as
+   a seam. Kept as an element: when the nav comes back it needs a ground again,
+   and that ground will have to be the tint rather than paper. */
 .bar {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 72px;
-  /* The ground alone. The rule that used to close it off read as chrome on a
-     page that has none anywhere else. */
-  background: var(--paper);
   /* Behind the wordmark and nav, which are its siblings. */
   z-index: -1;
+}
+
+/* ── The wash ──────────────────────────────────────────────────────────────
+   Behind everything and above the body's own paper: a negative z-index child
+   paints over the root background but under content that has none. */
+.tints {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.tint {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  /* Slower than the details (240ms) and the frames (420ms) on purpose. This is
+     ambient: it should have finished without ever having been watched. */
+  transition: opacity 800ms var(--ease);
+}
+
+.tint[data-on] {
+  opacity: 1;
 }
 
 /* ── Wordmark: 160px at y=67 → 24px at y=24 ───────────────────────────────── */

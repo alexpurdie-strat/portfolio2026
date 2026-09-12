@@ -10,6 +10,9 @@
  * Set in the sans face while the prose is serif, so it reads as annotation on
  * the work rather than more of the work.
  */
+import { Children, isValidElement } from "react";
+import { Todo, TODOS_VISIBLE } from "@/components/todo";
+
 export function Aside({
   kind = "helped",
   children,
@@ -18,6 +21,18 @@ export function Aside({
   kind?: "helped" | "limit" | "checked";
   children: React.ReactNode;
 }) {
+  /*
+   * An aside whose only content is a hidden note has nothing left to say, and
+   * would render as a label standing over an empty box. Drop the whole thing.
+   */
+  if (!TODOS_VISIBLE) {
+    const substantive = Children.toArray(children).filter((c) => {
+      if (isValidElement(c) && c.type === Todo) return false;
+      return typeof c === "string" ? c.trim().length > 0 : true;
+    });
+    if (substantive.length === 0) return null;
+  }
+
   const label = {
     helped: "AI in the loop",
     limit: "Where AI fell short",
