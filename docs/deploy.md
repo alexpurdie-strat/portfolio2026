@@ -68,6 +68,36 @@ nameservers* → paste both → save.
 Propagation is usually minutes, occasionally a few hours. Cloudflare emails when
 the zone is active. Nothing below works until it is.
 
+### 2c. Email on the domain
+
+No IONOS mailbox is wanted, which leaves the imported mail records pointing at a
+service nobody uses. Two ways to finish, and they are not equivalent.
+
+**Forwarding (recommended).** Cloudflare **Email Routing** is free and is not a
+mailbox — `alex@alexpurdie.co` lands in an existing inbox. Worth it because the
+contact address on the site is currently a Gmail account sitting next to a
+custom domain, which reads as a smaller operation than it is.
+
+Delete the IONOS records first — MX ×2, the SPF TXT, `autodiscover`, `_dmarc` —
+then Cloudflare dashboard → **Email** → **Email Routing** → add the destination
+address and verify it from the confirmation mail. Cloudflare writes its own MX
+and SPF. Update `email` in `src/content/site.ts` once a test message arrives,
+not before.
+
+**No email at all.** Then the domain should say so, or it can be spoofed by
+anyone — a live risk for a domain printed on a resume. Delete the same four
+records and add:
+
+| Type | Name | Content | Priority |
+|---|---|---|---|
+| MX | `alexpurdie.co` | `.` | 0 |
+| TXT | `alexpurdie.co` | `v=spf1 -all` | — |
+| TXT | `_dmarc` | `v=DMARC1; p=reject;` | — |
+
+A null MX (RFC 7505) states the domain accepts no mail; `-all` states no server
+may send as it; `p=reject` tells receivers to drop anything that fails. The
+inherited IONOS DMARC record is `p=none`, which asks for nothing.
+
 ### 3. Create the Pages project
 
 Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** →
