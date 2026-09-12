@@ -145,26 +145,60 @@ Pages project → **Custom domains** → **Set up a custom domain** → `alexpur
 then again for `www.alexpurdie.co`. Cloudflare writes the DNS records
 itself and issues the certificate. No change needed at IONOS.
 
-### 5. Lock it, if you want it locked
+### 5. The password
 
-The job posting asks for a password on the resume, so at least one path needs
-one.
+The posting asks for credentials on the resume, and the brief forbids doing
+this in the browser — for the obvious reason that a password checked in the
+browser is a password printed in the browser. So it runs in the Worker, at the
+edge, ahead of the files: a locked page is never sent rather than hidden after
+it arrives.
 
-Cloudflare **Zero Trust** → **Access** → **Applications** → **Add an
-application** → **Self-hosted**.
+Two secrets. Neither is ever in the repo:
 
-- Application domain: `alexpurdie.co`, or a path like `alexpurdie.co/archive/*`
-- Policy → Action **Allow**, Include → **Emails** (list the addresses) or
-  **Service Auth** with a one-time PIN
+```
+npx wrangler secret put SITE_PASSWORD
+npx wrangler secret put COOKIE_SECRET
+```
 
-A one-time PIN to a named email is the closest Access gets to "here is the
-password", and it is stronger than a shared one. If a literal shared password
-is wanted instead, that is Cloudflare **Workers** with basic auth, or a
-Netlify site-wide password — both worse, both simpler to explain on a resume.
+The first is the password that goes on the resume. The second signs the cookie
+so nobody who guesses its format can forge one — it is never typed by a person,
+so make it long. One generated for you, unused, valid to paste:
 
-**Decide what to lock.** Locking everything means a recruiter has to authenticate
-before they can see anything, which costs more than it protects. The usual
-answer is a public index and locked case studies.
+```
+3c96745fdfcb7020f6c59bab1271ff382e40336ca939b7e6132bd7a56f761470
+```
+
+Secrets apply to the live Worker immediately and survive every later deploy.
+Setting them is what turns the gate on: **with no SITE_PASSWORD the site serves
+normally.** That is deliberate. The content here is a portfolio its author
+wants read, and the failure mode of a missing secret should not be a stranger
+meeting a lock screen. For anything actually confidential that trade would be
+the wrong way round.
+
+**Everything is locked by default.** To leave part of it open — a public index
+with the work behind the password is the usual shape — add a plain variable in
+the dashboard under Settings → Variables:
+
+| Name | Value |
+|---|---|
+| `PUBLIC_PREFIXES` | `/,/about/,/_next/` |
+
+Comma-separated path prefixes. Leave it unset to lock everything.
+
+Verified locally against `wrangler dev`, all eight cases: a request with no
+cookie gets the lock page and none of the site's content; pages and images are
+both gated; a wrong password is refused; the right one sets an HttpOnly, Secure,
+SameSite=Lax cookie and returns you to the page you asked for; a tampered or
+malformed cookie is refused; and `next=https://evil.example` redirects to `/`
+rather than off-site.
+
+To change the password later, run `wrangler secret put SITE_PASSWORD` again.
+To revoke everyone's existing session, change `COOKIE_SECRET` — every cookie
+signed with the old one stops verifying.
+
+Note that `run_worker_first` means the Worker runs on every request, including
+images. That is what makes the gate real, and a portfolio does not come close
+to the free plan's daily request allowance.
 
 ---
 

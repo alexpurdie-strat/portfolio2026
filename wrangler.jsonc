@@ -1,26 +1,35 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
 
-  // A Worker that serves static files and nothing else. There is no "main",
-  // because there is no server: `next build` with output: "export" produces a
-  // directory of HTML, and this uploads it.
-  //
-  // This file's real job is to exist. Without a wrangler config, `wrangler
-  // deploy` runs its own auto-configuration, detects Next.js, assumes a
+  // This file's first job is to exist. Without a wrangler config, `wrangler
+  // deploy` runs its own auto-detection, finds Next.js, assumes a
   // server-rendered app, and installs the OpenNext adapter — which then looks
-  // for .next/standalone and fails, because a static export never produces one.
-  // The build was fine every time; the deploy step was rebuilding it wrong.
+  // for .next/standalone and fails, because `output: "export"` never produces
+  // one. The build is fine; the deploy step rebuilds it as a different kind of
+  // application.
   "name": "portfolio2026",
   "compatibility_date": "2026-09-11",
+
+  // The gate. Runs at the edge, ahead of the files, so a locked page is never
+  // sent rather than hidden after arrival.
+  "main": "worker/index.ts",
 
   "assets": {
     "directory": "./out",
 
     // Serves out/404.html for anything unmatched, which is the page Next
-    // exports for that purpose. Not "single-page-application" — this is a
-    // multi-page static site and that setting would answer every bad URL
-    // with the home page and a 200.
-    "not_found_handling": "404-page"
+    // exports for the purpose. Not "single-page-application" — this is a
+    // multi-page static site and that setting would answer every bad URL with
+    // the home page and a 200.
+    "not_found_handling": "404-page",
+
+    // How the Worker reaches the files once someone is through the gate.
+    "binding": "ASSETS",
+
+    // Without this the platform serves any matching file BEFORE the Worker
+    // runs, and the gate would only ever see requests for paths that do not
+    // exist — which is every page except the ones worth protecting.
+    "run_worker_first": ["/*"]
   },
 
   "observability": { "enabled": true }
