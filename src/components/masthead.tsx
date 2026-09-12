@@ -18,11 +18,15 @@ import { useCollapse } from "@/lib/use-collapse";
  * standing details all left the screen when they should have stayed.
  */
 export function Masthead() {
-  const stage = useRef<HTMLDivElement>(null);
+  /* --t is written to <html> rather than to this layer, because the first work
+     row needs it too and they have no closer shared ancestor. It is the one
+     property on the site allowed up there, and it is quantized so an
+     imperceptible change costs no recalc. */
+  const stage = useRef<HTMLElement>(null);
   useCollapse(stage);
 
   return (
-    <div className="fixed-layer" ref={stage} aria-hidden={false}>
+    <div className="fixed-layer">
       {/* Scales 160 → 24 and rises. One element, not a handover. */}
       <Link className="mark" href="/">
         <span className="mark__italic">Alex</span> Purdie

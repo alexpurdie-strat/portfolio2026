@@ -13,12 +13,15 @@ import type { WorkMeta } from "@/content/work";
 export function WorkRow({
   meta,
   disciplines,
+  lead = false,
 }: {
   meta: WorkMeta;
   disciplines: string[];
+  /** The first row, whose image grows out of the load-in state. */
+  lead?: boolean;
 }) {
   return (
-    <article className="grid row">
+    <article className="grid row" data-lead={lead || undefined}>
       <Link className="row__media" href={`/work/${meta.slug}`} tabIndex={-1} aria-hidden>
         <span className="row__block" />
       </Link>

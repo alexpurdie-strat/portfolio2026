@@ -14,13 +14,19 @@ import { useEffect } from "react";
  * Quantized to 200 steps so an imperceptible change costs no style recalc.
  */
 export function useCollapse(
-  ref: React.RefObject<HTMLElement | null>,
-  /** How far the collapse takes, as a fraction of viewport height. */
-  over = 0.6,
+  _ref: React.RefObject<HTMLElement | null>,
+  /*
+   * How far the collapse takes, as a fraction of viewport height.
+   *
+   * 0.9, not an arbitrary number: the runway is one screen and the first image
+   * comes to rest at y=101, so the collapse has to finish at
+   * (100vh − 101) / 100vh. Any shorter and the image is still growing after
+   * the wordmark has finished, which reads as two separate animations.
+   */
+  over = 0.9,
 ) {
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    const el = document.documentElement;
 
     /* Reduced motion gets the finished state immediately — the collapse is
        decoration; the compact header is the functional part. */
@@ -57,5 +63,5 @@ export function useCollapse(
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, [ref, over]);
+  }, [over]);
 }

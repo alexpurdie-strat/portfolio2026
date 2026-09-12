@@ -15,6 +15,7 @@
 }
 
 html {
+  --t: 0;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -89,7 +90,6 @@ video {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .fixed-layer {
-  --t: 0;
   position: fixed;
   inset: 0;
   z-index: 10;
@@ -274,6 +274,36 @@ video {
 
 .row__media {
   grid-column: 1 / span 9;
+}
+
+/*
+ * The first image grows out of the load-in state.
+ *
+ * In 64:105 it is 687 × 434 centered with its top at y=671; in 64:175 it is
+ * 1038 × 768 at the left margin with its top at y=101. Same image, so it is
+ * the row's own media interpolating rather than a second element handing over.
+ *
+ * Width and offset are percentages of the 9-column track (687 is 66.18% of
+ * 1038, and the 351px inset is 33.82%), which is also why it reads as centered
+ * on the page at rest — flush to the track's right edge happens to be page
+ * center. The lift is what pulls it up from its natural place below the runway
+ * to where the frame puts it.
+ */
+.row[data-lead] .row__media {
+  width: calc(66.18% + 33.82% * var(--t, 1));
+  margin-left: calc(33.82% * (1 - var(--t, 1)));
+  translate: 0 calc((1 - var(--t, 1)) * -1 * (100svh - 671px));
+}
+
+/* 687/434 → 1038/768. The aspect changes as well as the size, so this cannot
+   be a uniform scale. */
+.row[data-lead] .row__block {
+  aspect-ratio: calc(1.5829 + (1.3516 - 1.5829) * var(--t, 1));
+}
+
+/* The first row's details do not exist in the load-in frame. */
+.row[data-lead] .row__meta {
+  opacity: clamp(0, calc((var(--t, 1) - 0.7) * 3.4), 1);
 }
 
 /* Figma 64:198: 1038 × 768. */
