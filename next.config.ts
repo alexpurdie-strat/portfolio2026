@@ -11,8 +11,13 @@ const isProduction = process.env.NODE_ENV === "production";
  * `next build` want to run at the root. The deploy workflow sets it; nothing
  * else does, so local work is unaffected.
  */
-/* NEXT_PUBLIC_ so the same value is readable from src/lib/asset.ts, which
-   has to prefix paths into public/ that Next passes through untouched. */
+/*
+ * Empty on Cloudflare Pages, which serves from the root of a domain.
+ *
+ * Kept rather than deleted: it is the difference between a subdirectory deploy
+ * working and every asset on the site 404ing, and it costs nothing while
+ * unset. src/lib/asset.ts reads the same variable, so the two cannot drift.
+ */
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 const nextConfig: NextConfig = {

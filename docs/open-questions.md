@@ -36,6 +36,16 @@ any of it is outstanding; `npm run check:draft` passes so work can continue.
 - [ ] **Three disciplines per project**, as `[LIKE] [THIS]` in the frame.
       Placeholders are in `src/app/page.tsx`.
 
+## Deployment
+
+- [ ] **Canonical URL.** `src/app/layout.tsx` needs a `metadataBase` pointing
+      at the real domain, or every Open Graph URL resolves relative and breaks
+      when the site is shared. One line, but it cannot be written until the
+      domain is known — see `docs/deploy.md`.
+- [ ] **Decide what gets locked.** The posting asks for a password on the
+      resume. Locking everything makes a recruiter authenticate before seeing
+      anything; the usual answer is a public index and locked case studies.
+
 ## Licensing
 
 - [ ] **Metric is a Klim test font.** Licensed for evaluation and mockups, not
