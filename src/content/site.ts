@@ -77,11 +77,12 @@ export const SITE = {
   /* Labels from the Figma frames. "Archive" points at /work for now — the
      brief's IA calls it Work and the design calls it Archive, and that naming
      is logged in docs/open-questions.md rather than guessed at here. */
-  /* `ready` gates what the nav renders. The routes exist and build; the pages
-     behind them are not written yet, and a nav that promises four pages and
-     delivers four drafts is worse than a nav with nothing in it. Flip these
-     back to true one at a time as each page is finished. */
-  nav: [
+  /* Every nav link the site will eventually have, and whether its page is
+     written. Nothing renders this directly — `SITE.nav` below is the filtered
+     list, so a component that maps the nav cannot accidentally ship a link to
+     an unwritten page. Three components render this nav and I had gated two.
+     Flip `ready` as each page is finished. */
+  navAll: [
     { label: "Approach", href: "/approach", ready: false },
     { label: "Archive", href: "/work", ready: false },
     { label: "About", href: "/about", ready: false },
@@ -100,3 +101,10 @@ export const SITE = {
     notFor: "Who I’m not for",
   },
 } as const;
+
+/*
+ * What the nav actually renders: only links whose page exists. Derived rather
+ * than filtered at each call site, because there are three call sites and the
+ * one that is forgotten is the one that ships.
+ */
+export const NAV = SITE.navAll.filter((item) => item.ready);

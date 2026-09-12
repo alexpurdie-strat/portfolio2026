@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { SITE } from "@/content/site";
+import { NAV } from "@/content/site";
 
 /* The collapsed masthead from the board, on every interior page — so the
    wordmark and nav sit where a reader has already learned to find them. */
@@ -14,8 +14,9 @@ export function WorkNav() {
       <Link className="mark mark--small" href="/">
         <span className="mark__italic">Alex</span> Purdie
       </Link>
+      {NAV.length > 0 ? (
       <nav className="nav nav--fixed" aria-label="Primary">
-        {SITE.nav.map((item, i) => (
+        {NAV.map((item, i) => (
           <span key={item.href} className="nav__item">
             {i > 0 ? (
               <span className="nav__slash" aria-hidden>
@@ -26,6 +27,7 @@ export function WorkNav() {
           </span>
         ))}
       </nav>
+      ) : null}
     </div>
   );
 }

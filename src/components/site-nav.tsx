@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { SITE } from "@/content/site";
+import { NAV } from "@/content/site";
 
 /* Client-only for `aria-current`, which cannot be decided on the server. */
 export function SiteNav() {
   const pathname = usePathname();
-  const items = SITE.nav.filter((item) => item.ready);
+  const items = NAV;
   /* No empty landmark. A <nav> announcing itself to a screen reader and then
      containing nothing is a worse artifact than no nav at all. */
   if (items.length === 0) return null;

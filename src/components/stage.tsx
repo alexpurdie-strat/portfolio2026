@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Clock } from "@/components/clock";
-import { SITE } from "@/content/site";
+import { NAV, SITE } from "@/content/site";
 import { asset } from "@/lib/asset";
 import type { WorkMeta } from "@/content/work";
 import {
@@ -74,9 +74,9 @@ export function Stage({
         </Link>
 
         {/* Same gate as the site nav: only what is written gets linked. */}
-        {SITE.nav.some((item) => item.ready) ? (
+        {NAV.length > 0 ? (
         <nav className="nav nav--fixed" aria-label="Primary">
-          {SITE.nav.filter((item) => item.ready).map((item, i) => (
+          {NAV.map((item, i) => (
             <span key={item.href} className="nav__item">
               {i > 0 ? (
                 <span className="nav__slash" aria-hidden>
