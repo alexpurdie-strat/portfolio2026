@@ -1,6 +1,9 @@
 import type { ComponentType } from "react";
+import HomeDepot from "./home-depot.mdx";
+import HundredShapes from "./100-shapes.mdx";
 import ItvStudiosPortal from "./itv-studios-portal.mdx";
 import JaFinancePark from "./ja-finance-park.mdx";
+import YourMove from "./your-move.mdx";
 
 /*
  * The work registry.
@@ -77,6 +80,70 @@ export const WORK: WorkEntry[] = ([
         "What do you build for someone with nine thousand things to do, when the one they forget is the one that matters?",
       product:
         "Studios Portal — a single point of origin for production tasks, replacing a set of processes that had never been designed as a set.",
+    },
+  },
+  {
+    Body: YourMove,
+    meta: {
+      slug: "your-move",
+      title: "Your Move",
+      subtitle:
+        "Built a working AI prototype on day one, and learned which parts of discovery it cannot skip.",
+      client: "Your Move",
+      agency: "Whiteboard",
+      years: "2026",
+      role: "Lead platform strategist",
+      team: "6 at Whiteboard — UI designer, creative director, PM, account lead, developer",
+      platform: "Mobile web personal development coach",
+      status: "in development" as const,
+      featured: true,
+      order: 3,
+      challenge:
+        "What happens when building the thing becomes cheaper than deciding what to build?",
+      product:
+        "A self-guided coaching platform, prototyped to the point of being mistaken for the real product before a line of it was built.",
+    },
+  },
+  {
+    Body: HundredShapes,
+    meta: {
+      slug: "100-shapes",
+      title: "Building the practice",
+      subtitle:
+        "Built the structure that let eight designers get better on purpose rather than by accident.",
+      client: "100 Shapes",
+      years: "2021–2024",
+      role: "Head of Product Design",
+      team: "8 designers led, 4 hired, a 20-person contractor pool",
+      platform: "A design practice, in London",
+      status: "live" as const,
+      featured: true,
+      order: 4,
+      challenge:
+        "How do you install a growth structure in a team that has not asked for one and is fully booked?",
+      product:
+        "Skills matrices, growth rubrics, weekly critique and pairing — the scaffolding a design practice needs to improve on purpose.",
+    },
+  },
+  {
+    Body: HomeDepot,
+    meta: {
+      slug: "home-depot",
+      title: "The Home Depot",
+      subtitle:
+        "Designed the tools two thousand stores use, across three teams and with authority over none of them.",
+      client: "The Home Depot",
+      years: "2018",
+      role: "UX designer, contract",
+      team: "TODO(alex): who else, across the three streams",
+      platform: "Enterprise retail — rental, sign-on and departmental reporting",
+      status: "live" as const,
+      featured: true,
+      order: 5,
+      challenge:
+        "How do you get anything adopted across three teams when you report to none of them?",
+      product:
+        "Truck rental, single sign-on for 2,000+ stores, and the reporting a paint manager acts on — all of it used standing up, with a customer waiting.",
     },
   },
 ] satisfies WorkEntry[]).sort((a, b) => a.meta.order - b.meta.order);

@@ -8,10 +8,13 @@ export const metadata: Metadata = {
   description: SITE.meta.description,
 };
 
-/* TODO(alex): three disciplines per project, as the frame shows them. */
+/* TODO(alex): confirm three disciplines per project, as the frame shows them. */
 const DISCIPLINES: Record<string, string[]> = {
   "ja-finance-park": ["Strategy", "Product", "Service design"],
-  "itv-studios-portal": ["Systems", "Design systems", "Service design"],
+  "itv-studios-portal": ["Systems", "Design systems", "Governance"],
+  "your-move": ["Strategy", "Prototyping", "Research"],
+  "100-shapes": ["Leadership", "Practice", "Hiring"],
+  "home-depot": ["Enterprise", "Service design", "Research"],
 };
 
 export default function Home() {

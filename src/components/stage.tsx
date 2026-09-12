@@ -127,10 +127,23 @@ export function Stage({
             <span className="sr-only">
               {meta.title}, image {imageIndex + 1} of {IMAGES_PER_CASE}
             </span>
+
+            {/* Pagination for the frames, over the bottom of the image. Dots
+                rather than a fraction, because there are only ever three and a
+                shape is read faster than a number. */}
+            <span className="dots" aria-hidden>
+              {Array.from({ length: IMAGES_PER_CASE }, (_, i) => (
+                <span key={i} className="dot" data-on={i === imageIndex || undefined} />
+              ))}
+            </span>
           </div>
 
           <div className="board__meta" data-settled={settled || undefined}>
           <div className="board__details">
+            <p className="board__index ui" aria-hidden>
+              {String(shown + 1).padStart(2, "0")} /{" "}
+              {String(entries.length).padStart(2, "0")}
+            </p>
             <p className="row__disciplines ui">
               {discs.map((d) => `[${d.toUpperCase()}]`).join(" ")}
             </p>
@@ -138,11 +151,6 @@ export function Stage({
               <Link href={`/work/${meta.slug}`}>{meta.title}</Link>
             </h1>
             <p className="row__summary">{meta.subtitle}</p>
-
-            <p className="board__count ui" aria-hidden>
-              {String(imageIndex + 1).padStart(2, "0")} /{" "}
-              {String(IMAGES_PER_CASE).padStart(2, "0")}
-            </p>
 
             <p className="row__cta ui">
               <Link href={`/work/${meta.slug}`}>

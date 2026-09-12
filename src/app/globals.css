@@ -394,10 +394,43 @@ video {
     translate 240ms var(--ease);
 }
 
-.board__count {
-  margin-top: 1.5rem;
+/* Which case study, out of how many. Above the disciplines, because it is
+   orientation rather than detail — it says where you are before it says what
+   you are looking at. */
+.board__index {
+  margin-bottom: 1.1rem;
   font-variant-numeric: tabular-nums;
   opacity: 0.55;
+}
+
+/* ── Frame pagination ──────────────────────────────────────────────────────
+   Bottom center of the image area, over the picture. The lit dot takes the
+   accent — one of the few places it appears, and it does not cool with the
+   collapse because it is a control rather than a mood. */
+.dots {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  translate: -50% 0;
+  display: flex;
+  gap: 10px;
+  z-index: 1;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  /* Over a dark image, so the resting state is the paper color held back. */
+  background: color-mix(in oklab, var(--paper) 45%, transparent);
+  transition:
+    background 260ms var(--ease),
+    scale 260ms var(--ease);
+}
+
+.dot[data-on] {
+  background: var(--accent);
+  scale: 1.15;
 }
 
 .row__disciplines {
