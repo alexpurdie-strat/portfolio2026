@@ -58,7 +58,7 @@ export const blankWeirdosAlt3 = localFont({
  *
  * These are Klim's TEST fonts. They are licensed for evaluation and mockups,
  * not for a public production site — see docs/open-questions.md. A retail
- * licence swaps the files and nothing else.
+ * license swaps the files and nothing else.
  */
 export const metric = localFont({
   src: [
