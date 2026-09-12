@@ -10,23 +10,63 @@ and this is the split.
 
 ### 1. Add the site to Cloudflare
 
-Cloudflare dashboard → **Add a site** → enter the domain → pick the **Free**
-plan. It scans the existing DNS and then gives you **two nameservers**, like:
+Cloudflare dashboard → **Add a site** → `alexpurdie.co` → **Free** plan.
+
+Cloudflare scans the existing IONOS DNS and shows you what it found. Do not
+click straight through — the scan imports records that were pointing at IONOS,
+and some of them are wrong now.
+
+### 2. Clean the imported records
+
+**Delete** — these point at the IONOS parking page and would fight with the
+records Pages writes later:
+
+| Type | Name | Content |
+|---|---|---|
+| A | `alexpurdie.co` | `74.208.236.100` |
+| AAAA | `alexpurdie.co` | `2607:f1c0:…` |
+
+**Delete or ignore** — `_domainconnect` is IONOS's mechanism for letting
+third-party apps write DNS at IONOS. Once the nameservers move, IONOS no longer
+holds the DNS, so it does nothing.
+
+**Set to DNS only (grey cloud)** — these are mail records. A proxied record
+answers with Cloudflare's IPs, which is correct for web traffic and wrong for
+everything else. Proxying `_dmarc` in particular breaks DMARC lookups outright:
+the resolver asks for a TXT record and gets a web proxy.
+
+| Type | Name |
+|---|---|
+| CNAME | `autodiscover` |
+| CNAME | `_dmarc` |
+
+**Leave alone** — already DNS only, which is right:
+
+| Type | Name | Why |
+|---|---|---|
+| MX ×2 | `alexpurdie.co` | IONOS mailboxes |
+| TXT | `alexpurdie.co` | SPF |
+
+**Do not add `www`.** Cloudflare warns that it is missing; ignore it. Pages
+writes that record itself when you attach the custom domain, and a manual one
+would only have to be replaced.
+
+Then **Continue to activation**.
+
+### 2b. Point IONOS at Cloudflare
+
+Activation gives you **two nameservers**:
 
 ```
 xxxx.ns.cloudflare.com
 yyyy.ns.cloudflare.com
 ```
 
-Copy both.
+IONOS → **Domains & SSL** → `alexpurdie.co` → **Nameservers** → *Use custom
+nameservers* → paste both → save.
 
-### 2. Point IONOS at them
-
-IONOS → **Domains & SSL** → the domain → **Nameservers** → *Use custom
-nameservers* → paste the two Cloudflare ones → save.
-
-Propagation is usually minutes, occasionally a few hours. Cloudflare emails
-when it is active. Nothing below works until it is.
+Propagation is usually minutes, occasionally a few hours. Cloudflare emails when
+the zone is active. Nothing below works until it is.
 
 ### 3. Create the Pages project
 
@@ -55,8 +95,8 @@ there.
 
 ### 4. Attach the domain
 
-Pages project → **Custom domains** → **Set up a custom domain** → the apex
-(`example.com`), then again for `www`. Cloudflare writes the DNS records
+Pages project → **Custom domains** → **Set up a custom domain** → `alexpurdie.co`,
+then again for `www.alexpurdie.co`. Cloudflare writes the DNS records
 itself and issues the certificate. No change needed at IONOS.
 
 ### 5. Lock it, if you want it locked
@@ -67,7 +107,7 @@ one.
 Cloudflare **Zero Trust** → **Access** → **Applications** → **Add an
 application** → **Self-hosted**.
 
-- Application domain: the domain, or a path like `example.com/work/*`
+- Application domain: `alexpurdie.co`, or a path like `alexpurdie.co/archive/*`
 - Policy → Action **Allow**, Include → **Emails** (list the addresses) or
   **Service Auth** with a one-time PIN
 
@@ -96,9 +136,8 @@ building the same output is two things to keep in step.
 - [ ] `npm run check` must pass. It currently does not, on purpose: there are
       unresolved `TODO(alex)` markers and unfilled `<Slot>` images, and the
       gate exists to stop exactly that shipping. See `docs/open-questions.md`.
-- [ ] Set the canonical URL. `src/content/site.ts` has the metadata block;
-      it needs `metadataBase` in `src/app/layout.tsx` pointing at the real
-      domain, or Open Graph URLs resolve relative and break when shared.
+- [x] Canonical URL set — `metadataBase` in `src/app/layout.tsx` is
+      `https://alexpurdie.co`.
 
 ## Files that belong to the host
 
@@ -106,3 +145,9 @@ building the same output is two things to keep in step.
   at deploy; it is inert anywhere else.
 - `public/.nojekyll` — a GitHub Pages artifact. Harmless on Cloudflare, and
   worth keeping while the Pages URL still exists.
+
+## After activation
+
+Check **SSL/TLS → Overview** reads **Full (strict)**. Pages serves valid HTTPS
+on its own, so anything looser is both unnecessary and, on *Flexible*, a
+redirect loop waiting to happen.

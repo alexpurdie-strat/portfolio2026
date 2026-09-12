@@ -38,10 +38,10 @@ any of it is outstanding; `npm run check:draft` passes so work can continue.
 
 ## Deployment
 
-- [ ] **Canonical URL.** `src/app/layout.tsx` needs a `metadataBase` pointing
-      at the real domain, or every Open Graph URL resolves relative and breaks
-      when the site is shared. One line, but it cannot be written until the
-      domain is known — see `docs/deploy.md`.
+- [x] **Canonical URL.** Set to `https://alexpurdie.co`.
+- [ ] **IONOS mailboxes.** The imported MX and SPF records point at IONOS mail.
+      Keep them if a `@alexpurdie.co` address is wanted; if not, they route mail
+      to a mailbox nobody reads.
 - [ ] **Decide what gets locked.** The posting asks for a password on the
       resume. Locking everything makes a recruiter authenticate before seeing
       anything; the usual answer is a public index and locked case studies.
