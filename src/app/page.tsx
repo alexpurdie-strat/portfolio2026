@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { Masthead } from "@/components/masthead";
-import { SiteFooter } from "@/components/site-footer";
-import { WorkRow } from "@/components/work-row";
+import { Stage } from "@/components/stage";
 import { SITE } from "@/content/site";
 import { WORK } from "@/content/work";
 
@@ -19,21 +17,10 @@ const DISCIPLINES: Record<string, string[]> = {
 export default function Home() {
   return (
     <>
-      <Masthead />
-      {/* One screen of runway, so the load-in state is read before anything
-          moves. The rows scroll up under the persistent layer from here. */}
-      <div className="runway" aria-hidden />
-      <main id="main" className="work">
-        {WORK.map((w, i) => (
-          <WorkRow
-            key={w.meta.slug}
-            meta={w.meta}
-            disciplines={DISCIPLINES[w.meta.slug] ?? []}
-            lead={i === 0}
-          />
-        ))}
-      </main>
-      <SiteFooter />
+      {/* No footer here. The board is fixed and covers the full viewport, so
+          anything after it is unreachable — and neither frame has one. The
+          footer stays on the interior pages. */}
+      <Stage entries={WORK.map((w) => w.meta)} disciplines={DISCIPLINES} />
     </>
   );
 }

@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
  * rendered is a mismatch by construction.
  */
 export function Clock({ className }: { className?: string }) {
-  const [now, setNow] = useState<string | null>(null);
+  const [now, setNow] = useState<{ time: string; zone: string } | null>(null);
 
   useEffect(() => {
     const tick = () => {
@@ -19,7 +19,7 @@ export function Clock({ className }: { className?: string }) {
       /* The reader's own offset, not a hardcoded one. */
       const offset = -d.getTimezoneOffset() / 60;
       const sign = offset >= 0 ? "+" : "−";
-      setNow(`${time} (GMT ${sign}${Math.abs(offset)})`);
+      setNow({ time, zone: `(GMT ${sign}${Math.abs(offset)})` });
     };
     tick();
     const id = window.setInterval(tick, 1000);
@@ -28,7 +28,13 @@ export function Clock({ className }: { className?: string }) {
 
   return (
     <p className={className} suppressHydrationWarning>
-      {now ?? ""}
+      {now ? (
+        <>
+          {now.time} <span className="accent">{now.zone}</span>
+        </>
+      ) : (
+        ""
+      )}
     </p>
   );
 }

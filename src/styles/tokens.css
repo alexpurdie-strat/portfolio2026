@@ -23,6 +23,11 @@
   /* ── Ink ──────────────────────────────────────────────────────────────── */
   --paper: #ffffff;
   --ink: #0d1b1e;
+  /* The one accent. It appears on four things and nowhere else: the timezone,
+     "Alex", "lives", and the open-for-work dot. Three of those four cool to
+     --ink as the page collapses, so the color belongs to the load-in state
+     rather than to the site. */
+  --accent: #d65d3b;
   /* The image placeholder, until real imagery exists. */
   --block: #0d1b1e;
 
