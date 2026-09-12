@@ -77,11 +77,15 @@ export const SITE = {
   /* Labels from the Figma frames. "Archive" points at /work for now — the
      brief's IA calls it Work and the design calls it Archive, and that naming
      is logged in docs/open-questions.md rather than guessed at here. */
+  /* `ready` gates what the nav renders. The routes exist and build; the pages
+     behind them are not written yet, and a nav that promises four pages and
+     delivers four drafts is worse than a nav with nothing in it. Flip these
+     back to true one at a time as each page is finished. */
   nav: [
-    { label: "Approach", href: "/approach" },
-    { label: "Archive", href: "/work" },
-    { label: "About", href: "/about" },
-    { label: "Contact", href: "/contact" },
+    { label: "Approach", href: "/approach", ready: false },
+    { label: "Archive", href: "/work", ready: false },
+    { label: "About", href: "/about", ready: false },
+    { label: "Contact", href: "/contact", ready: false },
   ],
 
   meta: {

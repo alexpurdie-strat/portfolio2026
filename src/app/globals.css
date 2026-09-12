@@ -119,8 +119,9 @@ video {
   left: 0;
   right: 0;
   height: 72px;
+  /* The ground alone. The rule that used to close it off read as chrome on a
+     page that has none anywhere else. */
   background: var(--paper);
-  border-bottom: 1px solid color-mix(in oklab, var(--ink) 10%, transparent);
   /* Behind the wordmark and nav, which are its siblings. */
   z-index: -1;
 }
@@ -381,9 +382,36 @@ video {
 .board__frame {
   position: absolute;
   inset: 0;
-  background: var(--block);
+  /* Paper, not ink. Several of these images sit on transparency — device
+     mockups and diagrams — and the ground behind them should be the page they
+     are on, not a black rectangle they are pasted to. */
+  background: var(--paper);
+  overflow: hidden;
   opacity: 0;
   transition: opacity 420ms var(--ease);
+}
+
+.board__frame img {
+  object-fit: cover;
+}
+
+/* No imagery yet: the ink block returns, carrying the project's question. */
+.board__frame[data-empty] {
+  background: var(--block);
+  display: flex;
+  align-items: flex-end;
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.board__frameText {
+  color: var(--paper);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.4rem, 3vw, 2.6rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  max-width: 22ch;
+  text-wrap: balance;
 }
 
 .board__frame[data-on] {

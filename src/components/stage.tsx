@@ -1,9 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Clock } from "@/components/clock";
 import { SITE } from "@/content/site";
+import { asset } from "@/lib/asset";
 import type { WorkMeta } from "@/content/work";
 import {
   IMAGES_PER_CASE,
@@ -71,8 +73,10 @@ export function Stage({
           <span className="mark__italic accent-cools">Alex</span> Purdie
         </Link>
 
+        {/* Same gate as the site nav: only what is written gets linked. */}
+        {SITE.nav.some((item) => item.ready) ? (
         <nav className="nav nav--fixed" aria-label="Primary">
-          {SITE.nav.map((item, i) => (
+          {SITE.nav.filter((item) => item.ready).map((item, i) => (
             <span key={item.href} className="nav__item">
               {i > 0 ? (
                 <span className="nav__slash" aria-hidden>
@@ -83,6 +87,7 @@ export function Stage({
             </span>
           ))}
         </nav>
+        ) : null}
 
         <p className="statement">
           <span className="statement__line" style={{ "--d": 0 } as React.CSSProperties}>
@@ -116,29 +121,54 @@ export function Stage({
       <main id="main" className="board">
         <div className="grid board__row">
           <div className="board__media">
-            {/* Three frames per case study, cross-fading in place. Until real
-                imagery exists these are identical blocks, so the counter in the
-                details is what makes the change legible. */}
-            {Array.from({ length: IMAGES_PER_CASE }, (_, i) => (
-              <span
-                key={i}
-                className="board__frame"
-                data-on={i === imageIndex || undefined}
-                aria-hidden
-              />
-            ))}
+            {/* Three frames per case study, cross-fading in place — stacked
+                rather than swapped, which is the only way one can fade over
+                another. */}
+            {Array.from({ length: IMAGES_PER_CASE }, (_, i) => {
+              const img = meta.images?.[i];
+              return (
+                <span
+                  key={i}
+                  className="board__frame"
+                  data-on={i === imageIndex || undefined}
+                  data-empty={img ? undefined : true}
+                  aria-hidden
+                >
+                  {img ? (
+                    <Image
+                      src={asset(img.src)}
+                      alt=""
+                      fill
+                      sizes="(max-width: 900px) 100vw, 1040px"
+                      priority={i === 0}
+                    />
+                  ) : (
+                    /* No imagery for this one yet. The challenge set as display
+                       type says more than a grey rectangle would, and does not
+                       pretend something is coming. */
+                    <span className="board__frameText">{meta.challenge}</span>
+                  )}
+                </span>
+              );
+            })}
             <span className="sr-only">
-              {meta.title}, image {imageIndex + 1} of {IMAGES_PER_CASE}
+              {meta.images?.[imageIndex]
+                ? `${meta.title}: ${meta.images[imageIndex].alt}`
+                : `${meta.title}, image ${imageIndex + 1} of ${IMAGES_PER_CASE}`}
             </span>
 
             {/* Pagination for the frames, over the bottom of the image. Dots
                 rather than a fraction, because there are only ever three and a
                 shape is read faster than a number. */}
-            <span className="dots" aria-hidden>
-              {Array.from({ length: IMAGES_PER_CASE }, (_, i) => (
-                <span key={i} className="dot" data-on={i === imageIndex || undefined} />
-              ))}
-            </span>
+            {/* Only where the frames actually differ. Three dots over a
+                single static panel promise a change that never comes. */}
+            {meta.images ? (
+              <span className="dots" aria-hidden>
+                {Array.from({ length: IMAGES_PER_CASE }, (_, i) => (
+                  <span key={i} className="dot" data-on={i === imageIndex || undefined} />
+                ))}
+              </span>
+            ) : null}
           </div>
 
           <div className="board__meta" data-settled={settled || undefined}>
@@ -196,7 +226,24 @@ export function Stage({
             is more. */}
         <div className="grid board__row board__row--peek" aria-hidden>
           <div className="board__media board__media--peek">
-            <span className="board__frame" data-on />
+            {(() => {
+              const next = entries[(caseIndex + 1) % entries.length];
+              const img = next?.images?.[0];
+              return (
+                <span className="board__frame" data-on data-empty={img ? undefined : true}>
+                  {img ? (
+                    <Image
+                      src={asset(img.src)}
+                      alt=""
+                      fill
+                      sizes="(max-width: 900px) 100vw, 1040px"
+                    />
+                  ) : (
+                    <span className="board__frameText">{next?.challenge}</span>
+                  )}
+                </span>
+              );
+            })()}
           </div>
         </div>
       </main>

@@ -33,14 +33,23 @@ export function FramingStrip({
         <p className="framing__product">{product}</p>
       </div>
       <dl className="framing__facts">
-        {facts.map((f) => (
+        {facts
+          /* A fact whose value is still a marker renders nothing in production,
+             so the row would be a label standing over an empty definition.
+             Drop the row instead. */
+          .filter(
+            (f) =>
+              process.env.NODE_ENV !== "production" ||
+              !(typeof f.value === "string" && f.value.startsWith("TODO(alex)")),
+          )
+          .map((f) => (
           <div key={f.label} className="framing__fact">
             <dt className="label">{f.label}</dt>
             <dd>
               <Value value={f.value} />
             </dd>
           </div>
-        ))}
+          ))}
       </dl>
     </section>
   );
