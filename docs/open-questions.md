@@ -27,6 +27,14 @@ any of it is outstanding; `npm run check:draft` passes so work can continue.
 - [ ] **Is Studios Portal still in production?** Years-in-use is a strong
       substitute metric.
 
+## Licensing
+
+- [ ] **Metric is a Klim test font.** Licensed for evaluation and mockups, not
+      a public production site. A retail license swaps the files in
+      `src/fonts/` and changes nothing else — the declaration in `fonts.ts`
+      and every rule using `--sans` stays as it is. Same applies to Martina
+      Plantijn, which is also a test cut.
+
 ## Assets
 
 Alex rated these 5/5 and said no rebuilding needed. Every `<Slot>` on the site

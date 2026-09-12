@@ -36,7 +36,10 @@
 
   /* ── Type ─────────────────────────────────────────────────────────────── */
   --serif: var(--font-martina-plantijn), "Iowan Old Style", Georgia, serif;
-  --sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  /* Metric, with the old stack behind it. Seven weights and a real italic at
+     every one of them, which is what the type scale was missing. */
+  --sans: var(--font-metric), var(--font-geist-sans), ui-sans-serif, system-ui,
+    sans-serif;
   --mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
 
   --t-display: clamp(2.6rem, 6vw, 4.25rem);

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { martinaPlantijn } from "./fonts";
+import { martinaPlantijn, metric } from "./fonts";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${martinaPlantijn.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${martinaPlantijn.variable} ${metric.variable}`}
     >
       <body>
         {/* First thing in the tab order, invisible until focused. */}
