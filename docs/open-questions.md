@@ -50,6 +50,33 @@ any of it is outstanding; `npm run check:draft` passes so work can continue.
       resume. Locking everything makes a recruiter authenticate before seeing
       anything; the usual answer is a public index and locked case studies.
 
+## Assets still to export from Figma
+
+The JA Finance Park file has the rest of what the empty slots need. These
+cannot be pulled through the Figma connection — it renders a frame for reading
+but does not hand over a file — so each needs exporting by hand. Node ids are
+exact.
+
+- [ ] **`563:6494` — Frame 328, "Eye tracing progression of decision needs"**
+      (page `560:6298` HUD). A numbered scan path over the HUD with the
+      reasoning for each hop. The strongest information-architecture evidence
+      in the file and there is nothing like it elsewhere on the site. Export
+      the frame alone; the reasoning column beside it is a sibling and reads
+      better set in the page's own type than shipped as a picture of text.
+- [ ] **Page `804:19765` — Lock Screen.** The slot asks for two or three of the
+      eight iterations ending on the shipped version, because a sequence shows
+      the argument where one screen only shows the outcome.
+- [ ] **Final high-fidelity UI**, two or three screens. Pages `797:16220`
+      Savings Screen, `951:14919` Loans Process, or the Batch_4 wireframes.
+      Must be credited to Whiteboard's design team.
+- [ ] **The feature backlog artifact** — grouped feature sets sorted into
+      MVP / alpha / beta. Not located in the Figma file; it may be in
+      whatever tool the sorting happened in.
+- [ ] **The QA photograph** of tablets running in a live simulation. Still the
+      single most valuable missing image on the site: almost no product
+      portfolio shows the product in the physical room, and that is the whole
+      positioning.
+
 ## Licensing
 
 - [ ] **Metric is a Klim test font.** Licensed for evaluation and mockups, not
