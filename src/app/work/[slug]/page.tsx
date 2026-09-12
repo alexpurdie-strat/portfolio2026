@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
+import { isMarker, TODOS_VISIBLE } from "@/components/todo";
 import { WorkNav } from "@/components/work-nav";
 import { WORK, findWork } from "@/content/work";
 
@@ -82,12 +83,16 @@ export default async function WorkPage({
               { label: "Team", value: meta.team },
               { label: "Platform", value: meta.platform },
               { label: "Status", value: meta.status },
-            ].map((f) => (
+            ]
+              /* A fact still held as a marker prints the marker. Drop the row
+                 rather than leave a label standing over nothing. */
+              .filter((f) => TODOS_VISIBLE || !isMarker(f.value))
+              .map((f) => (
               <div key={f.label}>
                 <dt className="ui">{f.label}</dt>
                 <dd>{f.value}</dd>
               </div>
-            ))}
+              ))}
           </dl>
         </section>
 

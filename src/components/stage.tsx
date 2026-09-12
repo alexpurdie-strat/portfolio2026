@@ -118,6 +118,27 @@ export function Stage({
         <Clock className="clock ui" />
       </div>
 
+      {/* One wash per project, stacked and crossfading. Stacked rather than a
+          single element whose gradient changes, because a background-image
+          gradient does not transition — only opacity does, and only a
+          composited property should be running behind a scroll this long. */}
+      <div className="tints" aria-hidden>
+        {entries.map((m, i) => (
+          <span
+            key={m.slug}
+            className="tint"
+            data-on={i === caseIndex || undefined}
+            style={
+              m.tint
+                ? ({
+                    background: `radial-gradient(130% 100% at 78% -10%, color-mix(in oklab, ${m.tint} 14%, var(--paper)) 0%, var(--paper) 62%)`,
+                  } as React.CSSProperties)
+                : undefined
+            }
+          />
+        ))}
+      </div>
+
       <main id="main" className="board">
         <div className="grid board__row">
           <div className="board__media">
