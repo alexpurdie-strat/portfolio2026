@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteNav } from "@/components/site-nav";
+import { SITE } from "@/content/site";
 
 /*
  * Navigation is the one thing every benchmark in the framework keeps
@@ -10,7 +11,7 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="page site-header__inner">
         <Link className="site-header__name tap" href="/">
-          Alex Purdie
+          {SITE.name}
         </Link>
         <SiteNav />
       </div>

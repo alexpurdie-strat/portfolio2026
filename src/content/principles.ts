@@ -10,6 +10,11 @@
  * possible — the naming is the point, so the words are his.
  */
 
+export const PRINCIPLES_INTRO = {
+  title: "Principles.",
+  lede: "Ideas I keep returning to, named so they can be argued with. Each one links to the work that proves it.",
+};
+
 export type Principle = {
   name: string;
   /** Two sentences. The idea, then what it is for. */

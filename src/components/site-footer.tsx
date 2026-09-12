@@ -1,20 +1,20 @@
 import Link from "next/link";
+import { SITE } from "@/content/site";
 
 export function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="page site-footer__inner">
-        <p className="site-footer__line">
-          Alex Purdie — product designer and strategist.
-        </p>
+        <p className="site-footer__line">{SITE.footer.line}</p>
         <p className="site-footer__links">
-          <Link className="tap" href="/contact">
-            Get in touch
-          </Link>
-          <span aria-hidden> · </span>
-          <Link className="tap" href="/colophon">
-            How this site was built
-          </Link>
+          {SITE.footer.links.map((l, i) => (
+            <span key={l.href}>
+              {i > 0 ? <span aria-hidden> · </span> : null}
+              <Link className="tap" href={l.href}>
+                {l.label}
+              </Link>
+            </span>
+          ))}
         </p>
       </div>
     </footer>

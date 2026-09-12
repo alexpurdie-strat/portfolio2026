@@ -3,7 +3,7 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Todo } from "@/components/todo";
-import { PRINCIPLES } from "@/content/principles";
+import { PRINCIPLES, PRINCIPLES_INTRO } from "@/content/principles";
 
 export const metadata: Metadata = {
   title: "Principles — Alex Purdie",
@@ -17,11 +17,8 @@ export default function Principles() {
       <SiteHeader />
       <main id="main" className="page">
         <section className="section">
-          <h1 className="page-title measure">Principles.</h1>
-          <p className="lede measure">
-            Ideas I keep returning to, named so they can be argued with. Each
-            one links to the work that proves it.
-          </p>
+          <h1 className="page-title measure">{PRINCIPLES_INTRO.title}</h1>
+          <p className="lede measure">{PRINCIPLES_INTRO.lede}</p>
 
           <ol className="principles">
             {PRINCIPLES.map((p, i) => (
