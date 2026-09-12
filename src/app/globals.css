@@ -304,11 +304,46 @@ video {
   aspect-ratio: calc(1.5829 + (1.3516 - 1.5829) * var(--t));
 }
 
+/* ── Skipping ahead ────────────────────────────────────────────────────────
+   Sits in the 80px gap between one image and the next. */
+.board__skip {
+  height: 80px;
+  align-items: center;
+  opacity: clamp(0, calc((var(--t) - 0.8) * 5), 1);
+}
+
+.board__skipInner {
+  grid-column: 1 / span 9;
+  margin: 0;
+}
+
+.skip {
+  pointer-events: auto;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.skip:hover {
+  color: var(--accent);
+}
+
+.skip:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
 /* The next case study's top edge, below the current one. Figma puts the second
    image at y=949 against a first that ends at 869 — an 80px gap, so what shows
    is the beginning of what is next. */
 .board__row--peek {
-  margin-top: 80px;
+  margin-top: 0;
   opacity: clamp(0, calc((var(--t) - 0.8) * 5), 1);
 }
 

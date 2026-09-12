@@ -27,3 +27,25 @@ running it against the framework's novelty-budget and archetype tests.
 **Still open:** every fact in the JA case study that isn't in the intake. The
 site currently carries 23 visible gaps and refuses to build for production
 until they are closed.
+
+## 2026-09-11 — a background pattern, built and pulled
+
+**What was tried:** an animated topographic contour pattern behind the board.
+feTurbulence for the field, a discrete alpha transfer to slice it into contour
+lines, two layers drifting at different speeds and scales.
+
+**What it cost:** nothing. Measured at 16.7ms a frame with it on and 16.7ms
+with it off, at rest and while scrolling — identical. The reason is that the
+filter is baked into a data URI and rasterized once; all the motion after that
+is transform on a composited layer. Animating the turbulence itself would have
+been the obvious approach and would have cost tens of milliseconds a frame.
+
+**Two things it took to look right:** 48 tonal bands with a line every eighth,
+because at 25 the contours came out as blobs rather than lines. And a single
+image scaled to cover rather than a tile — feTurbulence does not tile
+seamlessly and the repeat seams were plainly visible as straight vertical
+edges.
+
+**Why it was pulled:** Alex's call, on looking at it. Worth recording that the
+cost question had an answer — free — and the decision was taste, not
+performance. The technique is here if a future surface wants it.

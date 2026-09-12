@@ -5,7 +5,12 @@ import { useEffect, useState } from "react";
 import { Clock } from "@/components/clock";
 import { SITE } from "@/content/site";
 import type { WorkMeta } from "@/content/work";
-import { IMAGES_PER_CASE, stageHeight, useStage } from "@/lib/use-stage";
+import {
+  IMAGES_PER_CASE,
+  scrollForCase,
+  stageHeight,
+  useStage,
+} from "@/lib/use-stage";
 
 /*
  * The stage.
@@ -146,6 +151,32 @@ export function Stage({
             </p>
             </div>
           </div>
+        </div>
+
+        {/* In the gap between the images: a way past the remaining frames.
+            Three images is a lot to scroll through to reach the next project,
+            and the counter tells you how many are left but not how to skip
+            them. */}
+        <div className="grid board__skip">
+          <p className="board__skipInner">
+            <button
+              type="button"
+              className="skip ui"
+              onClick={() =>
+                window.scrollTo({
+                  top: scrollForCase(
+                    (caseIndex + 1) % Math.max(1, entries.length),
+                  ),
+                  behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
+                    .matches
+                    ? "auto"
+                    : "smooth",
+                })
+              }
+            >
+              Next case study <span aria-hidden>↓</span>
+            </button>
+          </p>
         </div>
 
         {/* The next case study, showing above the fold. Figma 64:175 puts the

@@ -33,6 +33,15 @@ const STEP = 0.7;
 /** Viewport heights the collapse takes. Ends as the first image lands. */
 export const COLLAPSE = 0.9;
 
+/* Where a given case study's first image sits, in document pixels. Half a step
+   in, so a jump lands in the middle of a slot rather than on its boundary. */
+export function scrollForCase(index: number) {
+  const vh = window.innerHeight;
+  return Math.round(
+    vh * COLLAPSE + index * IMAGES_PER_CASE * STEP * vh + STEP * vh * 0.5,
+  );
+}
+
 export function stageHeight(cases: number) {
   /*
    * Plus one viewport, because scrollable distance is the runway *minus* one
