@@ -105,9 +105,6 @@ video {
 /* ── Wordmark: 160px at y=67 → 24px at y=24 ───────────────────────────────── */
 .mark {
   position: absolute;
-  transition:
-    translate 260ms var(--ease),
-    opacity 200ms var(--ease);
   left: var(--margin);
   top: calc((67px - 24px) * (1 - var(--t)) + 24px);
   font-family: var(--serif);
@@ -136,38 +133,8 @@ video {
   position: absolute;
   right: var(--margin);
   top: 24px;
-  transition:
-    translate 260ms var(--ease),
-    opacity 200ms var(--ease);
 }
 
-/*
- * The nav retreats going down and comes back on a move back up.
- *
- * It was sitting over the image and losing its contrast against it. Hiding it
- * on the way down solves that without giving it a background panel, which
- * would put a second surface on a page that has exactly one.
- */
-.fixed-layer[data-nav="hidden"] .nav--fixed {
-  translate: 0 calc(-100% - 24px);
-  opacity: 0;
-}
-
-.fixed-layer[data-nav="hidden"] .mark {
-  translate: 0 calc(-100% - 24px);
-  opacity: 0;
-}
-
-.fixed-layer[data-nav="hidden"] .mark:focus-visible {
-  translate: 0 0;
-  opacity: 1;
-}
-
-/* Never hide it from the keyboard. */
-.fixed-layer[data-nav="hidden"] .nav--fixed:focus-within {
-  translate: 0 0;
-  opacity: 1;
-}
 
 /* ── Statement: 68px centered → 36px hard right, line by line ───────────────
    Right-aligned always, then pushed left by an interpolated amount so it reads
@@ -301,10 +268,24 @@ video {
 .board {
   position: fixed;
   inset: 0;
-  align-items: stretch;
   /* Below the persistent layer, which has to stay legible over it. */
   z-index: 1;
   pointer-events: none;
+  overflow: hidden;
+}
+
+/*
+ * One row, sized by its image.
+ *
+ * The metadata column used to stretch to the viewport, so "bottom-aligned"
+ * put the call to action on the bottom of the *screen* rather than the bottom
+ * of the picture. Wrapping both in a row whose height the image sets means the
+ * column stretches to exactly the image and nothing else — which is the
+ * alignment the frame actually shows.
+ */
+.board__row {
+  align-items: stretch;
+  margin-top: calc(101px + (671px - 101px) * (1 - var(--t)));
 }
 
 .board a {
@@ -320,8 +301,21 @@ video {
   align-self: start;
   width: calc(66.18% + 33.82% * var(--t));
   margin-left: calc(33.82% * (1 - var(--t)));
-  margin-top: calc(101px + (671px - 101px) * (1 - var(--t)));
   aspect-ratio: calc(1.5829 + (1.3516 - 1.5829) * var(--t));
+}
+
+/* The next case study's top edge, below the current one. Figma puts the second
+   image at y=949 against a first that ends at 869 — an 80px gap, so what shows
+   is the beginning of what is next. */
+.board__row--peek {
+  margin-top: 80px;
+  opacity: clamp(0, calc((var(--t) - 0.8) * 5), 1);
+}
+
+.board__media--peek {
+  width: 100%;
+  margin-left: 0;
+  aspect-ratio: 1038 / 768;
 }
 
 /* Three frames stacked in place. Only one is lit, and they cross-fade — which
@@ -343,11 +337,9 @@ video {
 .board__meta {
   grid-column: 10 / span 3;
   display: flex;
+  /* Stretched to the row, which is the image's height — so this lands the block
+     on the image's bottom edge, not the viewport's. */
   align-items: flex-end;
-  /* The image's own top offset plus its height, so the details sit on its
-     bottom edge at every point of the collapse. */
-  padding-top: calc(101px + (671px - 101px) * (1 - var(--t)));
-  padding-bottom: var(--margin);
   /* Absent from the load-in frame; arrives with the last of the collapse. */
   opacity: clamp(0, calc((var(--t) - 0.7) * 3.4), 1);
 }
@@ -387,10 +379,14 @@ video {
   margin-block: 0.65rem 1.35rem;
 }
 
+/* Holds 192px whatever the copy runs to, so the block below it does not move
+   between case studies — the details fade in place, and a description that
+   changed height would make them jump instead. */
 .row__summary {
   font-family: var(--serif);
   font-weight: var(--w-regular);
   line-height: 1.3;
+  min-height: 192px;
 }
 
 .row__cta {
@@ -546,4 +542,30 @@ video {
 
 .status__dot {
   background: var(--accent);
+}
+
+/* ── The dot ───────────────────────────────────────────────────────────────
+   Slow enough to read as a signal rather than an alert. Opacity and scale
+   only, so it composites; and it stops entirely under reduced motion, where a
+   thing that pulses forever is exactly what the preference is asking about. */
+.status__dot {
+  animation: pulse 2.4s var(--ease) infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+  50% {
+    opacity: 0.35;
+    scale: 0.82;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status__dot {
+    animation: none;
+  }
 }

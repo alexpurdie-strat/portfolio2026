@@ -25,7 +25,7 @@ export function Stage({
   entries: WorkMeta[];
   disciplines: Record<string, string[]>;
 }) {
-  const { caseIndex, imageIndex, hidingNav } = useStage(entries.length);
+  const { caseIndex, imageIndex } = useStage(entries.length);
 
   /*
    * The details lag the index by one fade.
@@ -58,7 +58,7 @@ export function Stage({
         aria-hidden
       />
 
-      <div className="fixed-layer" data-nav={hidingNav ? "hidden" : "shown"}>
+      <div className="fixed-layer">
         <Link className="mark" href="/">
           <span className="mark__italic accent-cools">Alex</span> Purdie
         </Link>
@@ -105,25 +105,26 @@ export function Stage({
         <Clock className="clock ui" />
       </div>
 
-      <main id="main" className="grid board">
-        <div className="board__media">
-          {/* Three frames per case study, cross-fading in place. Until real
-              imagery exists these are identical blocks, so the counter in the
-              details is what makes the change legible. */}
-          {Array.from({ length: IMAGES_PER_CASE }, (_, i) => (
-            <span
-              key={i}
-              className="board__frame"
-              data-on={i === imageIndex || undefined}
-              aria-hidden
-            />
-          ))}
-          <span className="sr-only">
-            {meta.title}, image {imageIndex + 1} of {IMAGES_PER_CASE}
-          </span>
-        </div>
+      <main id="main" className="board">
+        <div className="grid board__row">
+          <div className="board__media">
+            {/* Three frames per case study, cross-fading in place. Until real
+                imagery exists these are identical blocks, so the counter in the
+                details is what makes the change legible. */}
+            {Array.from({ length: IMAGES_PER_CASE }, (_, i) => (
+              <span
+                key={i}
+                className="board__frame"
+                data-on={i === imageIndex || undefined}
+                aria-hidden
+              />
+            ))}
+            <span className="sr-only">
+              {meta.title}, image {imageIndex + 1} of {IMAGES_PER_CASE}
+            </span>
+          </div>
 
-        <div className="board__meta" data-settled={settled || undefined}>
+          <div className="board__meta" data-settled={settled || undefined}>
           <div className="board__details">
             <p className="row__disciplines ui">
               {discs.map((d) => `[${d.toUpperCase()}]`).join(" ")}
@@ -143,6 +144,17 @@ export function Stage({
                 Learn More <span aria-hidden>→</span>
               </Link>
             </p>
+            </div>
+          </div>
+        </div>
+
+        {/* The next case study, showing above the fold. Figma 64:175 puts the
+            second image at y=949 against a first that ends at 869 — so what you
+            see is the top edge of what is coming, which is what tells you there
+            is more. */}
+        <div className="grid board__row board__row--peek" aria-hidden>
+          <div className="board__media board__media--peek">
+            <span className="board__frame" data-on />
           </div>
         </div>
       </main>
