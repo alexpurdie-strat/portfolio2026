@@ -8,6 +8,9 @@ import { SITE } from "@/content/site";
 export function WorkNav() {
   return (
     <div className="fixed-layer">
+      {/* A ground for the header. Without it the wordmark and nav sit
+          directly on whatever image is passing underneath. */}
+      <span className="bar" aria-hidden />
       <Link className="mark mark--small" href="/">
         <span className="mark__italic">Alex</span> Purdie
       </Link>

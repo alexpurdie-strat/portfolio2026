@@ -94,12 +94,35 @@ video {
   inset: 0;
   z-index: 10;
   pointer-events: none;
+  /* Isolated so the bar's negative z-index stays inside this layer rather than
+     dropping behind the page and vanishing under the images. */
+  isolation: isolate;
 }
 
 /* Only the things you can actually click take pointer events back. */
 .fixed-layer a,
 .fixed-layer .nav {
   pointer-events: auto;
+}
+
+/* ── The header's ground ───────────────────────────────────────────────────
+   The wordmark and nav were sitting straight on whatever image was passing
+   beneath them. This is a band of paper behind both — invisible at rest, since
+   the page is already paper, and doing its work only once something dark is
+   moving under it.
+
+   Tall enough to clear the nav's baseline with room, and carrying a hairline so
+   the band has an edge rather than just stopping. */
+.bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: var(--paper);
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 10%, transparent);
+  /* Behind the wordmark and nav, which are its siblings. */
+  z-index: -1;
 }
 
 /* ── Wordmark: 160px at y=67 → 24px at y=24 ───────────────────────────────── */

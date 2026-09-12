@@ -64,6 +64,9 @@ export function Stage({
       />
 
       <div className="fixed-layer">
+        {/* A ground for the header. Without it the wordmark and nav sit
+            directly on whatever image is passing underneath. */}
+        <span className="bar" aria-hidden />
         <Link className="mark" href="/">
           <span className="mark__italic accent-cools">Alex</span> Purdie
         </Link>
