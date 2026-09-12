@@ -77,77 +77,36 @@ video {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   THE MASTHEAD AND ITS COLLAPSE
+   THE PERSISTENT LAYER
 
-   --t runs 0 → 1 across the first 60% of a viewport, written by
-   use-collapse.ts onto .stage. Both Figma frames are the two ends of it.
+   Everything purple in Figma 64:175. It is fixed — none of it scrolls — and
+   its parts move between the two frames' positions as --t runs 0 → 1, then
+   hold. Work rows scroll underneath.
+
+   Positions are the frames' own pixel values at 1440. Horizontal travel is
+   expressed in vw so it scales; vertical travel is in px because the margins
+   are fixed px and the layout hangs off them.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.stage {
+.fixed-layer {
   --t: 0;
-  position: relative;
-}
-
-/* ── The compact header (64:175) ───────────────────────────────────────────
-   Sticky, and arrives as the large one goes. */
-.bar {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  inset: 0;
   z-index: 10;
-  padding-block: var(--margin);
-  background: var(--paper);
-  /* Fades in over the back half of the collapse. */
-  opacity: clamp(0, calc((var(--t) - 0.55) * 3.4), 1);
   pointer-events: none;
 }
 
-.stage[style*="--t: 1"] .bar,
-.bar:focus-within {
+/* Only the things you can actually click take pointer events back. */
+.fixed-layer a,
+.fixed-layer .nav {
   pointer-events: auto;
 }
 
-.bar__inner {
-  align-items: baseline;
-  padding-inline: 0;
-}
-
-/* Figma 64:176: Martina Bold 24px, both words roman. */
-.bar__mark {
-  grid-column: 1 / span 5;
-  font-family: var(--serif);
-  font-weight: var(--w-bold);
-  font-size: var(--t-wordmark-small);
-  line-height: 1;
-  pointer-events: auto;
-}
-
-.bar__nav {
-  grid-column: 8 / span 5;
-  justify-self: end;
-  pointer-events: auto;
-}
-
-/* ── The hero, which becomes the first work row ────────────────────────────
-   Every value interpolates between the two frames on --t. */
-.hero {
-  position: relative;
-  padding-bottom: 80px;
-}
-
-.hero__top {
-  padding-top: clamp(2.5rem, 4.65vw, 4.19rem);
-  align-items: start;
-  /* Rises as it collapses so the wordmark finishes level with .bar. */
-  translate: 0 calc(var(--t) * -2.7rem);
-}
-
-/* Figma 64:106: Martina 160px. "Alex" medium italic, "Purdie" bold roman.
-   Seven columns, not eight — at eight it overlapped the nav's start column and
-   pushed the nav onto its own row. */
-.hero__mark {
-  grid-column: 1 / span 7;
+/* ── Wordmark: 160px at y=67 → 24px at y=24 ───────────────────────────────── */
+.mark {
+  position: absolute;
+  left: var(--margin);
+  top: calc((67px - 24px) * (1 - var(--t)) + 24px);
   font-family: var(--serif);
   font-weight: var(--w-bold);
   font-size: calc(
@@ -156,176 +115,108 @@ video {
   line-height: 0.92;
   letter-spacing: -0.02em;
   white-space: nowrap;
-  opacity: clamp(0, calc(1 - (var(--t) - 0.55) * 3.4), 1);
+  transform-origin: left top;
 }
 
-.hero__markItalic {
+/* "Alex" is medium italic in the load-in frame and bold roman once collapsed,
+   so the italic axis retreats as it shrinks. */
+.mark__italic {
   font-weight: var(--w-medium);
   font-style: italic;
 }
 
-.hero__nav {
-  grid-column: 8 / span 5;
-  justify-self: end;
-  opacity: clamp(0, calc(1 - var(--t) * 2.2), 1);
+/* ── Nav: fixed. Does not move at all. ──────────────────────────────────────
+   The two frames put it at y=61 and y=24; it holds the collapsed position,
+   because a navigation that shifts under the reader is the thing this layer
+   exists to stop. */
+.nav--fixed {
+  position: absolute;
+  right: var(--margin);
+  top: 24px;
 }
 
-/* Both are at opacity 0 in the collapsed frame. */
-.hero__tagline,
-.hero__email {
-  padding-top: clamp(1rem, 2.5vw, 2.25rem);
-  opacity: clamp(0, calc(1 - var(--t) * 2.2), 1);
-}
-
-.hero__tagline {
-  grid-column: 1 / span 6;
-}
-
-.hero__email {
-  grid-column: 7 / span 6;
-  justify-self: end;
-}
-
-/* Figma 64:165 → 64:177. Centered at 68px, ending right-aligned at 36px in the
-   metadata column. The lead is bold italic; the tail is roman. */
-.hero__statement {
-  position: relative;
-  z-index: 1;
-  margin-inline: auto;
-  margin-top: calc(clamp(2rem, 7vw, 6.2rem) * (1 - var(--t)));
-  margin-bottom: calc(clamp(1.5rem, 4vw, 3.5rem) * (1 - var(--t)));
-  width: 36rem;
-  max-width: 100%;
-  /* This instance is the load-in one. The collapsed frame puts the statement
-     in the metadata column instead, so it hands over rather than travelling —
-     see .hero__statementSmall. */
-  opacity: clamp(0, calc(1 - var(--t) * 1.6), 1);
-  margin-bottom: calc(clamp(1.5rem, 4vw, 3.5rem) * (1 - var(--t)));
-  padding-inline: var(--margin);
-  text-align: center;
-  font-family: var(--serif);
-  font-weight: var(--w-medium);
-  font-size: calc(
-    var(--t-statement) + (var(--t-statement-small) - var(--t-statement)) *
-      var(--t)
-  );
-  line-height: 1.04;
-  letter-spacing: -0.015em;
-  text-wrap: balance;
-}
-
-.hero__statement em {
-  font-weight: var(--w-bold);
-  font-style: italic;
-}
-
-/* ── The body: image left, metadata right ─────────────────────────────────
-   At t=0 the image is 687 wide and centered (49.35% of the content box, offset
-   25.22%). At t=1 it is 1038 on the left (74.57%, offset 0). Measured off both
-   frames rather than guessed. */
-.hero__body {
-  position: relative;
-  /* Stretch, not start: the metadata column has to be as tall as the image for
-     the call to action to sit on its bottom edge, which is the alignment that
-     makes the row read as one object. */
-  align-items: stretch;
-}
-
-.hero__media {
-  grid-column: 1 / span 9;
-  /* Percentages resolve against the 9-column track (1038 at 1440), not the
-     page — so the load-in width of 687 is 66.18% of the track and its offset
-     of 351 is 33.82%. Which also means the image sits flush to the track's
-     right edge at rest, and that is exactly what centers it on the page. */
-  width: calc(66.18% + 33.82% * var(--t));
-  margin-left: calc(33.82% * (1 - var(--t)));
-}
-
-.hero__block {
-  display: block;
-  width: 100%;
-  /* 687/434 → 1038/768. */
-  aspect-ratio: calc(1.5829 + (1.3516 - 1.5829) * var(--t));
-  background: var(--block);
-}
-
-.hero__meta {
-  grid-column: 10 / span 3;
+/* ── Statement: 68px centered → 36px hard right, line by line ───────────────
+   Right-aligned always, then pushed left by an interpolated amount so it reads
+   as centered at rest. Each line runs on its own slice of --t — line two starts
+   when line one is 12% through, line three at 24% — which is what makes them
+   arrive in sequence instead of as a block. */
+.statement {
+  position: absolute;
+  right: var(--margin);
+  top: calc((411px - 101px) * (1 - var(--t)) + 101px);
   display: flex;
   flex-direction: column;
-  /* CTA to the bottom edge of the image. */
-  justify-content: flex-start;
+  align-items: flex-end;
   text-align: right;
-  /* The project's own details only exist once collapsed. */
-  opacity: clamp(0, calc((var(--t) - 0.6) * 3), 1);
-}
-
-/* Figma 64:177 — the statement once collapsed: 36px, right-aligned, sharing a
-   top edge with the image. */
-.hero__statementSmall {
   font-family: var(--serif);
   font-weight: var(--w-medium);
-  font-size: var(--t-statement-small);
   line-height: 1.04;
   letter-spacing: -0.015em;
-  margin-bottom: 0.75rem;
+  white-space: nowrap;
 }
 
-.hero__statementSmall em {
+.statement__line {
+  display: block;
+  /* Each line's own progress: t, delayed by 12% per line and re-normalized. */
+  --lt: clamp(0, calc((var(--t) - var(--d) * 0.12) / 0.76), 1);
+  font-size: calc(
+    var(--t-statement) + (var(--t-statement-small) - var(--t-statement)) *
+      var(--lt)
+  );
+  /*
+   * Travel, and centering, in one translate.
+   *
+   * The lines are right-aligned to the margin at rest in the DOM, but the
+   * load-in frame centers them on the page. So each line moves left by the
+   * distance to the centered block's right edge (448px at 1440) *plus* half its
+   * own width less half the block's — which is what `50% - 17.71vw` expresses,
+   * and why lines of different widths all end up sharing a center rather than
+   * an edge. Both terms go to zero as the line collapses.
+   */
+  translate: calc((1 - var(--lt)) * (50% - 48.82vw)) 0;
+}
+
+.statement em {
   font-weight: var(--w-bold);
   font-style: italic;
 }
 
-.hero__statementSmall,
-.hero__currently,
-.hero__statusTop {
-  opacity: clamp(0, calc((var(--t) - 0.6) * 3), 1);
-}
-
-.hero__statusTop {
-  justify-content: flex-end;
-  margin-top: 0.5rem;
-}
-
-.hero__details {
-  margin-top: clamp(3rem, 9.7vw, 8.7rem);
-}
-
-.hero__meta .row__cta {
-  margin-top: auto;
-  padding-top: 2rem;
-}
-
-/* ── The load-in footer ────────────────────────────────────────────────────
-   Clock bottom left, status bottom right. Present only before the collapse. */
-.hero__foot {
+/* ── Standing details: slide up from the foot to under the statement ────────
+   Figma: CURRENTLY at y=948 → 236, OPEN FOR WORK at 984 → 264. */
+.standing {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 80px;
-  align-items: end;
-  opacity: clamp(0, calc(1 - var(--t) * 2.2), 1);
-  pointer-events: none;
-}
-
-.hero__clock {
-  grid-column: 1 / span 5;
-}
-
-.hero__footStatus {
-  grid-column: 8 / span 5;
-  justify-self: end;
-  text-align: right;
+  right: var(--margin);
+  top: calc((948px - 236px) * (1 - var(--t)) + 236px);
   display: grid;
-  gap: 0.5rem;
+  gap: 8px;
+  justify-items: end;
+  text-align: right;
 }
 
-.hero__footStatus .status {
-  justify-self: end;
+/* ── Load-in only ─────────────────────────────────────────────────────────── */
+.tagline,
+.email,
+.clock {
+  position: absolute;
+  opacity: clamp(0, calc(1 - var(--t) * 2.2), 1);
 }
 
-/* ── Nav ───────────────────────────────────────────────────────────────────
-   Figma: 22px between items, with slashes between. */
+.tagline {
+  left: var(--margin);
+  top: 215px;
+}
+
+.email {
+  right: var(--margin);
+  top: 215px;
+}
+
+.clock {
+  left: var(--margin);
+  bottom: var(--margin);
+}
+
+/* ── Nav and status internals ─────────────────────────────────────────────── */
 .nav {
   display: flex;
   align-items: baseline;
@@ -338,7 +229,9 @@ video {
   gap: 22px;
 }
 
-.nav a:hover {
+.nav a:hover,
+.row__cta a:hover,
+.row__title a:hover {
   text-decoration: underline;
   text-underline-offset: 0.3em;
 }
@@ -358,14 +251,19 @@ video {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   WORK ROWS (64:175)
-   Image on columns 1–9. Metadata on 10–12, with the call to action pinned to
-   the image's bottom edge.
+   WORK ROWS
+
+   Image on columns 1–9, details on 10–12 and bottom-aligned to the image.
    ═══════════════════════════════════════════════════════════════════════════ */
+
+/* One screen before the first row, so the load-in state is read before
+   anything moves. */
+.runway {
+  height: 100svh;
+}
 
 .work {
   display: grid;
-  /* Figma: 80px between rows. */
   gap: 80px;
   padding-bottom: 80px;
 }
@@ -378,7 +276,7 @@ video {
   grid-column: 1 / span 9;
 }
 
-/* Figma 64:198: 1038 × 768. Held as a ratio so it survives any width. */
+/* Figma 64:198: 1038 × 768. */
 .row__block {
   display: block;
   width: 100%;
@@ -388,40 +286,18 @@ video {
 
 .row__meta {
   grid-column: 10 / span 3;
-  /* The row is as tall as the image; the CTA sits on its bottom edge. */
-  min-height: 100%;
   display: flex;
-  flex-direction: column;
+  /* Bottom-aligned to the image, per 70:247 — the block sits low in the column
+     and "Learn More" lands on the image's bottom edge. */
+  align-items: flex-end;
 }
 
-.row__lede {
-  text-align: right;
-  display: grid;
-  gap: 0.5rem;
-  margin-bottom: clamp(3rem, 9.7vw, 8.7rem);
-}
-
-.row__lede .status {
-  justify-self: end;
-}
-
-/* Figma 64:177: Martina 36px, right-aligned in the metadata column. */
-.row__statement {
-  font-family: var(--serif);
-  font-weight: var(--w-medium);
-  font-size: var(--t-statement-small);
-  line-height: 1.04;
-  letter-spacing: -0.015em;
-  margin-bottom: 0.75rem;
-}
-
-.row__statement em {
-  font-weight: var(--w-bold);
-  font-style: italic;
+.row__details {
+  width: 100%;
+  text-align: left;
 }
 
 .row__title {
-  /* Figma 64:201: Martina Bold Italic 36px. */
   font-family: var(--serif);
   font-weight: var(--w-bold);
   font-style: italic;
@@ -431,34 +307,20 @@ video {
   margin-block: 0.65rem 1.35rem;
 }
 
-.row__title a:hover {
-  text-decoration: underline;
-  text-underline-offset: 0.12em;
-}
-
-/* Figma 64:211: Martina Regular 18px. */
 .row__summary {
   font-family: var(--serif);
   font-weight: var(--w-regular);
   line-height: 1.3;
-  max-width: 18rem;
 }
 
 .row__cta {
-  margin-top: auto;
-  padding-top: 2rem;
+  margin-top: clamp(4rem, 14vw, 9rem);
 }
 
 .row__cta a {
   display: inline-flex;
   align-items: baseline;
-  /* Figma 64:222: 24px between the label and the arrow. */
   gap: 24px;
-}
-
-.row__cta a:hover {
-  text-decoration: underline;
-  text-underline-offset: 0.3em;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -544,56 +406,37 @@ video {
 }
 
 /* ── Below 900px ───────────────────────────────────────────────────────────
-   The 12-column split stops being useful: the image takes the full width and
-   the metadata sits under it. */
+   The persistent layer stops being a layer: the statement and standing details
+   would cover the content at this width, so the wordmark and nav stay fixed and
+   everything else returns to normal flow above the work. */
 @media (max-width: 900px) {
+  .statement,
+  .standing,
+  .tagline,
+  .email,
+  .clock {
+    display: none;
+  }
+
+  .mark {
+    font-size: var(--t-wordmark-small);
+    top: 24px;
+  }
+
+  .runway {
+    height: 6rem;
+  }
+
   .row__media,
   .row__meta {
     grid-column: 1 / -1;
   }
 
   .row__meta {
-    min-height: 0;
     margin-top: 1.5rem;
   }
 
-  .row__lede {
-    text-align: left;
-    margin-bottom: 2.5rem;
-  }
-
-  .row__lede .status {
-    justify-self: start;
-  }
-
   .row__cta {
-    padding-top: 1.5rem;
-  }
-
-  .hero__mark {
-    grid-column: 1 / -1;
-    white-space: normal;
-  }
-
-  .hero__nav,
-  .hero__email {
-    grid-column: 1 / -1;
-    justify-self: start;
-  }
-
-  .hero__tagline,
-  .hero__clock,
-  .hero__status {
-    grid-column: 1 / -1;
-    justify-self: start;
-    text-align: left;
-  }
-
-  .bar__mark {
-    grid-column: 1 / span 6;
-  }
-
-  .bar__nav {
-    grid-column: 7 / span 6;
+    margin-top: 2rem;
   }
 }

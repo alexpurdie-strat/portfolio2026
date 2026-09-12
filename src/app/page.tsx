@@ -17,18 +17,14 @@ const DISCIPLINES: Record<string, string[]> = {
 };
 
 export default function Home() {
-  const [lead, ...rest] = WORK;
-
   return (
     <>
-      {/* The masthead carries the first project: once collapsed, the hero is
-          that project's row. */}
-      <Masthead
-        lead={lead.meta}
-        disciplines={DISCIPLINES[lead.meta.slug] ?? []}
-      />
+      <Masthead />
+      {/* One screen of runway, so the load-in state is read before anything
+          moves. The rows scroll up under the persistent layer from here. */}
+      <div className="runway" aria-hidden />
       <main id="main" className="work">
-        {rest.map((w) => (
+        {WORK.map((w) => (
           <WorkRow
             key={w.meta.slug}
             meta={w.meta}
