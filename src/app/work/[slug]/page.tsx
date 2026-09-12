@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { FramingStrip } from "@/components/framing-strip";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { WorkNav } from "@/components/work-nav";
 import { WORK, findWork } from "@/content/work";
 
 export function generateStaticParams() {
@@ -24,6 +23,16 @@ export async function generateMetadata({
   };
 }
 
+/* Disciplines run under the title as separate marks, the way the old site set
+   them — one per line rather than a comma list. */
+const DISCIPLINES: Record<string, string[]> = {
+  "ja-finance-park": ["Strategy", "Product", "Service design", "Facilitation"],
+  "itv-studios-portal": ["Research", "Strategy", "Design systems", "Governance"],
+  "your-move": ["Strategy", "Prototyping", "Research", "Mentorship"],
+  "100-shapes": ["Leadership", "Practice", "Hiring", "Mentorship"],
+  "home-depot": ["Enterprise", "Service design", "Research"],
+};
+
 export default async function WorkPage({
   params,
 }: {
@@ -34,41 +43,66 @@ export default async function WorkPage({
   if (!entry) notFound();
 
   const { meta, Body } = entry;
+  const index = WORK.findIndex((w) => w.meta.slug === slug);
+  const next = WORK[(index + 1) % WORK.length].meta;
 
   return (
     <>
-      <SiteHeader />
-      <main id="main" className="page case">
-        <header className="case__masthead measure">
-          <p className="label">
-            {meta.client} · {meta.years}
+      <WorkNav />
+      <main id="main" className="study">
+        {/*
+          The opening, borrowed from the old site: a small client line, a title
+          at display size, and the disciplines stacked beneath it. The title was
+          161px there against 36px here — and at 36px a case study opens like a
+          blog post rather than like a piece of work.
+        */}
+        <header className="grid study__head">
+          <p className="study__client ui">
+            {meta.client}
+            {meta.agency ? ` · ${meta.agency}` : ""} — {meta.years}
           </p>
-          <h1 className="case__title">{meta.title}</h1>
-          <p className="lede case__subtitle">{meta.subtitle}</p>
+          <h1 className="study__title">{meta.title}</h1>
+          <ul className="study__disciplines ui">
+            {(DISCIPLINES[meta.slug] ?? []).map((d) => (
+              <li key={d}>{d}</li>
+            ))}
+          </ul>
+          <p className="study__standfirst">{meta.subtitle}</p>
         </header>
 
-        <FramingStrip
-          challenge={meta.challenge}
-          product={meta.product}
-          facts={[
-            { label: "Client", value: meta.client },
-            ...(meta.agency ? [{ label: "Agency", value: meta.agency }] : []),
-            { label: "My role", value: meta.role },
-            { label: "Team", value: meta.team },
-            { label: "Platform", value: meta.platform },
-            { label: "Status", value: meta.status },
-          ]}
-        />
+        <div className="grid study__hero">
+          <span className="study__heroBlock" />
+        </div>
 
-        <div className="case__body">
+        <section className="grid study__facts" aria-label="Project summary">
+          <p className="study__challenge">{meta.challenge}</p>
+          <dl className="study__factList">
+            {[
+              { label: "My role", value: meta.role },
+              { label: "Team", value: meta.team },
+              { label: "Platform", value: meta.platform },
+              { label: "Status", value: meta.status },
+            ].map((f) => (
+              <div key={f.label}>
+                <dt className="ui">{f.label}</dt>
+                <dd>{f.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <div className="grid study__body">
           <Body />
         </div>
 
-        <nav className="case__next" aria-label="Keep reading">
-          <Link className="tap" href="/">
-            <span aria-hidden>←</span> All work
-          </Link>
-        </nav>
+        {/* The old site's closing move, and a better one than a back link. */}
+        <section className="grid study__next">
+          <p className="study__nextLabel ui">Why not read another while you’re here</p>
+          <h2 className="study__nextTitle">
+            <Link href={`/work/${next.slug}`}>{next.title}</Link>
+          </h2>
+          <p className="study__nextSummary">{next.subtitle}</p>
+        </section>
       </main>
       <SiteFooter />
     </>

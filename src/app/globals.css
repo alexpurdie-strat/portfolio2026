@@ -486,29 +486,6 @@ video {
   font-size: var(--t-ui);
 }
 
-.page {
-  max-width: 74rem;
-  margin-inline: auto;
-  padding-inline: var(--margin);
-  padding-top: 8rem;
-}
-
-.measure {
-  max-width: 34rem;
-}
-
-.section {
-  padding-block: 0 6rem;
-}
-
-.page-title {
-  font-family: var(--serif);
-  font-weight: var(--w-bold);
-  font-style: italic;
-  font-size: var(--t-statement-small);
-  margin-bottom: 1rem;
-}
-
 .sr-only {
   position: absolute;
   width: 1px;
@@ -635,5 +612,373 @@ video {
 @media (prefers-reduced-motion: reduce) {
   .status__dot {
     animation: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CASE STUDY
+
+   Borrowed from the old Studios Portal page, which got one thing right that
+   the first version of this template got backwards: the loudest things are the
+   quote and the numbers, and the prose is the quiet part between them. There,
+   the title ran at 161px, metrics at 70px and the research quote at 71px full
+   width. Here it was 36px, a labelled table, and an indented blockquote — so
+   the page opened like a blog post rather than a piece of work.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.study {
+  padding-top: clamp(7rem, 12vw, 11rem);
+  padding-bottom: 0;
+}
+
+.study__head {
+  row-gap: 0;
+}
+
+.study__client {
+  grid-column: 1 / span 12;
+  opacity: 0.6;
+  margin-bottom: 1.25rem;
+}
+
+/* The old site's 161px. Big enough that the project names itself before you
+   have read anything. */
+.study__title {
+  grid-column: 1 / span 10;
+  font-family: var(--serif);
+  font-weight: var(--w-bold);
+  font-size: clamp(3rem, 10vw, 9rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+/* Stacked marks rather than a comma list, as the old page set them. */
+.study__disciplines {
+  grid-column: 11 / span 2;
+  list-style: none;
+  margin: 0.65rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  opacity: 0.6;
+}
+
+.study__standfirst {
+  grid-column: 1 / span 7;
+  margin-top: clamp(1.75rem, 3vw, 2.75rem);
+  font-family: var(--serif);
+  font-size: var(--t-statement-small);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+.study__hero {
+  margin-top: clamp(3rem, 6vw, 5.5rem);
+}
+
+.study__heroBlock {
+  grid-column: 1 / span 12;
+  aspect-ratio: 1440 / 700;
+  background: var(--block);
+}
+
+/* ── The facts ─────────────────────────────────────────────────────────── */
+.study__facts {
+  margin-top: clamp(3rem, 6vw, 5.5rem);
+  padding-block: clamp(2rem, 4vw, 3.25rem);
+  border-top: 1px solid var(--ink);
+  align-items: start;
+}
+
+.study__challenge {
+  grid-column: 1 / span 7;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: var(--t-title);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+.study__factList {
+  grid-column: 9 / span 4;
+  margin: 0;
+  display: grid;
+  gap: 1.1rem;
+}
+
+.study__factList dt {
+  opacity: 0.55;
+}
+
+.study__factList dd {
+  margin: 0.2rem 0 0;
+  font-family: var(--serif);
+}
+
+/* ── The body ──────────────────────────────────────────────────────────────
+   Prose sits in the reading column; everything loud breaks out of it. */
+.study__body {
+  margin-top: clamp(3.5rem, 7vw, 6rem);
+  row-gap: 0;
+}
+
+.study__body > * {
+  grid-column: 3 / span 6;
+}
+
+.study__body p {
+  font-family: var(--serif);
+  font-size: 1.18rem;
+  line-height: 1.5;
+  margin: 0 0 1.1em;
+}
+
+.study__body h2 {
+  grid-column: 1 / span 10;
+  font-family: var(--serif);
+  font-weight: var(--w-medium);
+  font-size: clamp(2rem, 4.6vw, 4rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  margin: clamp(4rem, 8vw, 7rem) 0 clamp(1.5rem, 3vw, 2.5rem);
+  text-wrap: balance;
+}
+
+.study__body h3 {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: var(--w-medium);
+  font-size: var(--t-title);
+  line-height: 1.05;
+  margin: clamp(2.25rem, 4vw, 3.25rem) 0 0.9rem;
+}
+
+.study__body ul {
+  padding-left: 1.15rem;
+  margin: 0 0 1.1em;
+}
+
+.study__body li {
+  font-family: var(--serif);
+  font-size: 1.18rem;
+  line-height: 1.5;
+  margin-bottom: 0.4rem;
+}
+
+.study__body strong {
+  font-weight: var(--w-bold);
+}
+
+/* The quote is the loudest thing on the page. Full width, display size, and
+   broken by its own line breaks rather than by the measure. */
+.study__body blockquote {
+  grid-column: 1 / span 11;
+  margin: clamp(3.5rem, 7vw, 6rem) 0 clamp(1rem, 2vw, 1.75rem);
+  font-family: var(--serif);
+  font-weight: var(--w-medium);
+  font-style: italic;
+  font-size: clamp(2rem, 5.2vw, 4.5rem);
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.study__body blockquote p {
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+}
+
+/* The attribution under it, quiet. */
+.study__body blockquote + p {
+  grid-column: 3 / span 6;
+  font-family: var(--sans);
+  font-weight: var(--w-medium);
+  font-size: var(--t-ui);
+  font-style: normal;
+  opacity: 0.6;
+  margin-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+/* ── Metrics as display numerals ───────────────────────────────────────── */
+.metrics {
+  grid-column: 1 / span 12;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: clamp(2rem, 4vw, 3.5rem);
+  margin: clamp(3.5rem, 7vw, 6rem) 0;
+  padding-top: clamp(2rem, 4vw, 3rem);
+  border-top: 1px solid var(--ink);
+}
+
+.metric__value {
+  font-family: var(--serif);
+  font-weight: var(--w-bold);
+  font-size: clamp(2.5rem, 5.4vw, 4.75rem);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric__of {
+  margin: 0.85rem 0 0;
+  font-family: var(--sans);
+  font-weight: var(--w-medium);
+  font-size: var(--t-ui);
+  line-height: 1.35;
+  opacity: 0.65;
+  max-width: 15rem;
+}
+
+/* ── Asides, slots and gaps inside the body ────────────────────────────── */
+.study__body .aside {
+  grid-column: 9 / span 4;
+  font-family: var(--sans);
+  font-size: var(--t-ui);
+  line-height: 1.45;
+  border-left: 2px solid var(--accent);
+  padding-left: 1rem;
+  margin: 0 0 2rem;
+}
+
+.study__body .aside__label {
+  color: var(--accent);
+  margin: 0 0 0.35rem;
+}
+
+.study__body .aside p {
+  font-family: var(--sans);
+  font-size: var(--t-ui);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.slot {
+  grid-column: 3 / span 6;
+  margin: clamp(2.5rem, 5vw, 4rem) 0;
+}
+
+.slot[data-wide] {
+  grid-column: 1 / span 12;
+}
+
+.slot__frame {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--ink) 8%, var(--paper));
+  border: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+}
+
+/* Lost in the rewrite: without it the filler letterboxes and leaves grey bars
+   down either side of the frame. */
+.slot__frame img {
+  object-fit: cover;
+}
+
+.slot__brief {
+  position: relative;
+  padding: clamp(0.9rem, 2vw, 1.4rem);
+  max-width: 34rem;
+}
+
+.slot__tag {
+  color: var(--accent);
+  margin: 0 0 0.3rem;
+}
+
+.slot__text,
+.slot__caption {
+  font-family: var(--sans);
+  font-size: var(--t-ui);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.slot__text {
+  background: var(--paper);
+  box-shadow: 0 0 0 6px var(--paper);
+}
+
+.slot__caption {
+  margin-top: 0.8rem;
+  opacity: 0.6;
+}
+
+/* The label was butting straight into the caption — "Caption States what…". */
+.slot__caption .label {
+  margin-right: 0.5rem;
+  opacity: 0.8;
+}
+
+/* ── Next project ──────────────────────────────────────────────────────── */
+.study__next {
+  margin-top: clamp(5rem, 10vw, 9rem);
+  padding-block: clamp(3rem, 6vw, 5rem);
+  border-top: 1px solid var(--ink);
+}
+
+.study__nextLabel {
+  grid-column: 1 / span 12;
+  opacity: 0.55;
+  margin-bottom: 0.9rem;
+}
+
+.study__nextTitle {
+  grid-column: 1 / span 10;
+  font-family: var(--serif);
+  font-weight: var(--w-bold);
+  font-style: italic;
+  font-size: clamp(2.5rem, 7vw, 6rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.study__nextTitle a:hover {
+  color: var(--accent);
+}
+
+.study__nextSummary {
+  grid-column: 1 / span 6;
+  margin-top: 1.1rem;
+  font-family: var(--serif);
+  font-size: 1.18rem;
+  line-height: 1.4;
+  opacity: 0.7;
+}
+
+.mark--small {
+  font-size: var(--t-wordmark-small);
+  top: 24px;
+}
+
+@media (max-width: 900px) {
+  .study__title,
+  .study__standfirst,
+  .study__challenge,
+  .study__factList,
+  .study__disciplines,
+  .study__body > *,
+  .study__body h2,
+  .study__body blockquote,
+  .study__body blockquote + p,
+  .study__body .aside,
+  .slot,
+  .slot[data-wide],
+  .metrics,
+  .study__nextTitle,
+  .study__nextSummary,
+  .study__heroBlock {
+    grid-column: 1 / -1;
+  }
+
+  .study__disciplines {
+    grid-auto-flow: column;
+    justify-content: start;
+    gap: 1rem;
+    margin-top: 1.25rem;
   }
 }
