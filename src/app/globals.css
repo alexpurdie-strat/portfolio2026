@@ -815,7 +815,10 @@ video {
 }
 
 /* The attribution under it, quiet. */
-.study__body blockquote + p {
+/* Was `blockquote + p`, which styled whatever followed a quote — so the first
+   line of real prose after one came out as an attribution. An attribution is a
+   paragraph that is nothing but an emphasized line; ordinary prose is not. */
+.study__body blockquote + p:has(> em:only-child) {
   grid-column: 3 / span 6;
   font-family: var(--sans);
   font-weight: var(--w-medium);
@@ -937,6 +940,34 @@ video {
   opacity: 0.8;
 }
 
+/* ── Stream brief ──────────────────────────────────────────────────────── */
+
+.challenge {
+  grid-column: 3 / span 6;
+  margin: 1.5rem 0 2.25rem;
+  padding-left: 1.15rem;
+  border-left: 2px solid color-mix(in oklab, var(--ink) 22%, transparent);
+}
+
+/* One accent mark per stream. The rule itself stays in ink, or three of these
+   down a page turns the accent into a texture instead of an emphasis. */
+.study__body .challenge__label {
+  font-family: var(--sans);
+  font-size: var(--t-ui);
+  color: var(--accent);
+  margin: 0 0 0.4rem;
+}
+
+/* Scoped under .study__body deliberately: `.study__body p` is 0-1-1 and a bare
+   class is 0-1-0, so the plain selector lost and this set itself in the serif
+   it was written to contrast with. */
+.study__body .challenge__text {
+  font-family: var(--sans);
+  font-size: var(--t-ui);
+  line-height: 1.5;
+  margin: 0;
+}
+
 /* ── Figures ───────────────────────────────────────────────────────────── */
 
 /* Mirrors .slot exactly, so a real image landing in a reserved place does not
@@ -1034,6 +1065,7 @@ video {
   .study__body .aside,
   .slot,
   .slot[data-wide],
+  .challenge,
   .figure,
   .figure[data-wide],
   .metrics,

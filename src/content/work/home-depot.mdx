@@ -1,18 +1,35 @@
-<Slot
+<Figure
+  plain
   wide
-  ratio="16/9"
-  brief="The tools in the aisle — an associate at a terminal, or the rental desk. This is the earliest work on the site and the clearest example of the thesis: software that only makes sense in the building where it runs."
-  caption="Two thousand stores, a hundred and fifty associates in each, all of them standing up."
+  src="/work/home-depot/sign-on-landing.avif"
+  width={1008}
+  height={801}
+  alt="The sign-on landing screen, offering a list of names to pick from — John Smith, Juan Ortiz, Emily Williams — above a separate login option, rather than an empty username field."
+  caption="You pick your name. The whole saving is in not making someone type credentials between customers, a hundred and fifty times a store."
 />
 
 ## Why it mattered
 
-Three separate streams, one building. The truck rental system, the single
-sign-on portal every associate used to reach their tools, and the reporting
-that told paint department managers how their department was doing.
+Three separate streams, one building. The truck rental system and the
+infrastructure under it. The single sign-on portal every associate used to
+reach their tools. And the reporting that told paint department managers how
+their department was actually doing.
 
 None of them were the website. All of them were software used by someone
 standing on a shop floor with a customer waiting.
+
+<Metrics
+  items={[
+    { value: "7:25", of: "login minutes saved per session" },
+    { value: "$5–10M", of: "forecast business-plan impact — a projection made at the time, not a measured result" },
+    { value: "2,000+", of: "stores reached by the sign-on work, 150+ associates in each" },
+  ]}
+/>
+
+<Todo>Confirm the first two figures and where they came from. They are off the
+old site, and an unverified number is the first item on the framework's
+red-flag list — worse here than at ITV, because these are the strongest claims
+on the page.</Todo>
 
 ## The hard part
 
@@ -28,34 +45,101 @@ know I was learning.
 
 ### Truck rental
 
+<Challenge>
+  Refine the rental process for the associates running it, and evaluate the
+  infrastructure far enough out to see where franchising partnerships could
+  attach.
+</Challenge>
+
 > Renting a truck is a long process at the moment.
 
-That was the finding, more or less politely phrased. The work was refining the
-rental process for the associates running it, and mapping the infrastructure far
-enough out to see where franchising partnerships could attach.
+*— The research finding, more or less politely phrased.*
 
-<Slot
-  ratio="4/3"
-  brief="The rental flow — before and after, or the service blueprint. A process case study with no process artifact in it is asking to be taken on trust."
-  caption="The blueprint is where the franchising question got answered, not the interface."
+The interface work was the visible half. The half that mattered was mapping the
+process well enough to answer a business question about franchising that no
+screen could have answered.
+
+<Figure
+  plain
+  src="/work/home-depot/truck-rental.avif"
+  width={1285}
+  height={973}
+  alt="The truck rental booking screen: a van selected with its deposit, pickup and expected return dates, a round-trip and one-way toggle, and separate pickup and return stores each showing their address, phone number and opening hours."
+  caption="Round trip or one way is the branch the whole flow turns on, so it sits above the store fields it changes rather than below them."
 />
+
+<Todo>This screenshot carries latin filler text in the rental guarantee card.
+Your own brief says placeholder text never ships, and the hygiene gate cannot
+read inside an image — so this marker is the only thing stopping it, and it
+will block a production build until you either supply a clean export or say
+you accept it.</Todo>
 
 ### Single sign-on, 2,000+ stores
 
-A hundred and fifty associates per store, each of them reaching for internal
-tools between customers. The work was refining the interface of an integration
-that let them get in and get back out — the whole value of it measured in
-seconds recovered, multiplied by a number I could not fit on a slide.
+<Challenge>
+  Refine the interface of an integration that let store associates reach
+  internal tools quickly and without strain, so they could get back to the
+  customer faster.
+</Challenge>
+
+A hundred and fifty associates per store, each reaching for internal tools
+between customers. The value was measured in seconds recovered, multiplied by a
+number that did not fit on a slide. Three things carried it.
+
+<Figure
+  plain
+  wide
+  src="/work/home-depot/sso-autocomplete.avif"
+  width={1429}
+  height={248}
+  alt="The store switcher: typing two digits narrows a list of stores to four matches, each showing its number and location, with the typed digits emphasized in each result."
+  caption="One. Store numbers are four digits nobody recites from memory. Matching on the first two and showing the location makes recognition do the work instead."
+/>
+
+<Figure
+  plain
+  wide
+  src="/work/home-depot/sso-user-switch.avif"
+  width={1421}
+  height={281}
+  alt="The account menu open on a list of other named associates, letting the next person take over the terminal without the current one logging out first."
+  caption="Two. A terminal on a shop floor has many users and no owner. Switching had to be faster than signing out and back in, or nobody would do it."
+/>
+
+<Figure
+  plain
+  wide
+  src="/work/home-depot/sso-error.avif"
+  width={1425}
+  height={223}
+  alt="A rejected store number shown in red in the field where it was typed, with a warning beneath explaining that the store was not found and to check the number."
+  caption="Three. The wrong number stays on screen where it was typed. Clearing the field would hide the only thing the person needs to see to fix it."
+/>
 
 ### Paint, a two-million-dollar-a-day department
 
-I worked with the reporting team on localized performance insight for paint
-managers. Not a dashboard for executives — guidance a department manager could
-act on that week.
+<Challenge>
+  Work with the reporting team to turn departmental performance data into
+  something a paint manager could act on, rather than something an executive
+  could review.
+</Challenge>
+
+Not a dashboard for head office. Guidance a department manager could use that
+week — and the part that made it usable was ranking the department against
+comparable ones rather than against a target in isolation.
+
+<Figure
+  plain
+  src="/work/home-depot/paint-dashboard.avif"
+  width={1214}
+  height={1313}
+  alt="The paint department's performance view: weekly sales against plan, the department's largest trade accounts as cards, and its rank shown three ways — within the store, within the district, and within the region."
+  caption="Sixth of fifteen departments in the store, ninth of ten paint departments in the district. One number is reassuring and the other is not, which is the point of showing both."
+/>
 
 <Todo>One decision from this stream, specifically. What did the research find
-that the reporting team had not expected? Right now this reads as a scope
-description rather than a design story.</Todo>
+that the reporting team had not expected? This is still closer to a scope
+description than a design story.</Todo>
 
 ## What went wrong
 
@@ -64,14 +148,6 @@ honest, not harder — what would you do differently now with three streams and
 no authority?</Todo>
 
 ## Outcome
-
-<Metrics
-  items={[
-    { value: "2,000+", of: "stores reached by the sign-on work" },
-    { value: "150+", of: "associates per store" },
-    { value: "$2M/day", of: "the paint department's revenue" },
-  ]}
-/>
 
 Patterns from this work went into the design system — as an apprentice, which
 is the part I am still slightly surprised by.
@@ -84,3 +160,8 @@ substitute for the metrics this work does not have.</Todo>
 Contract, through to a company-wide reduction in contractors. Guerrilla
 testing, rapid prototyping and validation, service blueprinting, and
 stakeholder alignment across three teams that owned their own work.
+
+Client branding is scrubbed from every screen here; the systems and the work
+are The Home Depot's.
+
+<Todo>Who else was on it, across the three streams? Name disciplines.</Todo>
