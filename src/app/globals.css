@@ -3,9 +3,9 @@
 
 /* ═══════════════════════════════════════════════════════════════════════════
    BASE
-
-   Restrained editorial with warmth. The reading column is the design;
-   everything else is scaffolding around it.
+   Implemented from Figma: Portfolio Moodboard, 64:105 (load-in) and 64:175
+   (after the collapse). Color and imagery are not designed yet — black on
+   white, and black blocks where pictures go, exactly as the frames show.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 *,
@@ -16,42 +16,30 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  scroll-behavior: smooth;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
 }
 
 body {
   margin: 0;
-  background: var(--bone);
+  background: var(--paper);
   color: var(--ink);
   font-family: var(--serif);
-  font-size: var(--t-body);
-  line-height: 1.7;
-  font-synthesis-weight: none;
-  text-rendering: optimizeLegibility;
+  font-size: var(--t-ui);
+  line-height: 1.4;
+  font-synthesis: none;
   -webkit-font-smoothing: antialiased;
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
+  text-rendering: optimizeLegibility;
 }
 
 h1,
 h2,
-h3 {
-  font-weight: 500;
-  line-height: 1.12;
-  text-wrap: balance;
+h3,
+p {
   margin: 0;
-  letter-spacing: -0.014em;
 }
 
-p {
-  margin: 0 0 1.15em;
-  text-wrap: pretty;
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 img,
@@ -61,71 +49,460 @@ video {
   height: auto;
 }
 
-/* Underlined by default and offset off the baseline: an editorial site lives
-   or dies on links reading as links inside running prose. */
-a {
-  color: inherit;
-  text-decoration-color: var(--rule-strong);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
-  transition: text-decoration-color var(--quick) var(--ease);
-}
-
-a:hover {
-  text-decoration-color: var(--accent);
-}
-
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--ink);
   outline-offset: 3px;
-  border-radius: 2px;
 }
 
-/* ── Layout primitives ─────────────────────────────────────────────────── */
-.page {
-  max-width: var(--page);
+/* Every interface label in both frames is Metric Medium at one size. */
+.ui,
+.nav,
+.row__disciplines,
+.row__cta {
+  font-family: var(--sans);
+  font-weight: var(--w-medium);
+  font-size: var(--t-ui);
+  line-height: 1.15;
+  font-style: normal;
+}
+
+/* ── The grid ──────────────────────────────────────────────────────────────
+   12 columns, 24px margins and gutters, stretched. Everything that needs to
+   agree with something else across the page hangs off this. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: var(--gutter);
+  padding-inline: var(--margin);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE MASTHEAD AND ITS COLLAPSE
+
+   --t runs 0 → 1 across the first 60% of a viewport, written by
+   use-collapse.ts onto .stage. Both Figma frames are the two ends of it.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.stage {
+  --t: 0;
+  position: relative;
+}
+
+/* ── The compact header (64:175) ───────────────────────────────────────────
+   Sticky, and arrives as the large one goes. */
+.bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding-block: var(--margin);
+  background: var(--paper);
+  /* Fades in over the back half of the collapse. */
+  opacity: clamp(0, calc((var(--t) - 0.55) * 3.4), 1);
+  pointer-events: none;
+}
+
+.stage[style*="--t: 1"] .bar,
+.bar:focus-within {
+  pointer-events: auto;
+}
+
+.bar__inner {
+  align-items: baseline;
+  padding-inline: 0;
+}
+
+/* Figma 64:176: Martina Bold 24px, both words roman. */
+.bar__mark {
+  grid-column: 1 / span 5;
+  font-family: var(--serif);
+  font-weight: var(--w-bold);
+  font-size: var(--t-wordmark-small);
+  line-height: 1;
+  pointer-events: auto;
+}
+
+.bar__nav {
+  grid-column: 8 / span 5;
+  justify-self: end;
+  pointer-events: auto;
+}
+
+/* ── The hero, which becomes the first work row ────────────────────────────
+   Every value interpolates between the two frames on --t. */
+.hero {
+  position: relative;
+  padding-bottom: 80px;
+}
+
+.hero__top {
+  padding-top: clamp(2.5rem, 4.65vw, 4.19rem);
+  align-items: start;
+  /* Rises as it collapses so the wordmark finishes level with .bar. */
+  translate: 0 calc(var(--t) * -2.7rem);
+}
+
+/* Figma 64:106: Martina 160px. "Alex" medium italic, "Purdie" bold roman.
+   Seven columns, not eight — at eight it overlapped the nav's start column and
+   pushed the nav onto its own row. */
+.hero__mark {
+  grid-column: 1 / span 7;
+  font-family: var(--serif);
+  font-weight: var(--w-bold);
+  font-size: calc(
+    var(--t-wordmark) + (var(--t-wordmark-small) - var(--t-wordmark)) * var(--t)
+  );
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  opacity: clamp(0, calc(1 - (var(--t) - 0.55) * 3.4), 1);
+}
+
+.hero__markItalic {
+  font-weight: var(--w-medium);
+  font-style: italic;
+}
+
+.hero__nav {
+  grid-column: 8 / span 5;
+  justify-self: end;
+  opacity: clamp(0, calc(1 - var(--t) * 2.2), 1);
+}
+
+/* Both are at opacity 0 in the collapsed frame. */
+.hero__tagline,
+.hero__email {
+  padding-top: clamp(1rem, 2.5vw, 2.25rem);
+  opacity: clamp(0, calc(1 - var(--t) * 2.2), 1);
+}
+
+.hero__tagline {
+  grid-column: 1 / span 6;
+}
+
+.hero__email {
+  grid-column: 7 / span 6;
+  justify-self: end;
+}
+
+/* Figma 64:165 → 64:177. Centered at 68px, ending right-aligned at 36px in the
+   metadata column. The lead is bold italic; the tail is roman. */
+.hero__statement {
+  position: relative;
+  z-index: 1;
   margin-inline: auto;
-  padding-inline: var(--gutter);
+  margin-top: calc(clamp(2rem, 7vw, 6.2rem) * (1 - var(--t)));
+  margin-bottom: calc(clamp(1.5rem, 4vw, 3.5rem) * (1 - var(--t)));
+  width: 36rem;
+  max-width: 100%;
+  /* This instance is the load-in one. The collapsed frame puts the statement
+     in the metadata column instead, so it hands over rather than travelling —
+     see .hero__statementSmall. */
+  opacity: clamp(0, calc(1 - var(--t) * 1.6), 1);
+  margin-bottom: calc(clamp(1.5rem, 4vw, 3.5rem) * (1 - var(--t)));
+  padding-inline: var(--margin);
+  text-align: center;
+  font-family: var(--serif);
+  font-weight: var(--w-medium);
+  font-size: calc(
+    var(--t-statement) + (var(--t-statement-small) - var(--t-statement)) *
+      var(--t)
+  );
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
 }
 
-/* The reading column. Everything that is prose sits in this; nothing else
-   does. */
+.hero__statement em {
+  font-weight: var(--w-bold);
+  font-style: italic;
+}
+
+/* ── The body: image left, metadata right ─────────────────────────────────
+   At t=0 the image is 687 wide and centered (49.35% of the content box, offset
+   25.22%). At t=1 it is 1038 on the left (74.57%, offset 0). Measured off both
+   frames rather than guessed. */
+.hero__body {
+  position: relative;
+  /* Stretch, not start: the metadata column has to be as tall as the image for
+     the call to action to sit on its bottom edge, which is the alignment that
+     makes the row read as one object. */
+  align-items: stretch;
+}
+
+.hero__media {
+  grid-column: 1 / span 9;
+  /* Percentages resolve against the 9-column track (1038 at 1440), not the
+     page — so the load-in width of 687 is 66.18% of the track and its offset
+     of 351 is 33.82%. Which also means the image sits flush to the track's
+     right edge at rest, and that is exactly what centers it on the page. */
+  width: calc(66.18% + 33.82% * var(--t));
+  margin-left: calc(33.82% * (1 - var(--t)));
+}
+
+.hero__block {
+  display: block;
+  width: 100%;
+  /* 687/434 → 1038/768. */
+  aspect-ratio: calc(1.5829 + (1.3516 - 1.5829) * var(--t));
+  background: var(--block);
+}
+
+.hero__meta {
+  grid-column: 10 / span 3;
+  display: flex;
+  flex-direction: column;
+  /* CTA to the bottom edge of the image. */
+  justify-content: flex-start;
+  text-align: right;
+  /* The project's own details only exist once collapsed. */
+  opacity: clamp(0, calc((var(--t) - 0.6) * 3), 1);
+}
+
+/* Figma 64:177 — the statement once collapsed: 36px, right-aligned, sharing a
+   top edge with the image. */
+.hero__statementSmall {
+  font-family: var(--serif);
+  font-weight: var(--w-medium);
+  font-size: var(--t-statement-small);
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  margin-bottom: 0.75rem;
+}
+
+.hero__statementSmall em {
+  font-weight: var(--w-bold);
+  font-style: italic;
+}
+
+.hero__statementSmall,
+.hero__currently,
+.hero__statusTop {
+  opacity: clamp(0, calc((var(--t) - 0.6) * 3), 1);
+}
+
+.hero__statusTop {
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.hero__details {
+  margin-top: clamp(3rem, 9.7vw, 8.7rem);
+}
+
+.hero__meta .row__cta {
+  margin-top: auto;
+  padding-top: 2rem;
+}
+
+/* ── The load-in footer ────────────────────────────────────────────────────
+   Clock bottom left, status bottom right. Present only before the collapse. */
+.hero__foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 80px;
+  align-items: end;
+  opacity: clamp(0, calc(1 - var(--t) * 2.2), 1);
+  pointer-events: none;
+}
+
+.hero__clock {
+  grid-column: 1 / span 5;
+}
+
+.hero__footStatus {
+  grid-column: 8 / span 5;
+  justify-self: end;
+  text-align: right;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.hero__footStatus .status {
+  justify-self: end;
+}
+
+/* ── Nav ───────────────────────────────────────────────────────────────────
+   Figma: 22px between items, with slashes between. */
+.nav {
+  display: flex;
+  align-items: baseline;
+  gap: 22px;
+}
+
+.nav__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 22px;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink);
+  flex: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORK ROWS (64:175)
+   Image on columns 1–9. Metadata on 10–12, with the call to action pinned to
+   the image's bottom edge.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.work {
+  display: grid;
+  /* Figma: 80px between rows. */
+  gap: 80px;
+  padding-bottom: 80px;
+}
+
+.row {
+  align-items: stretch;
+}
+
+.row__media {
+  grid-column: 1 / span 9;
+}
+
+/* Figma 64:198: 1038 × 768. Held as a ratio so it survives any width. */
+.row__block {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1038 / 768;
+  background: var(--block);
+}
+
+.row__meta {
+  grid-column: 10 / span 3;
+  /* The row is as tall as the image; the CTA sits on its bottom edge. */
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.row__lede {
+  text-align: right;
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: clamp(3rem, 9.7vw, 8.7rem);
+}
+
+.row__lede .status {
+  justify-self: end;
+}
+
+/* Figma 64:177: Martina 36px, right-aligned in the metadata column. */
+.row__statement {
+  font-family: var(--serif);
+  font-weight: var(--w-medium);
+  font-size: var(--t-statement-small);
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  margin-bottom: 0.75rem;
+}
+
+.row__statement em {
+  font-weight: var(--w-bold);
+  font-style: italic;
+}
+
+.row__title {
+  /* Figma 64:201: Martina Bold Italic 36px. */
+  font-family: var(--serif);
+  font-weight: var(--w-bold);
+  font-style: italic;
+  font-size: var(--t-title);
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  margin-block: 0.65rem 1.35rem;
+}
+
+.row__title a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+/* Figma 64:211: Martina Regular 18px. */
+.row__summary {
+  font-family: var(--serif);
+  font-weight: var(--w-regular);
+  line-height: 1.3;
+  max-width: 18rem;
+}
+
+.row__cta {
+  margin-top: auto;
+  padding-top: 2rem;
+}
+
+.row__cta a {
+  display: inline-flex;
+  align-items: baseline;
+  /* Figma 64:222: 24px between the label and the arrow. */
+  gap: 24px;
+}
+
+.row__cta a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FURNITURE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.site-footer {
+  border-top: 1px solid var(--ink);
+  padding-block: var(--margin);
+}
+
+.site-footer__inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-family: var(--sans);
+  font-weight: var(--w-medium);
+  font-size: var(--t-ui);
+}
+
+.page {
+  max-width: 74rem;
+  margin-inline: auto;
+  padding-inline: var(--margin);
+  padding-top: 8rem;
+}
+
 .measure {
-  max-width: var(--measure);
+  max-width: 34rem;
 }
 
 .section {
-  padding-block: var(--space-section);
+  padding-block: 0 6rem;
 }
 
-.section + .section {
-  padding-top: 0;
+.page-title {
+  font-family: var(--serif);
+  font-weight: var(--w-bold);
+  font-style: italic;
+  font-size: var(--t-statement-small);
+  margin-bottom: 1rem;
 }
 
-/* The one place the mono face appears: metadata, status, field names. It marks
-   "a fact about the work" as distinct from "the work". */
-.label {
-  font-family: var(--mono);
-  font-size: var(--t-label);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-quiet);
-  font-weight: 500;
-}
-
-.lede {
-  font-size: var(--t-lede);
-  line-height: 1.5;
-  color: var(--ink-soft);
-}
-
-.rule {
-  border: 0;
-  border-top: 1px solid var(--rule);
-  margin: 0;
-}
-
-/* ── Accessibility furniture ───────────────────────────────────────────── */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -145,654 +522,78 @@ a:hover {
   z-index: 100;
   padding: 0.65rem 1rem;
   background: var(--ink);
-  color: var(--bone);
+  color: var(--paper);
   font-family: var(--sans);
-  font-size: var(--t-small);
-  text-decoration: none;
-  border-radius: 3px;
+  font-size: var(--t-ui);
   translate: 0 -160%;
-  transition: translate var(--quick) var(--ease);
 }
 
 .skip-link:focus-visible {
   translate: 0 0;
 }
 
-/* Coarse pointers get a 44px target without inflating the visual design — an
-   invisible pseudo-element carries the extra area. */
-@media (pointer: coarse) {
-  .tap {
-    position: relative;
-  }
-
-  .tap::before {
-    content: "";
-    position: absolute;
-    inset: -0.7rem -0.4rem;
-    pointer-events: auto;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   FURNITURE
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.site-header {
-  border-bottom: 1px solid var(--rule);
-}
-
-.site-header__inner {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  padding-block: 1.4rem;
-}
-
-.site-header__name {
-  font-size: 1.05rem;
-  letter-spacing: -0.01em;
-  text-decoration: none;
-}
-
-.site-nav {
-  display: flex;
-  gap: clamp(1rem, 2.6vw, 2.25rem);
-  font-family: var(--sans);
-  font-size: var(--t-small);
-}
-
-.site-nav__link {
-  text-decoration: none;
-  color: var(--ink-soft);
-  transition: color var(--quick) var(--ease);
-}
-
-.site-nav__link:hover {
-  color: var(--ink);
-}
-
-.site-nav__link[aria-current="page"] {
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-underline-offset: 0.35em;
-}
-
-.site-footer {
-  border-top: 1px solid var(--rule);
-  margin-top: var(--space-section);
-}
-
-.site-footer__inner {
-  display: flex;
-  justify-content: space-between;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  padding-block: 2rem;
-  font-family: var(--sans);
-  font-size: var(--t-small);
-  color: var(--ink-soft);
-}
-
-.site-footer__line,
-.site-footer__links {
-  margin: 0;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   HOME
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.hero {
-  padding-top: clamp(3rem, 8vw, 6rem);
-}
-
-/* The belief line. The largest type on the site, and the only place display
-   size is used — a hero that states a position rather than a job title. */
-.hero__belief {
-  font-size: var(--t-display);
-  line-height: 1.08;
-  letter-spacing: -0.02em;
-  margin: 0 0 var(--space-block);
-  text-wrap: balance;
-  /* Wider than the reading measure on purpose. At 34rem this ran to seven
-     lines and filled the viewport on its own, so a recruiter's first ten
-     seconds contained a belief and no work. At 46rem it is three or four. */
-  max-width: 46rem;
-}
-
-.hero__bio {
-  margin-bottom: 1.25rem;
-}
-
-.hero__now {
-  margin: 0;
-}
-
-.clients__list {
-  font-size: var(--t-lede);
-  line-height: 1.6;
-  max-width: 48rem;
-  margin: 0.9rem 0 0;
-  color: var(--ink-soft);
-}
-
-.work__grid {
-  display: grid;
-  gap: clamp(2rem, 4vw, 3rem);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-  margin-top: 1.6rem;
-}
-
-.case-card__title {
-  font-size: var(--t-head);
-  margin: 0.35rem 0 0.5rem;
-}
-
-.case-card__link {
-  text-decoration: none;
-}
-
-.case-card__link:hover {
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-underline-offset: 0.2em;
-}
-
-.case-card__subtitle {
-  color: var(--ink-soft);
-  margin: 0;
-  max-width: 30rem;
-}
-
-.work__more,
-.contact__line {
-  margin-top: 1.6rem;
-}
-
-.page-title {
-  font-size: var(--t-title);
-  margin-bottom: 1rem;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   CASE STUDY
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.case__masthead {
-  padding-top: clamp(2.5rem, 6vw, 4.5rem);
-}
-
-.case__title {
-  font-size: var(--t-title);
-  margin: 0.5rem 0 0.75rem;
-}
-
-.case__subtitle {
-  margin: 0;
-}
-
-/* ── Framing strip ─────────────────────────────────────────────────────────
-   The challenge as a question, the product in one sentence, then the facts.
-   A reader who stops here still knows the problem, the thing, and my part. */
-.framing {
-  margin-top: var(--space-block);
-  padding-block: var(--space-block);
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
-}
-
-.framing__challenge {
-  font-size: var(--t-head);
-  font-style: italic;
-  margin-bottom: 0.6rem;
-}
-
-.framing__product {
-  color: var(--ink-soft);
-  margin-bottom: var(--space-block);
-}
-
-.framing__facts {
-  display: grid;
-  gap: 1.1rem 2rem;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  margin: 0;
-}
-
-.framing__fact dd .todo {
-  box-shadow: 0 0 0 2px var(--accent-soft);
-}
-
-.framing__fact dd {
-  margin: 0.2rem 0 0;
-  font-size: var(--t-small);
-  font-family: var(--sans);
-}
-
-/* ── Prose ─────────────────────────────────────────────────────────────────
-   The body is the reading column; asides sit in a lane beside it on a wide
-   screen and fall inline beneath the paragraph they belong to on a narrow one. */
-.case__body {
-  margin-top: var(--space-section);
-  /* Constrained here rather than on each child. The asides float out of this
-     box by a negative margin, and when the box was full page width they floated
-     past the viewport edge and put a horizontal scrollbar on every case study
-     at 1440px. */
-  max-width: var(--measure);
-}
-
-.case__body h2 {
-  font-size: var(--t-head);
-  margin-top: var(--space-block);
-  margin-bottom: 0.75rem;
-}
-
-.case__body h3 {
-  font-size: 1.1rem;
-  font-style: italic;
-  margin-top: 2rem;
-  margin-bottom: 0.6rem;
-}
-
-.case__body ul {
-  padding-left: 1.1rem;
-  margin: 0 0 1.15em;
-}
-
-.case__body li {
-  margin-bottom: 0.4rem;
-}
-
-.case__next {
-  margin-top: var(--space-section);
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--rule);
-  font-family: var(--sans);
-  font-size: var(--t-small);
-}
-
-/* ── AI in the loop ────────────────────────────────────────────────────────
-   Novelty spend number two. Set in sans against serif prose so it reads as
-   annotation on the work rather than more of the work, and marked with the
-   one accent color the site has. */
-.aside {
-  font-family: var(--sans);
-  font-size: var(--t-small);
-  line-height: 1.55;
-  color: var(--ink-soft);
-  border-left: 2px solid var(--accent);
-  padding-left: 1rem;
-  margin: 1.75rem 0;
-  max-width: var(--measure);
-}
-
-.aside__label {
-  color: var(--accent);
-  margin: 0 0 0.35rem;
-}
-
-.aside__body > :last-child {
-  margin-bottom: 0;
-}
-
-@media (min-width: 1100px) {
-  /* Into the margin, beside the paragraph it annotates. */
-  .aside {
-    position: relative;
-    float: right;
-    width: var(--lane);
-    margin-right: calc(var(--lane) * -1 - 3rem);
-    margin-top: 0.35rem;
-    clear: right;
-  }
-}
-
-/* ── Figures ───────────────────────────────────────────────────────────── */
-.figure {
-  margin: var(--space-block) 0;
-}
-
-.figure img {
-  border: 1px solid var(--rule);
-  border-radius: 2px;
-}
-
-.figure figcaption {
-  font-family: var(--sans);
-  font-size: var(--t-small);
-  color: var(--ink-soft);
-  margin-top: 0.7rem;
-  max-width: var(--measure);
-}
-
-.figure[data-wide] {
-  max-width: none;
-}
-
-/* ── Visible gaps ──────────────────────────────────────────────────────────
-   A TODO that ships is a bug, so it is impossible to miss on the page and the
-   hygiene check fails the build on it. */
 .todo {
-  display: inline;
-  background: var(--accent-soft);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-  border-radius: 1px;
+  background: #ffe9c7;
+  box-shadow: 0 0 0 3px #ffe9c7;
   font-family: var(--sans);
-  font-size: var(--t-small);
-  color: #6a3d16;
+  font-size: var(--t-ui);
 }
 
 .todo__tag {
-  color: var(--accent);
-  font-weight: 600;
+  font-weight: var(--w-bold);
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   PRINCIPLES
-
-   Novelty spend number one. A numbered list where every idea carries its
-   proof, so none of them can sit as an assertion.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.principles {
-  list-style: none;
-  margin: var(--space-block) 0 0;
-  padding: 0;
-  counter-reset: none;
-}
-
-.principle {
-  display: grid;
-  grid-template-columns: 3rem 1fr;
-  gap: 0 1rem;
-  padding-block: var(--space-block);
-  border-top: 1px solid var(--rule);
-  max-width: 46rem;
-}
-
-.principle__num {
-  margin: 0.4rem 0 0;
-}
-
-.principle__name {
-  font-size: var(--t-head);
-  margin-bottom: 0.5rem;
-}
-
-.principle__body {
-  color: var(--ink-soft);
-  max-width: var(--measure);
-  margin-bottom: 0.75rem;
-}
-
-.principle__proof {
-  margin: 0;
-  font-family: var(--sans);
-  font-size: var(--t-small);
-}
-
-@media (max-width: 600px) {
-  .principle {
-    grid-template-columns: 1fr;
-    gap: 0.35rem;
+/* ── Below 900px ───────────────────────────────────────────────────────────
+   The 12-column split stops being useful: the image takes the full width and
+   the metadata sits under it. */
+@media (max-width: 900px) {
+  .row__media,
+  .row__meta {
+    grid-column: 1 / -1;
   }
-}
 
-.not-for__line {
-  font-size: var(--t-lede);
-  line-height: 1.5;
-  margin-top: 1rem;
-}
-
-.not-for__line:last-child {
-  color: var(--ink);
-}
-
-.not-for__line:first-of-type {
-  color: var(--ink-quiet);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   IMAGE SLOTS
-
-   A reserved place for an image that does not exist yet. It holds the real
-   aspect ratio so the page reads at its true length, and it says what belongs
-   there. Deliberately calm rather than alarming — these are a working state,
-   not an error — but the production build refuses while any remain.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.slot {
-  margin: var(--space-block) 0;
-}
-
-.slot__frame {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  border: 1px solid var(--rule-strong);
-  border-radius: 2px;
-  overflow: hidden;
-  background: var(--bone-sunk);
-}
-
-.slot__frame img {
-  object-fit: cover;
-}
-
-.slot__brief {
-  position: relative;
-  padding: clamp(0.9rem, 2vw, 1.4rem);
-  max-width: 34rem;
-}
-
-.slot__tag {
-  color: var(--accent);
-  margin: 0 0 0.3rem;
-}
-
-.slot__text {
-  font-family: var(--sans);
-  font-size: var(--t-small);
-  line-height: 1.5;
-  color: var(--ink-soft);
-  margin: 0;
-  /* legible over the hatch */
-  background: var(--bone);
-  box-shadow: 0 0 0 6px var(--bone);
-  border-radius: 1px;
-}
-
-.slot__caption {
-  font-family: var(--sans);
-  font-size: var(--t-small);
-  color: var(--ink-quiet);
-  margin-top: 0.7rem;
-  max-width: var(--measure);
-}
-
-/* Context shots break the reading column; detail shots stay inside it. */
-.slot[data-wide] {
-  max-width: none;
-  width: min(var(--page), 100%);
-}
-
-@media (min-width: 1100px) {
-  .slot[data-wide] {
-    /* out into the same lane the asides use */
-    width: calc(var(--measure) + var(--lane) + 3rem);
+  .row__meta {
+    min-height: 0;
+    margin-top: 1.5rem;
   }
-}
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   WARMTH AND STRUCTURE
-
-   The first pass had a top and a bottom to its type scale and nothing between,
-   an accent that only appeared on hover, and a flat ground. That is not
-   restraint, it is absence. These rules are the 40% of a 60/40 brief.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* A ground with temperature. Two very wide, very low-contrast washes so the
-   page has a direction of light rather than being one flat fill. */
-body {
-  background-image:
-    radial-gradient(
-      120% 80% at 12% 0%,
-      rgb(255 253 247 / 0.85) 0%,
-      rgb(255 253 247 / 0) 62%
-    ),
-    radial-gradient(
-      100% 70% at 100% 100%,
-      rgb(214 200 176 / 0.22) 0%,
-      rgb(214 200 176 / 0) 60%
-    );
-  background-attachment: scroll;
-}
-
-/* ── Section headers ───────────────────────────────────────────────────────
-   A label, a short accent rule, and real size. The rule is the only piece of
-   pure decoration on the site and it earns its place by making sections
-   findable when scanning rather than reading. */
-.section-head {
-  display: flex;
-  align-items: baseline;
-  gap: 0.9rem;
-  margin-bottom: 1.5rem;
-}
-
-.section-head::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    var(--accent-line) 0%,
-    var(--rule) 40%,
-    rgb(0 0 0 / 0) 100%
-  );
-}
-
-/* Prose headings inside a case study get the same treatment, so the reading
-   column has landmarks. */
-.case__body h2 {
-  font-size: var(--t-section);
-  margin-top: var(--space-section);
-  margin-bottom: 1rem;
-  padding-top: 1.1rem;
-  border-top: 1px solid var(--rule);
-  position: relative;
-}
-
-.case__body h2::before {
-  content: "";
-  position: absolute;
-  top: -1px;
-  left: 0;
-  width: 3.5rem;
-  height: 1px;
-  background: var(--accent);
-}
-
-.case__body h3 {
-  font-size: var(--t-head);
-  font-style: italic;
-  color: var(--ink);
-  margin-top: 2.25rem;
-}
-
-/* ── Metrics ───────────────────────────────────────────────────────────────
-   Scale first, explanation second. */
-.metrics {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
-  gap: clamp(1.5rem, 3vw, 2.5rem);
-  margin: var(--space-block) 0;
-  padding: var(--space-block) 0;
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
-  max-width: none;
-  width: min(var(--page), 100%);
-}
-
-@media (min-width: 1100px) {
-  .metrics {
-    width: calc(var(--measure) + var(--lane) + 3rem);
+  .row__lede {
+    text-align: left;
+    margin-bottom: 2.5rem;
   }
-}
 
-.metric__value {
-  font-size: var(--t-metric);
-  line-height: 1;
-  letter-spacing: -0.03em;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  /* The one place a number is allowed to be the loudest thing on the page. */
-  color: var(--ink);
-}
+  .row__lede .status {
+    justify-self: start;
+  }
 
-.metric__of {
-  margin: 0.55rem 0 0;
-  font-family: var(--sans);
-  font-size: var(--t-small);
-  line-height: 1.45;
-  color: var(--ink-soft);
-  max-width: 16rem;
-}
+  .row__cta {
+    padding-top: 1.5rem;
+  }
 
-/* ── The framing strip, with the question carrying weight ─────────────── */
-.framing {
-  background: var(--bone-sunk);
-  border-top: 1px solid var(--accent-line);
-  border-bottom: 1px solid var(--rule);
-  padding-inline: clamp(1.25rem, 3vw, 2.5rem);
-  margin-inline: clamp(-1.25rem, -3vw, -2.5rem);
-}
+  .hero__mark {
+    grid-column: 1 / -1;
+    white-space: normal;
+  }
 
-.framing__challenge {
-  font-size: var(--t-section);
-  font-style: italic;
-  color: var(--ink);
-}
+  .hero__nav,
+  .hero__email {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
 
-/* ── Principles with presence ──────────────────────────────────────────── */
-.principle__num {
-  color: var(--accent);
-  font-size: 0.85rem;
-  letter-spacing: 0.06em;
-}
+  .hero__tagline,
+  .hero__clock,
+  .hero__status {
+    grid-column: 1 / -1;
+    justify-self: start;
+    text-align: left;
+  }
 
-.principle__name {
-  font-size: var(--t-section);
-}
+  .bar__mark {
+    grid-column: 1 / span 6;
+  }
 
-.principle:first-of-type {
-  border-top-color: var(--accent-line);
-}
-
-/* ── The hero belief, with the accent under it ─────────────────────────── */
-.hero__belief {
-  padding-bottom: var(--space-block);
-  border-bottom: 1px solid var(--accent-line);
-  margin-bottom: var(--space-block);
-}
-
-/* Pull quotes in a case study read as testimony, not as body copy. */
-.case__body blockquote {
-  margin: var(--space-block) 0;
-  padding-left: 1.25rem;
-  border-left: 2px solid var(--accent-line);
-  font-size: var(--t-lede);
-  line-height: 1.45;
-  font-style: italic;
-  color: var(--ink);
-}
-
-.case__body blockquote + p em,
-.case__body blockquote + p {
-  font-family: var(--sans);
-  font-size: var(--t-small);
-  color: var(--ink-quiet);
-  font-style: normal;
+  .bar__nav {
+    grid-column: 7 / span 6;
+  }
 }

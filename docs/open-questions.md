@@ -27,6 +27,15 @@ any of it is outstanding; `npm run check:draft` passes so work can continue.
 - [ ] **Is Studios Portal still in production?** Years-in-use is a strong
       substitute metric.
 
+## Naming, from the Figma frames
+
+- [ ] **The nav says Approach / Archive / About / Contact.** The brief's IA
+      calls it Work plus a Library. "Archive" currently points at `/work`,
+      which is a label and a route that disagree. Settle which naming wins
+      before anything links to it publicly.
+- [ ] **Three disciplines per project**, as `[LIKE] [THIS]` in the frame.
+      Placeholders are in `src/app/page.tsx`.
+
 ## Licensing
 
 - [ ] **Metric is a Klim test font.** Licensed for evaluation and mockups, not

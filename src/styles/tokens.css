@@ -1,74 +1,57 @@
 /*
- * Tokens.
+ * Tokens — implemented from Figma (Portfolio Moodboard, nodes 64:105 / 64:175).
  *
- * Calm neutral base, one warm accent, generous space. The brief's rule is that
- * the novelty budget is spent on two things only — named ideas, and the
- * AI-in-the-loop notes — so nothing here is asked to be clever. Type, color
- * and rhythm exist to get out of the way of reading.
+ * Every value here is measured off the two frames rather than invented. The
+ * frames are 1440 wide, so anything sized in px there is expressed as a clamp
+ * that hits the Figma value at 1440 and scales sensibly either side of it.
  *
- * The accent is a burnt ochre, deliberately short of red: the first target
- * employer is Coca-Cola, and a red-accented portfolio reads as pandering.
+ * Color and imagery are deliberately not designed yet. Black on white and
+ * black rectangles, exactly as the frames show them.
  */
 
 :root {
   color-scheme: light;
 
-  /* ── Ground and ink ───────────────────────────────────────────────────── */
-  /* Warmer and a shade deeper than white. A page that is #fff with black text
-     has no temperature, and temperature is where the 40% warmth in a 60/40
-     brief actually lives. */
-  --bone: #f7f4ec;
-  --bone-sunk: #efeade;
-  --bone-deep: #e8e2d2;
-  --ink: #1a1917;
-  --ink-soft: #56534c;
-  /* The quietest text allowed. Measured at 4.6:1 on --bone; anything lighter
-     fails AA and the brief sets AA as the floor. */
-  --ink-quiet: #6e6a62;
-  --rule: #e2ddd3;
-  --rule-strong: #cdc6b8;
+  /* ── Grid ─────────────────────────────────────────────────────────────────
+     12 columns, 24px margins, 24px gutters, stretched. At 1440 that resolves
+     to 94px columns — which is what makes the case study image land on exactly
+     9 columns (24 → 1062) and the metadata column on 10–12 (1086 → 1416). */
+  --margin: 24px;
+  --gutter: 24px;
+  --cols: 12;
 
-  /* One accent, but it has to do structural work rather than sit on a hover
-     state: section rules, numerals, the question at the top of a case study. */
-  --accent: #9c5a24;
-  --accent-soft: #f2e6d7;
-  --accent-line: #d8bd9c;
+  /* ── Ink ──────────────────────────────────────────────────────────────── */
+  --paper: #ffffff;
+  --ink: #000000;
+  /* The image placeholder, until real imagery exists. */
+  --block: #000000;
 
-  /* ── Type ─────────────────────────────────────────────────────────────── */
+  /* ── Type ─────────────────────────────────────────────────────────────────
+     Martina Plantijn carries everything editorial — the wordmark, the
+     statement, project titles and body prose. Metric carries every piece of
+     interface text at a single size. */
   --serif: var(--font-martina-plantijn), "Iowan Old Style", Georgia, serif;
-  /* Metric, with the old stack behind it. Seven weights and a real italic at
-     every one of them, which is what the type scale was missing. */
-  --sans: var(--font-metric), var(--font-geist-sans), ui-sans-serif, system-ui,
-    sans-serif;
-  --mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+  --sans: var(--font-metric), ui-sans-serif, system-ui, sans-serif;
 
-  --t-display: clamp(2.6rem, 6vw, 4.25rem);
-  --t-title: clamp(2rem, 4.4vw, 3.1rem);
-  /* The missing middle. Section heads were 1.3rem against a 4.25rem display —
-     a scale with a top and a bottom and nothing in between has no rhythm, and
-     every page read as one big thing followed by a lot of small things. */
-  --t-section: clamp(1.6rem, 3vw, 2.15rem);
-  --t-metric: clamp(2.1rem, 4.5vw, 3rem);
-  --t-head: clamp(1.25rem, 2vw, 1.45rem);
-  --t-lede: clamp(1.15rem, 1.7vw, 1.4rem);
-  --t-body: 1.0625rem;
-  --t-small: 0.9rem;
-  --t-label: 0.75rem;
+  /* Figma: 160px at 1440. The largest thing on the site by a wide margin. */
+  --t-wordmark: clamp(3.25rem, 11.1vw, 10rem);
+  /* Figma: 24px — what the wordmark collapses to on scroll. */
+  --t-wordmark-small: clamp(1.15rem, 1.67vw, 1.5rem);
+  /* Figma: 68px centered, collapsing to 36px top-right. */
+  --t-statement: clamp(2rem, 4.72vw, 4.25rem);
+  --t-statement-small: clamp(1.5rem, 2.5vw, 2.25rem);
+  /* Figma: 36px — project titles. */
+  --t-title: clamp(1.6rem, 2.5vw, 2.25rem);
+  /* Figma: 18px — every interface label and all body prose. One size. */
+  --t-ui: clamp(0.95rem, 1.25vw, 1.125rem);
 
-  /* ── Measure and rhythm ───────────────────────────────────────────────── */
-  /* ~68 characters. The single most load-bearing number on the site. */
-  --measure: 34rem;
-  --page: 74rem;
-  --gutter: clamp(1.25rem, 5vw, 4rem);
-  --lane: 15rem;
+  --w-regular: 400;
+  --w-medium: 500;
+  --w-bold: 700;
 
-  --space-section: clamp(4rem, 9vw, 7.5rem);
-  --space-block: clamp(2rem, 4vw, 3.25rem);
-
-  /* ── Motion ───────────────────────────────────────────────────────────── */
-  /* Purposeful only, per the brief. Two durations and one curve is the whole
-     vocabulary — there is nothing here that needs a third. */
-  --ease: cubic-bezier(0.2, 0.6, 0.3, 1);
-  --quick: 140ms;
-  --settle: 320ms;
+  /* ── Motion ───────────────────────────────────────────────────────────────
+     The masthead collapse is scroll-linked rather than timed, so the only
+     durations here are for things that respond to a pointer. */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --quick: 160ms;
 }

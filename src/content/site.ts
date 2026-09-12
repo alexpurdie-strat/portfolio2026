@@ -13,6 +13,21 @@ export const SITE = {
   name: "Alex Purdie",
   role: "Product designer and strategist",
 
+  tagline: "Product strategy and Product Design leader",
+  email: "alexpurdieux@gmail.com",
+  currently: "CURRENTLY @ Whiteboard",
+  status: "OPEN FOR WORK",
+
+  /* The headline from the Figma frames, split so the first half can be set in
+     bold italic and the second in roman — the two-voice treatment is the whole
+     gesture and it cannot be done with one string.
+
+     It comes from intake §1: "I believe people should be empowered to live
+     their most unrestrained embodied lives." A third belief line alongside the
+     two below; none are lost. */
+  statementLead: "Empowering embodied lives",
+  statementTail: "on and off screen",
+
   /* Alex's own belief line, intake §1. He also offered "The canvas is not the
      physical medium, the canvas is people's hearts and minds" and marked it as
      the better one — kept below as the alternate, undecided. */
@@ -59,9 +74,12 @@ export const SITE = {
     ],
   },
 
+  /* Labels from the Figma frames. "Archive" points at /work for now — the
+     brief's IA calls it Work and the design calls it Archive, and that naming
+     is logged in docs/open-questions.md rather than guessed at here. */
   nav: [
-    { label: "Work", href: "/work" },
-    { label: "Principles", href: "/principles" },
+    { label: "Approach", href: "/approach" },
+    { label: "Archive", href: "/work" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ],
