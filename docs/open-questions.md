@@ -39,9 +39,13 @@ any of it is outstanding; `npm run check:draft` passes so work can continue.
 ## Deployment
 
 - [x] **Canonical URL.** Set to `https://alexpurdie.co`.
-- [ ] **IONOS mailboxes.** The imported MX and SPF records point at IONOS mail.
-      Keep them if a `@alexpurdie.co` address is wanted; if not, they route mail
-      to a mailbox nobody reads.
+- [x] **IONOS mail records.** Deleted; no mailbox wanted.
+- [ ] **Anti-spoofing records.** The domain now says nothing about mail, so
+      anyone can send as `@alexpurdie.co`. Needs a null MX, `v=spf1 -all` and a
+      DMARC `p=reject` — see `docs/deploy.md`.
+- [ ] **Contact address.** The site shows a Gmail account next to a custom
+      domain. Cloudflare Email Routing would forward `alex@alexpurdie.co` for
+      free without a mailbox to check.
 - [ ] **Decide what gets locked.** The posting asks for a password on the
       resume. Locking everything makes a recruiter authenticate before seeing
       anything; the usual answer is a public index and locked case studies.

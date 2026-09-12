@@ -68,25 +68,16 @@ nameservers* → paste both → save.
 Propagation is usually minutes, occasionally a few hours. Cloudflare emails when
 the zone is active. Nothing below works until it is.
 
-### 2c. Email on the domain
+### 2c. Lock the domain against mail spoofing
 
-No IONOS mailbox is wanted, which leaves the imported mail records pointing at a
-service nobody uses. Two ways to finish, and they are not equivalent.
+No mailbox is wanted, and the four inherited IONOS mail records — `MX` x2, the
+SPF `TXT`, `autodiscover` and `_dmarc` — have been deleted. Verified gone from
+the authoritative nameserver.
 
-**Forwarding (recommended).** Cloudflare **Email Routing** is free and is not a
-mailbox — `alex@alexpurdie.co` lands in an existing inbox. Worth it because the
-contact address on the site is currently a Gmail account sitting next to a
-custom domain, which reads as a smaller operation than it is.
-
-Delete the IONOS records first — MX ×2, the SPF TXT, `autodiscover`, `_dmarc` —
-then Cloudflare dashboard → **Email** → **Email Routing** → add the destination
-address and verify it from the confirmation mail. Cloudflare writes its own MX
-and SPF. Update `email` in `src/content/site.ts` once a test message arrives,
-not before.
-
-**No email at all.** Then the domain should say so, or it can be spoofed by
-anyone — a live risk for a domain printed on a resume. Delete the same four
-records and add:
+That leaves the domain saying nothing about mail, which is the spoofable state:
+with no SPF and no DMARC, anyone can send mail claiming to be
+`@alexpurdie.co` and receivers have no instruction to stop them. This matters
+more than usual for a domain printed on a resume. Add three records:
 
 | Type | Name | Content | Priority |
 |---|---|---|---|
@@ -95,8 +86,14 @@ records and add:
 | TXT | `_dmarc` | `v=DMARC1; p=reject;` | — |
 
 A null MX (RFC 7505) states the domain accepts no mail; `-all` states no server
-may send as it; `p=reject` tells receivers to drop anything that fails. The
-inherited IONOS DMARC record is `p=none`, which asks for nothing.
+may send as it; `p=reject` tells receivers to drop anything failing those
+checks. All three are DNS only — there is nothing to proxy.
+
+If an address on the domain is ever wanted, **Cloudflare Email Routing** is free
+and is not a mailbox: it forwards `alex@alexpurdie.co` to an existing inbox and
+writes its own MX and SPF, replacing the records above. The contact address in
+`src/content/site.ts` is a Gmail account; change it only once a test message has
+actually arrived.
 
 ### 3. Create the Pages project
 
@@ -181,3 +178,34 @@ building the same output is two things to keep in step.
 Check **SSL/TLS → Overview** reads **Full (strict)**. Pages serves valid HTTPS
 on its own, so anything looser is both unnecessary and, on *Flexible*, a
 redirect loop waiting to happen.
+
+## alexpurdie.com
+
+`.co` is the primary. `.com` is owned too and redirects to it, so that nobody
+typing the more obvious TLD from memory or from a printed resume lands on an
+IONOS parking page.
+
+1. Cloudflare → **Add a site** → `alexpurdie.com` → Free. Delete whatever the
+   scan imports; nothing on this domain needs to resolve anywhere.
+2. IONOS → the `.com` domain → nameservers → the pair Cloudflare gives.
+3. Add two **proxied** DNS records, both pointing at `192.0.2.1` — a reserved
+   documentation address from RFC 5737 that nothing routes to:
+
+   | Type | Name | Content | Proxy |
+   |---|---|---|---|
+   | A | `alexpurdie.com` | `192.0.2.1` | Proxied |
+   | A | `www` | `192.0.2.1` | Proxied |
+
+   A redirect rule only runs on traffic that reaches Cloudflare's edge, and
+   traffic only reaches the edge if a proxied record exists. The address is
+   never connected to — the redirect answers first.
+
+4. **Rules** → **Redirect Rules** → create:
+
+   - When: `Hostname` `equals` `alexpurdie.com` — add an *or* for `www.alexpurdie.com`
+   - Then: **Dynamic** redirect, status **301**, preserve query string
+   - Expression: `concat("https://alexpurdie.co", http.request.uri.path)`
+
+   Dynamic rather than static so that deep links survive —
+   `alexpurdie.com/archive/ja-finance-park/` lands on the case study rather
+   than dumping every visitor on the home page.
