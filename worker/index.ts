@@ -53,7 +53,8 @@ async function sign(secret: string, data: string): Promise<string> {
  * closed door.
  *
  * Both sides go through this, so the stored secret can be written however it
- * reads best on the page.
+ * reads best on the page — and a profile URL reduces to its handle, so the
+ * whole line and the name at the end of it are both accepted.
  */
 function normalize(value: string): string {
   return value
@@ -61,7 +62,11 @@ function normalize(value: string): string {
     .toLowerCase()
     .replace(/^https?:\/\//, "")
     .replace(/^www\./, "")
-    .replace(/\/+$/, "");
+    .replace(/\/+$/, "")
+    /* Reduce a profile URL to the handle, so the whole line off the resume and
+       just the name at the end of it are the same answer. */
+    .replace(/^linkedin\.com\/in\//, "")
+    .replace(/^@/, "");
 }
 
 /* Compares in time that does not depend on where the strings first differ. A

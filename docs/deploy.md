@@ -161,9 +161,11 @@ npx wrangler secret put COOKIE_SECRET
 ```
 
 The first is the password that goes on the resume. It is compared after
-normalizing both sides — trimmed, lowercased, and with `https://`, `www.` and a
-trailing slash removed — so a password that reads as a URL can be typed the way
-anyone would type it. Write the secret however it reads best on the page. The second signs the cookie
+normalizing both sides — trimmed, lowercased, with `https://`, `www.`, a
+trailing slash and a leading `@` removed, and a `linkedin.com/in/` prefix
+reduced to the handle after it. So the whole line off the resume and just the
+name at the end of it are the same answer, and the secret can be written
+however it reads best on the page. The second signs the cookie
 so nobody who guesses its format can forge one — it is never typed by a person,
 so make it long. One generated for you, unused, valid to paste:
 
