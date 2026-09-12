@@ -937,6 +937,49 @@ video {
   opacity: 0.8;
 }
 
+/* ── Figures ───────────────────────────────────────────────────────────── */
+
+/* Mirrors .slot exactly, so a real image landing in a reserved place does not
+   move the page it lands on. Until now nothing used <Figure> and none of this
+   existed — every image sat at the body default and `wide` did nothing. */
+.figure {
+  grid-column: 3 / span 6;
+  margin: clamp(2.5rem, 5vw, 4rem) 0;
+}
+
+.figure[data-wide] {
+  grid-column: 1 / span 12;
+}
+
+.figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Centers an image whose own width caps it below the column. */
+  margin-inline: auto;
+}
+
+/* A screenshot is a rectangle of somebody else's white and needs an edge, or
+   it bleeds into the paper. An image on transparency has its own edge already,
+   and a rule drawn around one boxes in the space it floats in. */
+.figure:not([data-plain]) img {
+  border: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+}
+
+/* The framework's test is whether the argument survives reading the captions
+   alone, so these are content, not annotation, and are set to be read. */
+.figure figcaption {
+  font-family: var(--sans);
+  font-size: var(--t-ui);
+  line-height: 1.45;
+  margin: 0.85rem 0 0;
+  opacity: 0.72;
+}
+
+.figure[data-wide] figcaption {
+  max-width: 46rem;
+}
+
 /* ── Next project ──────────────────────────────────────────────────────── */
 .study__next {
   margin-top: clamp(5rem, 10vw, 9rem);
@@ -991,6 +1034,8 @@ video {
   .study__body .aside,
   .slot,
   .slot[data-wide],
+  .figure,
+  .figure[data-wide],
   .metrics,
   .study__nextTitle,
   .study__nextSummary,

@@ -31,6 +31,19 @@ const UK = [
   "fulfil", "enrol", "traveller", "modelling", "learnt", "whilst", "amongst",
 ];
 
+/*
+ * Names that keep their own spelling, because renaming a thing is not
+ * localization. A real product, department or title is spelled the way its
+ * owner spells it even in US copy — the alternative is alt text that describes
+ * a screenshot using a name that appears nowhere in the screenshot.
+ *
+ * Exact, case-sensitive, and each one carries where it comes from. A bare word
+ * would re-open the hole this gate exists to close.
+ */
+const PROPER_NOUNS = [
+  "Core Catalogue Optimisation", // ITV product, named in the ecosystem diagram
+];
+
 const files = walk("src");
 for (const file of files) {
   const text = readFileSync(file, "utf8");
@@ -52,8 +65,12 @@ for (const file of files) {
     }
     if (/href="#"/.test(line)) problems.push(`${at}  dead link href="#"`);
     if (isContent && /<img(?![^>]*\balt=)/.test(line)) problems.push(`${at}  <img> without alt`);
+    /* Proper nouns are removed before the spelling test, not exempted after
+       it, so a genuine UK spelling elsewhere on the same line still fails. */
+    let prose = line;
+    for (const n of PROPER_NOUNS) prose = prose.split(n).join("");
     for (const w of UK) {
-      if (new RegExp(`\\b${w}`, "i").test(line)) problems.push(`${at}  UK spelling "${w}"`);
+      if (new RegExp(`\\b${w}`, "i").test(prose)) problems.push(`${at}  UK spelling "${w}"`);
     }
   });
 }
