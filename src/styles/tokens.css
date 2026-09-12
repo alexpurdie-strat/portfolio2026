@@ -1,0 +1,62 @@
+/*
+ * Tokens — implemented from Figma (Portfolio Moodboard, nodes 64:105 / 64:175).
+ *
+ * Every value here is measured off the two frames rather than invented. The
+ * frames are 1440 wide, so anything sized in px there is expressed as a clamp
+ * that hits the Figma value at 1440 and scales sensibly either side of it.
+ *
+ * Color and imagery are deliberately not designed yet. Black on white and
+ * black rectangles, exactly as the frames show them.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ── Grid ─────────────────────────────────────────────────────────────────
+     12 columns, 24px margins, 24px gutters, stretched. At 1440 that resolves
+     to 94px columns — which is what makes the case study image land on exactly
+     9 columns (24 → 1062) and the metadata column on 10–12 (1086 → 1416). */
+  --margin: 24px;
+  --gutter: 24px;
+  --cols: 12;
+
+  /* ── Ink ──────────────────────────────────────────────────────────────── */
+  --paper: #f8f5f2;
+  --ink: #0d1b1e;
+  /* The one accent. It appears on four things and nowhere else: the timezone,
+     "Alex", "lives", and the open-for-work dot. Three of those four cool to
+     --ink as the page collapses, so the color belongs to the load-in state
+     rather than to the site. */
+  --accent: #d65d3b;
+  /* The image placeholder, until real imagery exists. */
+  --block: #0d1b1e;
+
+  /* ── Type ─────────────────────────────────────────────────────────────────
+     Martina Plantijn carries everything editorial — the wordmark, the
+     statement, project titles and body prose. Metric carries every piece of
+     interface text at a single size. */
+  --serif: var(--font-martina-plantijn), "Iowan Old Style", Georgia, serif;
+  --sans: var(--font-metric), ui-sans-serif, system-ui, sans-serif;
+
+  /* Figma: 160px at 1440. The largest thing on the site by a wide margin. */
+  --t-wordmark: clamp(3.25rem, 11.1vw, 10rem);
+  /* Figma: 24px — what the wordmark collapses to on scroll. */
+  --t-wordmark-small: clamp(1.15rem, 1.67vw, 1.5rem);
+  /* Figma: 68px centered, collapsing to 36px top-right. */
+  --t-statement: clamp(2rem, 4.72vw, 4.25rem);
+  --t-statement-small: clamp(1.5rem, 2.5vw, 2.25rem);
+  /* Figma: 36px — project titles. */
+  --t-title: clamp(1.6rem, 2.5vw, 2.25rem);
+  /* Figma: 18px — every interface label and all body prose. One size. */
+  --t-ui: clamp(0.95rem, 1.25vw, 1.125rem);
+
+  --w-regular: 400;
+  --w-medium: 500;
+  --w-bold: 700;
+
+  /* ── Motion ───────────────────────────────────────────────────────────────
+     The masthead collapse is scroll-linked rather than timed, so the only
+     durations here are for things that respond to a pointer. */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --quick: 160ms;
+}

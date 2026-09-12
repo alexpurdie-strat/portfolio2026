@@ -1,0 +1,18 @@
+# Cloudflare Pages reads this at deploy time.
+# https://developers.cloudflare.com/pages/configuration/headers/
+
+/*
+  # No framing, no MIME sniffing, no referrer leakage to other origins.
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Nothing here needs a camera, a microphone or a location.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+
+# Fingerprinted by the build, so they can be cached hard and forever.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Self-hosted and fingerprinted the same way.
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable

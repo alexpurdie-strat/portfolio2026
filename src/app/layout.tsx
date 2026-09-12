@@ -1,67 +1,52 @@
 import type { Metadata, Viewport } from "next";
-import { Cutive_Mono, Geist, Geist_Mono } from "next/font/google";
-import {
-  blankWeirdos,
-  blankWeirdosAlt1,
-  blankWeirdosAlt2,
-  blankWeirdosAlt3,
-  martinaPlantijn,
-} from "./fonts";
-import { AgentationToolbar } from "@/components/agentation-toolbar";
-import { PaperFilters } from "@/components/paper-filters";
-import { PaperMotion } from "@/components/paper-motion";
+import { Geist, Geist_Mono } from "next/font/google";
+import { martinaPlantijn, metric } from "./fonts";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-/* Typewriter face for the archive's front-matter tag blocks. */
-const cutiveMono = Cutive_Mono({
-  variable: "--font-cutive-mono",
-  weight: "400",
-  subsets: ["latin"],
-});
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Alexpurdie.co",
-  description: "Portfolio of Alex Purdie.",
+  /* Open Graph URLs resolve against this. Without it they resolve relative and
+     break the moment the site is shared anywhere. */
+  metadataBase: new URL("https://alexpurdie.co"),
+  title: "Alex Purdie — Product designer and strategist",
+  description:
+    "Product designer and strategist leading teams that build platforms where digital systems meet real people doing real work.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "Alex Purdie",
+    locale: "en_US",
+    url: "/",
+    title: "Alex Purdie — Product designer and strategist",
+    description:
+      "Product designer and strategist leading teams that build platforms where digital systems meet real people doing real work.",
+  },
 };
 
-/* Separate from `metadata` on purpose: this Next version rejects themeColor
-   there and warns on every route. */
 export const viewport: Viewport = {
-  /* the ground, so the browser chrome does not fight the paper */
-  themeColor: "#faf7ef",
-  /* Without this the `env(safe-area-inset-*)` padding in globals.css computes
-     to zero and the notch work does nothing at all. */
+  themeColor: "#faf8f4",
+  /* Without this the env(safe-area-inset-*) padding computes to zero. */
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${martinaPlantijn.variable} ${blankWeirdos.variable} ${blankWeirdosAlt1.variable} ${blankWeirdosAlt2.variable} ${blankWeirdosAlt3.variable} ${cutiveMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${martinaPlantijn.variable} ${metric.variable}`}
     >
-      <body className="min-h-full flex flex-col">
-        {/* First thing in the tab order, invisible until focused. The header
-            nav is four links deep on every page. */}
+      <body>
+        {/* First thing in the tab order, invisible until focused. */}
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <PaperFilters />
-        <PaperMotion />
         {children}
-        {/* dev-only; NODE_ENV is statically replaced, so it drops out of the
-            production bundle entirely */}
-        {process.env.NODE_ENV === "development" ? <AgentationToolbar /> : null}
       </body>
     </html>
   );
