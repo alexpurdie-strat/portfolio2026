@@ -406,6 +406,7 @@ video {
 .board__frame {
   position: absolute;
   inset: 0;
+  border-radius: var(--radius-media);
   /* Paper, not ink. Several of these images sit on transparency — device
      mockups and diagrams — and the ground behind them should be the page they
      are on, not a black rectangle they are pasted to. */
@@ -944,6 +945,7 @@ video {
 
 .slot__frame {
   position: relative;
+  border-radius: var(--radius-media);
   display: flex;
   align-items: flex-end;
   overflow: hidden;
@@ -1047,6 +1049,7 @@ video {
    and a rule drawn around one boxes in the space it floats in. */
 .figure:not([data-plain]) img {
   border: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  border-radius: var(--radius-media);
 }
 
 /* The framework's test is whether the argument survives reading the captions

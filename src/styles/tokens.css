@@ -57,6 +57,11 @@
   /* ── Motion ───────────────────────────────────────────────────────────────
      The masthead collapse is scroll-linked rather than timed, so the only
      durations here are for things that respond to a pointer. */
+  /* Softens the corner of anything that is a filled rectangle of image. Fluid,
+     because a radius that reads as a soft corner at 1392px reads as a lozenge
+     at 342. */
+  --radius-media: clamp(8px, 0.85vw, 14px);
+
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --quick: 160ms;
 }
