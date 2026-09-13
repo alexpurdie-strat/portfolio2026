@@ -48,10 +48,10 @@ export type WorkMeta = {
    */
   tint?: string;
   /*
-   * The flat colour behind the client's stamp, sampled from the asset itself
+   * The flat color behind the client's stamp, sampled from the asset itself
    * rather than eyeballed. The drawer takes this, so the stamp's own square
    * dissolves into the panel and only the mark is left standing on a field of
-   * the client's colour.
+   * the client's color.
    */
   stampBg?: string;
 };

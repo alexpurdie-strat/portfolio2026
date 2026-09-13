@@ -111,7 +111,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
           {
             "--up": `${UP}ms`,
             "--down": `${DOWN}ms`,
-            /* The client's colour while one is in hand; ink otherwise, which is
+            /* The client's color while one is in hand; ink otherwise, which is
                what the home link and any stampless route get. */
             ...(stampBg ? { background: stampBg } : null),
           } as React.CSSProperties
