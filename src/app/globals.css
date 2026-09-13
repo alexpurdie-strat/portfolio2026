@@ -754,12 +754,6 @@ video {
   margin-top: clamp(3rem, 6vw, 5.5rem);
 }
 
-.study__heroBlock {
-  grid-column: 1 / span 12;
-  aspect-ratio: 1440 / 700;
-  background: var(--block);
-}
-
 /* ── The facts ─────────────────────────────────────────────────────────── */
 .study__facts {
   margin-top: clamp(3rem, 6vw, 5.5rem);
@@ -1126,14 +1120,67 @@ video {
   .metrics,
   .study__nextTitle,
   .study__nextSummary,
-  .study__heroBlock {
-    grid-column: 1 / -1;
-  }
-
   .study__disciplines {
     grid-auto-flow: column;
     justify-content: start;
     gap: 1rem;
     margin-top: 1.25rem;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE DRAWER
+
+   Rises to cover the page, carries the client's stamp, drops away to reveal
+   what loaded behind it.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.drawer {
+  position: fixed;
+  inset: 0;
+  /* Above the fixed layer, which is 10. */
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--block);
+  transform: translateY(100%);
+  /* On the base rule rather than on the phases, so the first change from rest
+     has a transition to run on rather than acquiring one in the same frame. */
+  transition: transform var(--down, 460ms) var(--ease);
+  pointer-events: none;
+}
+
+.drawer[data-phase="up"] {
+  transform: translateY(0);
+  transition-duration: var(--up, 420ms);
+  /* Swallows a second click while the page behind is being replaced. */
+  pointer-events: auto;
+}
+
+.drawer__stamp {
+  width: clamp(88px, 13vw, 156px);
+  height: auto;
+  border-radius: var(--radius-media);
+  opacity: 0;
+  transform: scale(0.92);
+  transition:
+    opacity 260ms var(--ease),
+    transform 380ms var(--ease);
+}
+
+/* Behind the drawer's own rise, so the stamp arrives rather than travelling. */
+.drawer[data-phase="up"] .drawer__stamp {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 140ms;
+}
+
+/* The JS path already returns early under this preference. This is the guard
+   for anything that reaches the drawer another way. */
+@media (prefers-reduced-motion: reduce) {
+  .drawer,
+  .drawer__stamp {
+    transition: none;
   }
 }

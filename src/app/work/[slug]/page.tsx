@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
+import { StampLink } from "@/components/stamp-link";
 import { isMarker, TODOS_VISIBLE } from "@/components/todo";
 import { WorkNav } from "@/components/work-nav";
 import { WORK, findWork } from "@/content/work";
@@ -72,7 +73,6 @@ export default async function WorkPage({
         </header>
 
         <div className="grid study__hero">
-          <span className="study__heroBlock" />
         </div>
 
         <section className="grid study__facts" aria-label="Project summary">
@@ -104,7 +104,7 @@ export default async function WorkPage({
         <section className="grid study__next">
           <p className="study__nextLabel ui">Why not read another while you’re here</p>
           <h2 className="study__nextTitle">
-            <Link href={`/work/${next.slug}`}>{next.title}</Link>
+            <StampLink href={`/work/${next.slug}`} slug={next.slug}>{next.title}</StampLink>
           </h2>
           <p className="study__nextSummary">{next.subtitle}</p>
         </section>

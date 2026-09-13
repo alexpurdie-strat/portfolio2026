@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { StampLink } from "@/components/stamp-link";
 import type { WorkMeta } from "@/content/work";
 
 /*
@@ -14,9 +15,9 @@ export function CaseCard({ meta }: { meta: WorkMeta }) {
         {meta.client} · {meta.years}
       </p>
       <h3 className="case-card__title">
-        <Link className="case-card__link" href={`/work/${meta.slug}`}>
+        <StampLink className="case-card__link" href={`/work/${meta.slug}`} slug={meta.slug}>
           {meta.title}
-        </Link>
+        </StampLink>
       </h3>
       <p className="case-card__subtitle">{meta.subtitle}</p>
     </article>

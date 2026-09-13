@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Clock } from "@/components/clock";
+import { StampLink } from "@/components/stamp-link";
 import { NAV, SITE } from "@/content/site";
 import { asset } from "@/lib/asset";
 import type { WorkMeta } from "@/content/work";
@@ -202,14 +203,16 @@ export function Stage({
               {discs.map((d) => `[${d.toUpperCase()}]`).join(" ")}
             </p>
             <h1 className="row__title">
-              <Link href={`/work/${meta.slug}`}>{meta.title}</Link>
+              <StampLink href={`/work/${meta.slug}`} slug={meta.slug}>
+                  {meta.title}
+                </StampLink>
             </h1>
             <p className="row__summary">{meta.subtitle}</p>
 
             <p className="row__cta ui">
-              <Link href={`/work/${meta.slug}`}>
+              <StampLink href={`/work/${meta.slug}`} slug={meta.slug}>
                 Learn More <span aria-hidden>→</span>
-              </Link>
+              </StampLink>
             </p>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { martinaPlantijn, metric } from "./fonts";
+import { PageTransition } from "@/components/page-transition";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -46,7 +47,7 @@ export default function RootLayout({
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        {children}
+        <PageTransition>{children}</PageTransition>
       </body>
     </html>
   );
