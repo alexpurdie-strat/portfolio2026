@@ -47,6 +47,13 @@ export type WorkMeta = {
    * noticed on the way past, not looked at.
    */
   tint?: string;
+  /*
+   * The flat colour behind the client's stamp, sampled from the asset itself
+   * rather than eyeballed. The drawer takes this, so the stamp's own square
+   * dissolves into the panel and only the mark is left standing on a field of
+   * the client's colour.
+   */
+  stampBg?: string;
 };
 
 export type WorkEntry = { meta: WorkMeta; Body: ComponentType };
@@ -73,6 +80,7 @@ export const WORK: WorkEntry[] = ([
       product:
         "The tablet companion for Finance Park — the software a student holds while they are standing in the simulation, deciding whether they can afford the apartment.",
       tint: "#2B5BE8",
+      stampBg: "#285F74",
       images: [
         { src: "/work/ja-finance-park/storefront-in-room.webp", alt: "A tablet held in front of a real storefront inside a Finance Park facility, showing that storefront unlocked." },
         { src: "/work/ja-finance-park/tablets-array.webp", alt: "Eight tablets showing the shipped product — avatar, budget balancing, savings, and the running total." },
@@ -102,6 +110,7 @@ export const WORK: WorkEntry[] = ([
       product:
         "Studios Portal — a single point of origin for production tasks, replacing a set of processes that had never been designed as a set.",
       tint: "#1D2B4A",
+      stampBg: "#0F72EC",
       images: [
         { src: "/work/itv/welcome-onboarding.webp", alt: "The portal's home screen behind a welcome tour explaining where a production's tasks live." },
         { src: "/work/itv/asset-gallery.webp", alt: "A grid of sixteen episode stills in the portal's asset library, each with its filename and size." },
@@ -130,6 +139,7 @@ export const WORK: WorkEntry[] = ([
       product:
         "A self-guided coaching platform, prototyped to the point of being mistaken for the real product before a line of it was built.",
       tint: "#5A6B5E",
+      stampBg: "#244DA0",
     },
   },
   {
@@ -152,6 +162,7 @@ export const WORK: WorkEntry[] = ([
       product:
         "Skills matrices, growth rubrics, weekly critique and pairing — the scaffolding a design practice needs to improve on purpose.",
       tint: "#3A9E1E",
+      stampBg: "#FFFFFF",
       images: [
         { src: "/work/100-shapes/skill-definitions.webp", alt: "Twelve design skills defined across three families — craft, management and impact." },
         { src: "/work/100-shapes/responsibility-matrix.webp", alt: "The role responsibility matrix, reading six dimensions across four levels of seniority." },
@@ -179,6 +190,7 @@ export const WORK: WorkEntry[] = ([
       product:
         "Truck rental, single sign-on for 2,000+ stores, and the reporting a paint manager acts on — all of it used standing up, with a customer waiting.",
       tint: "#B8752A",
+      stampBg: "#FF6600",
       images: [
         { src: "/work/home-depot/sign-on-landing.avif", alt: "The sign-on screen offering a list of names to pick from rather than an empty username field." },
         { src: "/work/home-depot/paint-dashboard.avif", alt: "The paint department's performance view, ranking it within its store, district and region." },

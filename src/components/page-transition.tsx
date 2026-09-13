@@ -48,6 +48,9 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [phase, setPhase] = useState<"idle" | "up" | "down">("idle");
   const [slug, setSlug] = useState<string | null>(null);
+  const stampBg = slug
+    ? WORK.find((w) => w.meta.slug === slug)?.meta.stampBg
+    : undefined;
   const target = useRef<string | null>(null);
 
   /* Warmed after mount, off the critical path. A stamp that decodes while the
@@ -108,6 +111,9 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
           {
             "--up": `${UP}ms`,
             "--down": `${DOWN}ms`,
+            /* The client's colour while one is in hand; ink otherwise, which is
+               what the home link and any stampless route get. */
+            ...(stampBg ? { background: stampBg } : null),
           } as React.CSSProperties
         }
       >

@@ -416,8 +416,13 @@ video {
   transition: opacity 420ms var(--ease);
 }
 
+/* Fits rather than fills: the whole picture, sized to the frame's width, with
+   paper either side of it where the proportions do not agree. Cropping was
+   deciding which third of a wide diagram a reader got to see. */
 .board__frame img {
-  object-fit: cover;
+  object-fit: contain;
+  /* The image is now the visible edge, not the frame around it. */
+  border-radius: var(--radius-media);
 }
 
 /* No imagery yet: the ink block returns, carrying the project's question. */
