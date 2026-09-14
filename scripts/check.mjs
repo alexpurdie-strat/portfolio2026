@@ -42,6 +42,7 @@ const UK = [
  */
 const PROPER_NOUNS = [
   "Core Catalogue Optimisation", // ITV product, named in the ecosystem diagram
+  "Programme Title", // the literal placeholder printed on ITV's own cards
 ];
 
 const files = walk("src");

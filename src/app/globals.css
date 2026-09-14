@@ -1271,3 +1271,537 @@ video {
     animation: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE ARCHIVE
+
+   Implemented from Figma: Portfolio Moodboard, 111:3227 ("Archive concept").
+
+   The frame is 1440 wide on the site's 12-column grid, and every number below
+   is measured off it rather than invented. The wall of marks sits on columns
+   7–12 (732 → 1416, which is exactly four 141px tiles with 40px between them).
+   The title and the description share columns 1–5 (24 → 590). Column 6 is
+   empty, and that emptiness is the only thing separating the two halves — there
+   is no rule and no panel edge, so the gutter has to be wide enough to read as
+   a division on its own.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.archive-page {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  /*
+   * Masthead, then title, then description. The third track is flexible and
+   * that is load-bearing: the wall spans rows 2 and 3, and a spanning item's
+   * height is distributed across the tracks it covers unless one of them can
+   * absorb it. With three `auto` rows the wall's 865px inflated the title row
+   * and pushed the description 200px down the page.
+   */
+  grid-template-rows: auto auto 1fr;
+  column-gap: var(--gutter);
+  padding-inline: var(--margin);
+  padding-block: var(--margin) calc(var(--margin) * 2);
+  min-height: 100svh;
+}
+
+/* ── The masthead ──────────────────────────────────────────────────────────
+   One row: the name against the left margin, the nav against the right. The
+   tagline and the email that the frames put underneath each are not rendered
+   here — see the note in page-mast.tsx. Static: neither page collapses
+   anything, so it is a header and not a layer.
+
+   Baseline rather than center, because the two are set in different families
+   at different sizes and centering them lines up their boxes instead of their
+   type. */
+.mast {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* Figma: Martina Plantijn Medium Italic, 24px — the same cut the wordmark
+   collapses to on the home page. */
+.mast__name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: var(--w-medium);
+  font-size: var(--t-wordmark-small);
+  line-height: 1;
+}
+
+/* ── The title ─────────────────────────────────────────────────────────────
+   Figma: 160px bold italic, with the text box 112 tall — a 0.7 line box, which
+   is what pulls the descenders of the g down into the space the panel occupies
+   and stops the two reading as separate columns of a table. */
+.archive-title {
+  grid-column: 1 / 6;
+  grid-row: 2;
+  margin: 1.75rem 0 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: var(--w-bold);
+  font-size: var(--t-wordmark);
+  line-height: 0.7;
+  letter-spacing: -0.01em;
+}
+
+/*
+ * Not a box. The panel and the wall are both items of the page grid, so the
+ * wall can start level with the title while the panel sits below it — which is
+ * the whole composition, and is not something a wrapper can express.
+ */
+.archive {
+  display: contents;
+}
+
+/* ── The description ───────────────────────────────────────────────────────
+   Figma: the frame starts at y=293 and the prose measure inside it is 448px,
+   narrower than the 566 column it sits in. The short measure is deliberate —
+   it is what keeps this reading as a caption to the wall rather than as an
+   article the wall is illustrating. */
+.panel {
+  grid-column: 1 / 6;
+  grid-row: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 5rem;
+}
+
+.panel__disciplines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin-bottom: 2rem;
+}
+
+.panel__body {
+  /* Each entry is a fresh element — see the key in archive-wall.tsx — so this
+     plays on every change rather than once on mount. Short and opacity-only:
+     the panel is being read, and anything that slides arrives after the eye
+     has already got there. */
+  animation: panel-in 220ms var(--ease) both;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Figma: 36px bold italic in the accent. The only place on this page the
+   accent appears. */
+.panel__client {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: var(--w-bold);
+  font-size: var(--t-title);
+  line-height: 1.05;
+  color: var(--accent);
+}
+
+.panel__brief,
+.panel__work {
+  max-width: 28rem;
+  font-family: var(--serif);
+  font-size: var(--t-ui);
+  line-height: 1.45;
+}
+
+.panel__brief {
+  font-weight: var(--w-bold);
+  margin-top: 1rem;
+}
+
+.panel__work {
+  font-weight: var(--w-regular);
+  margin-top: 2rem;
+}
+
+/* Figma: 24px between the label and the arrow, and pinned to the foot of the
+   panel frame. Five of the eighteen entries have one. */
+.panel__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+
+.panel__cta span {
+  transition: translate var(--quick) var(--ease);
+}
+
+.panel__cta:hover span {
+  translate: 0.35rem 0;
+}
+
+/* ── The wall ──────────────────────────────────────────────────────────────
+   Four across, five down, square tiles.
+
+   The tile is whichever is smaller: the quarter of its six columns the frame
+   designs it at, or the share of viewport height that keeps all five rows
+   inside 90svh. Width alone is not enough — on a wide, short screen (1920×1080
+   is the common one) a tile sized purely by column came out at 207px and the
+   wall ran 1165 tall, which is 85px taller than the screen it was on. The
+   second term is what stops the last row falling off the bottom.
+
+   When height is the binding constraint the wall is narrower than its columns,
+   so it is pinned to the end of them — the right margin is the edge the frame
+   aligns the last tile to, and that is the alignment worth keeping. */
+.wall {
+  --wall-gap: clamp(0.75rem, 2.2vw, 2rem);
+  --wall-tile: min(
+    (100% - 3 * var(--wall-gap)) / 4,
+    (0.9 * 100svh - 4 * var(--wall-gap)) / 5
+  );
+  grid-column: 7 / -1;
+  grid-row: 2 / span 2;
+  align-self: start;
+  display: grid;
+  grid-template-columns: repeat(4, var(--wall-tile));
+  justify-content: end;
+  gap: var(--wall-gap);
+  margin-top: 1.75rem;
+}
+
+.wall__mark {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  /* Safari gives a button a default text alignment and font that the images
+     inside it inherit as a baseline gap. */
+  font: inherit;
+  line-height: 0;
+}
+
+/*
+ * At rest a mark sits at 80% size and 70% opacity; the one you are pointing at
+ * comes up to full size and full strength. The scale is on the images rather
+ * than on the mark itself so the hit target stays the size of its grid cell —
+ * a target that shrinks away from the cursor is a target you can lose by
+ * arriving at it.
+ */
+.wall__mono,
+.wall__color {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  scale: 0.8;
+  transition:
+    opacity var(--quick) var(--ease),
+    scale var(--quick) var(--ease);
+}
+
+.wall__mark[data-active] .wall__mono,
+.wall__mark[data-active] .wall__color,
+.wall__mark:hover .wall__mono,
+.wall__mark:hover .wall__color {
+  scale: 1;
+}
+
+/*
+ * The two cuts cross-fade in place. Both are in the DOM from the start, so the
+ * colored file is decoded before the first hover rather than fetched during
+ * it — a swap on the src would show a hole where the logo was for exactly as
+ * long as the request took.
+ */
+.wall__color {
+  opacity: 0;
+}
+
+.wall__mono {
+  opacity: 0.7;
+}
+
+.wall__mark[data-active] .wall__color,
+.wall__mark:hover .wall__color {
+  opacity: 1;
+}
+
+.wall__mark[data-active] .wall__mono,
+.wall__mark:hover .wall__mono {
+  opacity: 0;
+}
+
+.wall__mark:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 6px;
+}
+
+/* ── Below 900px ───────────────────────────────────────────────────────────
+   One column. The panel sticks to the top of the viewport so that tapping a
+   mark near the foot of a five-row wall still changes something you can see —
+   without it, the entire interaction happens off screen. */
+@media (max-width: 900px) {
+  .archive-page {
+    grid-template-rows: none;
+  }
+
+  .archive-title,
+  .panel,
+  .wall {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  .panel {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-top: 2.5rem;
+    padding-block: 1rem;
+    /* The wall scrolls underneath, so the panel needs its own ground. A hard
+       edge would be invisible — paper on paper — right up until a mark crossed
+       it and got guillotined, so the ground fades out instead. The same move
+       the home page's .bar makes, for the same reason. */
+    background: linear-gradient(
+      to bottom,
+      var(--paper) 0%,
+      var(--paper) calc(100% - 2.5rem),
+      transparent 100%
+    );
+    padding-bottom: 3.5rem;
+  }
+
+  .wall {
+    /* Stacked and scrolling, so five rows no longer have to share one screen. */
+    --wall-tile: minmax(0, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: 2.5rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .wall {
+    /* Three across, and the height cap comes off: below this width the wall is
+       something you scroll through rather than something that has to fit. */
+    --wall-tile: minmax(0, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    justify-content: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel__body {
+    animation: none;
+  }
+
+  .panel__cta span,
+  .wall__mono,
+  .wall__color {
+    transition: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CONTACT
+
+   Implemented from Figma: Portfolio Moodboard, 113:2772 ("contact concept").
+
+   The same skeleton as the archive, which is the point — masthead, a 160px
+   title, a left column on the grid and a square opposite it. The channels run
+   down columns 1–5, the LinkedIn URL is allowed out to column 7 because it is
+   longer than the others, and the photograph takes 8–12 (850 → 1416, a 566
+   square).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.contact-page {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  /* Masthead, title, body. The third track is flexible so the photograph —
+     which spans rows 2 and 3 — cannot inflate the title row. Same reason as
+     the archive page; see the note there. */
+  grid-template-rows: auto auto 1fr;
+  column-gap: var(--gutter);
+  padding-inline: var(--margin);
+  padding-block: var(--margin) calc(var(--margin) * 2);
+  min-height: 100svh;
+}
+
+/* Figma: 160px bold italic on a 112 line box, identical to the archive title.
+   Two words, two colors — the accent lands on "Chat". */
+.contact-title {
+  grid-column: 1 / 9;
+  grid-row: 2;
+  margin: 1.75rem 0 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: var(--w-bold);
+  font-size: var(--t-wordmark);
+  line-height: 0.7;
+  letter-spacing: -0.01em;
+  /* The two words are set as one line and must never break between them at a
+     width where the title still fits. */
+  text-wrap: balance;
+}
+
+.contact-title__accent {
+  color: var(--accent);
+}
+
+.channels {
+  grid-column: 1 / 8;
+  grid-row: 3;
+  margin-top: 5rem;
+}
+
+/* Figma: PHONE at y=0, EMAIL at y=189, LINKEDIN at y=290 — so the gap after
+   the block carrying the paragraph is the same as the gap after the ones that
+   do not. One rule, not three. */
+.channel + .channel {
+  margin-top: 2rem;
+}
+
+.channel__label {
+  /* Interface text. Already uppercase in the content, not transformed here —
+     the label is the string "PHONE", and a CSS transform would hide that from
+     anyone reading the copy. */
+  font-weight: var(--w-medium);
+}
+
+/* Figma: 36px bold italic in the accent, the same treatment the archive gives
+   a client name. These are the only four accented things on the page. */
+.channel__value {
+  /* Figma: label box 20 tall, value box 44 below its top — a 24px gap. */
+  margin-top: 1.5rem;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: var(--w-bold);
+  font-size: var(--t-title);
+  /*
+   * Figma sets 36px type in a 25px box. At a comfortable 1.05 each value ran
+   * 12px tall, and three of them compounded into a 40px drift by the time the
+   * column reached LinkedIn.
+   *
+   * 0.75 only holds while a value is one line. The LinkedIn URL wraps to two
+   * on a phone, and two italic lines at 0.75 have their ascenders and
+   * descenders in each other's way — so the tight box is applied per line and
+   * relaxed the moment there is more than one.
+   */
+  line-height: 0.75;
+  color: var(--accent);
+}
+
+.channel__value a {
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: from-font;
+  text-underline-offset: 0.18em;
+  transition: text-decoration-color var(--quick) var(--ease);
+}
+
+.channel__value a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* A URL is one unbreakable word to a line-breaking algorithm, so on a narrow
+   screen it would push the whole page sideways. This lets it break, and only
+   ever at the punctuation a reader already understands as a seam. */
+.channel__url {
+  overflow-wrap: anywhere;
+  line-break: anywhere;
+}
+
+/* Figma: Martina Plantijn Bold, 18px, on the same 448 measure the archive sets
+   its prose to. */
+.channel__note {
+  max-width: 28rem;
+  margin-top: 1rem;
+  font-family: var(--serif);
+  font-weight: var(--w-bold);
+  font-size: var(--t-ui);
+  /* Figma: 72px across three lines. Tighter than the archive's prose because
+     it is bold, and bold wants less air between lines to stay a paragraph. */
+  line-height: 1.35;
+}
+
+/* ── The photograph ────────────────────────────────────────────────────────
+   Figma blends it at luminosity rather than desaturating it, so it takes the
+   paper's warmth instead of resolving to neutral gray. That is the difference
+   between a black-and-white photograph and one that belongs to this page. */
+.portrait {
+  grid-column: 8 / -1;
+  grid-row: 2 / span 2;
+  align-self: start;
+  margin: 1.75rem 0 0;
+}
+
+.portrait__img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--radius-media);
+  mix-blend-mode: luminosity;
+}
+
+/* Figma 113:2996: 18px regular italic, right-aligned to the photograph's own
+   right edge, 16px below it. Regular rather than the bold the channels use —
+   it is an aside, and it should sound like one. */
+.portrait__caption {
+  margin-top: 1rem;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: var(--w-regular);
+  font-size: var(--t-ui);
+  line-height: 1.2;
+  text-align: right;
+}
+
+/* ── Below 900px ───────────────────────────────────────────────────────────
+   One column, photograph last. It is the one element on the page that carries
+   no information, so on a screen where something has to go below the fold, it
+   is the thing that goes. */
+@media (max-width: 900px) {
+  .contact-page {
+    grid-template-rows: none;
+  }
+
+  .contact-title,
+  .channels,
+  .portrait {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  .channels {
+    margin-top: 3rem;
+  }
+
+  /* See the note on line-height above: the URL wraps at this width, and the
+     tight line box is only safe on a single line. */
+  .channel__value {
+    line-height: 1.05;
+  }
+
+  .portrait {
+    max-width: 24rem;
+    margin-top: 3rem;
+  }
+
+  .portrait__caption {
+    text-align: left;
+  }
+}
+
+/* The off-site CTA carries where it goes, set quieter than the label itself so
+   "Learn More" still reads as the action and the destination as a footnote. */
+.panel__cta-where {
+  font-weight: var(--w-regular);
+  opacity: 0.62;
+}
+
+/* A diagonal arrow should not travel sideways on hover the way the straight one
+   does — it is pointing off the page, not along it. */
+.panel__cta:hover .panel__cta-where {
+  opacity: 1;
+}
