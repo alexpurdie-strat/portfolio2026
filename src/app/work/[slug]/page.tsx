@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ClientMarquee } from "@/components/client-marquee";
 import { SiteFooter } from "@/components/site-footer";
 import { StampLink } from "@/components/stamp-link";
 import { isMarker, TODOS_VISIBLE } from "@/components/todo";
@@ -51,6 +52,7 @@ export default async function WorkPage({
   return (
     <>
       <WorkNav />
+      <ClientMarquee />
       <main id="main" className="study">
         {/*
           The opening, borrowed from the old site: a small client line, a title

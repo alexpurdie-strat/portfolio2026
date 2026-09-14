@@ -122,7 +122,17 @@ video {
   top: 0;
   left: 0;
   right: 0;
-  height: 72px;
+  /* Taller than the 72px it covers, because the fade needs somewhere to
+     happen. A hard-edged ground on a page with no other chrome reads as a
+     seam, which is why the rule that used to close it off is gone too. */
+  height: 132px;
+  background: linear-gradient(
+    to bottom,
+    var(--paper) 0%,
+    var(--paper) 46%,
+    color-mix(in oklab, var(--paper) 70%, transparent) 72%,
+    transparent 100%
+  );
   /* Behind the wordmark and nav, which are its siblings. */
   z-index: -1;
 }
@@ -1187,5 +1197,77 @@ video {
   .drawer,
   .drawer__stamp {
     transition: none;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CLIENT WATERMARK
+
+   A slow column of client marks in the empty left gutter of a case study.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.marks {
+  /* Hidden by default: below 1080 the reading column takes the full width and
+     there is no gutter to sit in. */
+  display: none;
+}
+
+@media (min-width: 1080px) {
+  .marks {
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    /* Roughly columns one and two of the twelve. */
+    width: clamp(150px, 16vw, 240px);
+    overflow: hidden;
+    /* Behind the page, above the body's paper. Deliberately not inside
+       .fixed-layer, which isolates at z-index 10 and would lift this over the
+       prose it is supposed to sit under. */
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.07;
+    /* Fades in and out at the edges rather than being cut off mid-mark. */
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      #000 16%,
+      #000 84%,
+      transparent
+    );
+  }
+
+  .marks__track {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(3rem, 5vw, 5rem);
+    padding-block: clamp(3rem, 5vw, 5rem);
+    animation: marks-drift 78s linear infinite;
+  }
+
+  .marks__mark {
+    /* Two and a half times the first pass. At this size it stops reading as a
+       row of logos and starts reading as texture, which is the job. */
+    width: clamp(130px, 13.5vw, 195px);
+    height: auto;
+    flex: none;
+  }
+}
+
+/* Travels exactly one copy of the list, so the seam never shows. */
+@keyframes marks-drift {
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+/* A column of logos crawling forever is precisely what this preference is
+   about. The marks stay; the movement stops. */
+@media (prefers-reduced-motion: reduce) {
+  .marks__track {
+    animation: none;
   }
 }
