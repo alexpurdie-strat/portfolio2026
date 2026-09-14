@@ -15,18 +15,26 @@ export function StampLink({
   slug,
   className,
   children,
+  ...rest
 }: {
   href: string;
   /** Which client stamp rides up on the drawer. */
   slug?: string;
   className?: string;
   children: React.ReactNode;
-}) {
+  /*
+   * Everything else an anchor can carry — aria-label, data-*, pointer and
+   * focus handlers — passes straight through. The archive's marks need all
+   * three, and without this they had to be plain links, which meant they
+   * navigated without ever raising the drawer.
+   */
+} & Omit<React.ComponentPropsWithoutRef<typeof Link>, "href" | "className" | "children" | "onClick">) {
   const go = useTransitionTo();
   return (
     <Link
       href={href}
       className={className}
+      {...rest}
       onClick={(e) => {
         /* Leave every click the browser has its own meaning for alone. */
         if (

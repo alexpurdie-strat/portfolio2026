@@ -13,8 +13,10 @@ export const SITE = {
   name: "Alex Purdie",
   role: "Product designer and strategist",
 
-  tagline: "Product strategy and Product Design leader",
+  tagline: "Platform strategy and product design leader",
   email: "alexpurdieux@gmail.com",
+  phone: "704.409.7838",
+  linkedin: "https://www.linkedin.com/in/alexpurdieux/",
   currently: "CURRENTLY @ Whiteboard",
   status: "OPEN FOR WORK",
 
@@ -64,6 +66,37 @@ export const SITE = {
     heading: "Contact",
     line: "If you want someone to help decide what to build, and then hold the bar while it ships,",
     linkText: "let’s talk",
+
+    /* Implemented from Figma: Portfolio Moodboard, 113:2772 ("contact
+       concept"). The title is split because the two halves are set in two
+       colors, which is the whole gesture and cannot be done with one string —
+       the same two-voice treatment the home page statement uses. */
+    titleLead: "Let’s",
+    titleTail: "Chat",
+
+    /* Alex's own line from the frame. The joke is the point: it is the only
+       place on the site where he sounds like a person rather than a practice,
+       and a contact page is exactly where that belongs. */
+    phoneNote:
+      "Feel free to text or call me with any questions, except those about car maintenance… very limited understanding there.",
+
+    /* Three labeled channels, in the frame's order. The label is interface
+       text; the value is editorial, set in the accent. */
+    labels: {
+      phone: "PHONE",
+      email: "EMAIL",
+      linkedin: "LINKEDIN",
+    },
+
+    portrait: {
+      src: "/contact/portrait.jpg",
+      alt: "Alex as a toddler, grinning at the camera in a white sweater, another child just in frame at the edge.",
+      /* Figma 113:2996. The frame types it without the apostrophe in
+         "wouldn't"; set here with one, because every other contraction on the
+         site has one and the odd one out reads as a typo rather than as a
+         voice. */
+      caption: "I mean who wouldn’t want to chat with this guy?",
+    },
   },
 
   footer: {
@@ -84,9 +117,11 @@ export const SITE = {
      Flip `ready` as each page is finished. */
   navAll: [
     { label: "Approach", href: "/approach", ready: false },
-    { label: "Archive", href: "/work", ready: false },
+    /* Points at /archive, not /work. The archive concept is the page that got
+       built; /work is the older index and is not what this link means. */
+    { label: "Archive", href: "/archive", ready: true },
     { label: "About", href: "/about", ready: false },
-    { label: "Contact", href: "/contact", ready: false },
+    { label: "Contact", href: "/contact", ready: true },
   ],
 
   meta: {

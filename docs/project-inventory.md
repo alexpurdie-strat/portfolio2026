@@ -52,9 +52,13 @@ SSO pattern · ★ Home Depot tool truck rental · Home Depot department managem
 Chick-fil-A marketing 💀 · ★ Impact 360 Institute 💀 · ITV Studios Marketing ·
 ITV enterprise asset tracking · ★ ITV design system + governance (2023) ·
 ★ LEGO × TED play symposium · ★ play@TED · ★ TED Audacious 💀 · ★ Ministry Brands ·
-Homewood Living Ministries · BBC News Labs · NHS CMS 💀 · OSL (anonymize —
-"a security technology provider") · M&S · ★ JA BizTown · ★ Edisen 💀 · ★ Selfspace ·
+Homewood Living Ministries · BBC News Labs · NHS CMS 💀 · OSL (a security
+technology provider) · M&S · ★ JA BizTown · ★ Edisen 💀 · ★ Selfspace ·
 ★ Personal tools
+
+**OSL is named.** This entry used to carry an instruction to anonymize it. Alex
+withdrew that on 2026-09-13: their mark is in the archive wall, and a logo
+standing above the words "a security technology provider" anonymizes nobody.
 
 **Note:** ITV design system and governance is listed separately from the portal
 and is its own 2023 entry. The job posting names design system governance as a
