@@ -1,0 +1,456 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE LAB — artful digitization
+
+   Implemented from Figma: Portfolio Moodboard, 130:3544 ("Desktop - 6").
+
+   This file shares nothing with globals.css on purpose. The site's tokens are
+   paper and ink; this direction is a dark ground with one hot orange, and
+   inheriting --paper or --ink here would have produced a compromise between two
+   designs rather than either of them. Every value below is measured off the
+   1440 frame.
+
+   Scoped under .lab so it cannot leak into the rest of the site if this branch
+   is ever merged for comparison.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.lab {
+  /* ── Ground ─────────────────────────────────────────────────────────────── */
+  --void: #151515;
+  /* The one accent. Titles, the statement, the nav, Learn More — and the middle
+     card, which is the only place it becomes a surface rather than a mark. */
+  --ember: #d04a1f;
+  /* The pale card stock. Also the color of the ASCII glyphs and the pixel
+     field, so the "digitized" layer and the physical-looking cards are made of
+     the same substance. */
+  --stock: #e0d9d7;
+  /* Body copy on the dark ground. Warm, not neutral — a grey mixed toward the
+     ember rather than toward blue. */
+  --ash: #beada8;
+  /* Body copy on the pale card. */
+  --burnt: #501606;
+  --stock-dim: #e2e2e2;
+
+  --lab-margin: 24px;
+  --lab-max: 1440px;
+
+  background: var(--void);
+  color: var(--ash);
+  font-family: var(--font-metric), ui-sans-serif, system-ui, sans-serif;
+  min-height: 100svh;
+  overflow-x: clip;
+}
+
+/* The frame is 1440 wide with 24px margins. Everything hangs off this. */
+.lab__wrap {
+  max-width: var(--lab-max);
+  margin-inline: auto;
+  padding-inline: var(--lab-margin);
+  position: relative;
+}
+
+/* ── Masthead ───────────────────────────────────────────────────────────────
+   Figma: name at 24/48, nav right-aligned to the margin on the same baseline.
+   All four links, unlike the live site — this is a concept, and the concept
+   shows the finished IA. */
+.lab-mast {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-block: 48px 0;
+  position: relative;
+  z-index: 3;
+}
+
+.lab-mast__name {
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--ember);
+}
+
+.lab-nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-size: 18px;
+  color: var(--ember);
+}
+
+.lab-nav a {
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-weight: 300;
+}
+
+.lab-nav a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+.lab-nav__slash {
+  font-weight: 500;
+  opacity: 0.55;
+}
+
+/* ── Hero ───────────────────────────────────────────────────────────────────
+   Three layers on one band: the pixel field bleeding off the left edge, the
+   ASCII portrait bleeding off the right, and the statement centered between
+   them. The two canvases are siblings of the type rather than a background, so
+   neither can ever sit on top of a word. */
+.lab-hero {
+  position: relative;
+  min-height: 1031px;
+  display: grid;
+  align-content: center;
+}
+
+.lab-hero__field {
+  position: absolute;
+  /* Figma: x=0, y=256, 696×775 — hard against the left edge of the viewport,
+     not the margin, so the mark runs off the page. */
+  left: 0;
+  top: 256px;
+  width: 696px;
+  height: 775px;
+  z-index: 0;
+}
+
+.lab-hero__portrait {
+  position: absolute;
+  /* Bleeds off the right edge by about a third of its width, which is what
+     stops it reading as a framed picture and starts it reading as something
+     the page is cropping. */
+  right: -180px;
+  top: 100px;
+  width: 733px;
+  height: 850px;
+  z-index: 1;
+}
+
+.lab-hero__portrait canvas,
+.lab-hero__field canvas {
+  display: block;
+}
+
+/* Figma: 68px Martina Plantijn Light Italic, centered, 732 wide, with
+   "embodied lives" set Medium and upright — the two-voice treatment the live
+   site already uses on this same sentence. */
+.lab-statement {
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  max-width: 732px;
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-size: clamp(2.25rem, 4.72vw, 4.25rem);
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.12;
+  text-align: center;
+  color: var(--ember);
+  text-wrap: balance;
+}
+
+.lab-statement em {
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* ── Standing details ───────────────────────────────────────────────────────
+   Clock bottom-left, availability bottom-right, both on the hero's foot. */
+.lab-standing {
+  position: absolute;
+  inset-inline: var(--lab-margin);
+  bottom: 24px;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--ash);
+}
+
+.lab-standing__right {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  text-align: right;
+}
+
+.lab-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lab-status__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ember);
+}
+
+/* ── The restatement ────────────────────────────────────────────────────────
+   The same sentence again, small and hard right, as the band between the hero
+   and the work. It is a reprise, not a heading. */
+.lab-reprise {
+  display: grid;
+  justify-items: end;
+  gap: 32px;
+  padding-block: 120px 0;
+  text-align: right;
+}
+
+.lab-reprise__line {
+  max-width: 274px;
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-size: 18px;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.28;
+  color: var(--ember);
+}
+
+/* ── The cards ──────────────────────────────────────────────────────────────
+   Three 330×505 cards, the outer two rotated 4° away from the middle so the
+   set fans. Figma drops the left one 23px below its siblings; keeping that is
+   what stops the fan reading as a symmetrical graphic. */
+.lab-cards {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 81px;
+  padding-block: 190px 120px;
+}
+
+.lab-card {
+  flex: 0 0 330px;
+  height: 505px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 18px;
+  border-radius: 24px;
+  background: var(--stock);
+  /* The glow is the card's own stock color bled downward, which is how it
+     reads as lit rather than as sitting on a shadow. */
+  box-shadow:
+    0 6px 6.5px rgba(224, 217, 216, 0.1),
+    0 24px 12px rgba(224, 217, 216, 0.09),
+    0 54px 16px rgba(224, 217, 216, 0.05),
+    0 95px 19px rgba(224, 217, 216, 0.01);
+}
+
+.lab-card:nth-child(1) {
+  rotate: -4deg;
+  margin-top: 23px;
+}
+
+.lab-card:nth-child(3) {
+  rotate: 4deg;
+}
+
+.lab-card--ember {
+  background: var(--ember);
+}
+
+.lab-card__mark {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--ember);
+  border-radius: 50%;
+}
+
+.lab-card--ember .lab-card__mark {
+  border-color: var(--burnt);
+}
+
+.lab-card__title {
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-size: 24px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.16;
+  color: var(--ember);
+  margin-bottom: 24px;
+}
+
+.lab-card--ember .lab-card__title {
+  color: var(--stock);
+}
+
+.lab-card__body {
+  max-width: 287px;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.32;
+  color: var(--burnt);
+}
+
+.lab-card--ember .lab-card__body {
+  color: var(--stock-dim);
+}
+
+/* ── The work ───────────────────────────────────────────────────────────────
+   Figma's row is a 1388 track: 90 empty, 850 of image, 118 of gap, 330 of text.
+   Expressed as percentages of that track so the whole row scales as one thing
+   rather than the gap staying fixed while the image shrinks. */
+.lab-rows {
+  display: grid;
+  gap: 120px;
+  padding-bottom: 180px;
+}
+
+.lab-row {
+  display: grid;
+  grid-template-columns: 6.48% 61.24% 8.5% 23.78%;
+  align-items: end;
+}
+
+.lab-row__media {
+  grid-column: 2;
+  aspect-ratio: 850 / 588;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #000;
+}
+
+.lab-row__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.lab-row__meta {
+  grid-column: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.lab-row__disciplines {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--ash);
+  margin-bottom: 24px;
+}
+
+.lab-row__title {
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-size: 36px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.06;
+  color: var(--ember);
+  margin-bottom: 48px;
+}
+
+.lab-row__body {
+  max-width: 287px;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.32;
+  color: var(--ash);
+}
+
+.lab-row__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: auto;
+  padding-top: 24px;
+  color: var(--ember);
+}
+
+.lab-row__cta span:first-child {
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-size: 20px;
+  font-weight: 300;
+}
+
+.lab-row__cta span:last-child {
+  font-size: 18px;
+  font-weight: 500;
+  transition: translate 160ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.lab-row__cta:hover span:last-child {
+  translate: 0.35rem 0;
+}
+
+/* ── Below 1100px ───────────────────────────────────────────────────────────
+   The hero's two canvases are composed against a 1440 frame and have nowhere
+   to bleed on a narrow screen, so the portrait comes inside the margin and the
+   field goes. The rows stack. */
+@media (max-width: 1100px) {
+  .lab-hero {
+    min-height: auto;
+    padding-block: 120px 96px;
+    gap: 64px;
+  }
+
+  .lab-hero__field {
+    display: none;
+  }
+
+  .lab-hero__portrait {
+    position: relative;
+    right: auto;
+    top: auto;
+    width: 100%;
+    max-width: 520px;
+    height: 600px;
+    margin-inline: auto;
+  }
+
+  .lab-standing {
+    position: static;
+    margin-top: 48px;
+  }
+
+  .lab-cards {
+    flex-wrap: wrap;
+    gap: 48px;
+    padding-block: 96px;
+  }
+
+  .lab-card:nth-child(1),
+  .lab-card:nth-child(3) {
+    rotate: none;
+    margin-top: 0;
+  }
+
+  .lab-row {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .lab-row__media,
+  .lab-row__meta {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .lab-standing {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .lab-standing__right {
+    justify-items: start;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-row__cta span:last-child {
+    transition: none;
+  }
+}
