@@ -74,6 +74,24 @@ html.desk-locked body {
   pointer-events: none;
   user-select: none;
   max-width: none;
+  /*
+   * Cover, and this is not cosmetic. A Figma image fill crops; the Tailwind
+   * export of one does not say so, and the default `fill` stretches instead.
+   * The keyboard is a 768×1024 photograph sitting in a 780×400 box — left to
+   * stretch it came out 2.6x too wide and read as a smear of keys.
+   */
+  object-fit: cover;
+}
+
+/* Figma pins these two fills to the bottom of their box rather than the
+   middle, which is what keeps the keyboard's near edge in frame. */
+.desk__prop--bottom {
+  object-position: bottom;
+}
+
+/* A wordmark, not a photograph: it must letterbox rather than crop. */
+.desk__logo-mark {
+  object-fit: contain;
 }
 
 .desk__cut {

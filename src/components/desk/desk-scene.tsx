@@ -83,7 +83,7 @@ export function DeskScene() {
             key={f.src}
             alt=""
             aria-hidden
-            className="desk__prop"
+            className={`desk__prop${"blur" in f && f.blur ? " desk__prop--bottom" : ""}`}
             src={asset(f.src)}
             style={{
               ...inStage(f.x, f.y, f.w, f.h),
@@ -201,7 +201,7 @@ export function DeskScene() {
             <img
               alt=""
               aria-hidden
-              className="desk__prop"
+              className="desk__prop desk__prop--bottom"
               src={asset(n.src)}
               style={{ ...inStage(n.x, n.y, n.w, n.h), rotate: `${n.rotate}deg` }}
             />
@@ -231,7 +231,7 @@ export function DeskScene() {
               <img
                 alt=""
                 aria-hidden
-                className="desk__prop"
+                className="desk__prop desk__logo-mark"
                 src={asset(n.logo.src)}
                 style={{
                   ...inStage(n.logo.x, n.logo.y, n.logo.w, n.logo.h),
