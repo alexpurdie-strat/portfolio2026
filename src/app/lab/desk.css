@@ -1,0 +1,417 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE DESK
+
+   Implemented from Figma: Portfolio Moodboard, 139:19882 (the desk) and
+   166:20249 (the drawer).
+
+   Nothing here is shared with globals.css. This direction is photographic and
+   skeuomorphic; the site's paper-and-ink tokens have no bearing on it and
+   reaching for them would produce a compromise between two designs.
+
+   The one idea the whole file serves: a fixed 2022×1024 stage, scaled as a
+   single unit. A photograph does not reflow, so nothing inside the stage is
+   ever laid out — every element sits at its frame coordinate and the stage
+   carries all the responsiveness.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+html.desk-locked,
+html.desk-locked body {
+  /* The page never scrolls. The drawer does. */
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.desk {
+  --mat-green: #036250;
+  --mat-ink: #519378;
+  --drawer-green: #04503f;
+
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  /* The same wood, covering the viewport, so the letterbox the stage leaves
+     on a squarer screen is still desk rather than a bar. */
+  background: #2b1d12 url("/desk/desk.webp") center / cover no-repeat;
+}
+
+/*
+ * Contain, not cover — and this one is not a preference.
+ *
+ * The page never scrolls, so anything outside the viewport is unreachable
+ * rather than merely unseen. Covering a 2022×1024 frame on a 1440-wide screen
+ * cropped 290px off each side, which took the entire logo scatter and the
+ * "Currently AT" note off the desk. Containing keeps every element reachable;
+ * the wood behind fills whatever the stage does not.
+ */
+.desk__stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  width: min(100vw, calc(100svh * 2022 / 1024));
+  height: min(100svh, calc(100vw * 1024 / 2022));
+  /* Type inside the scene is sized in cqw off this box, so the printing on
+     the mat and the handwriting on the post-its scale with the photograph
+     instead of floating free of it. */
+  container-type: inline-size;
+}
+
+.desk__stage > *,
+.desk__pile > *,
+.desk__masthead > *,
+.desk__logos > * {
+  position: absolute;
+}
+
+.desk__prop,
+.desk__scenery {
+  /* Positioned here rather than only via `.desk__stage > *`: the post-it groups
+     are `display: contents`, so their images are grandchildren of the stage and
+     that selector never reaches them. Without this they fall into normal flow
+     and stack in the top-left corner. */
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  max-width: none;
+}
+
+.desk__cut {
+  /* The mat's printed cut lines sit over the mat but under everything on it. */
+  opacity: 0.85;
+}
+
+.desk__mat {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.desk__mat-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.desk__masthead {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.desk__chip {
+  position: absolute;
+  border-radius: 2px;
+  /* The green block the name is knocked out of, printed on the mat. */
+  opacity: 0.92;
+}
+
+/* Figma: The Future Black 36 / Bold 24 / Martina Light 18, all in --mat-ink.
+   The stencil weight is what makes it read as printed on the mat rather than
+   typeset on the page. */
+.desk__name {
+  margin: 0;
+  font-family: var(--font-the-future), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 1.7804cqw;
+  line-height: 1.7804cqw;
+  letter-spacing: -0.01em;
+}
+
+.desk__role {
+  margin: 0;
+  font-family: var(--font-the-future), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.1869cqw;
+  line-height: 0.7418cqw;
+  letter-spacing: -0.01em;
+}
+
+.desk__edition {
+  margin: 0;
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-weight: 300;
+  font-size: 0.8902cqw;
+  line-height: 0.7418cqw;
+}
+
+/* ── The pile ───────────────────────────────────────────────────────────────
+   Each piece is a button sized to the cutout and clipped to its own torn
+   edge, so the rectangle of the sheet on top cannot take a click meant for
+   the one underneath it. That clip is traced from the asset's alpha. */
+.desk__pile {
+  position: absolute;
+}
+
+.desk__piece {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+  /* Rotation happens about the middle of the sheet, as Figma composes it.
+     Scale rides on top of it, which is why both are separate properties
+     rather than one transform — otherwise the lift would cancel the tilt. */
+  transform-origin: center;
+  transition:
+    scale 220ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    filter 220ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  filter: drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.28));
+}
+
+.desk__piece img,
+.desk__scenery {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Lift: a little bigger, and a longer shadow, so the sheet reads as coming off
+   the mat rather than just growing. */
+.desk__piece[data-lifted] {
+  scale: 1.035;
+  filter: drop-shadow(6px 12px 14px rgba(0, 0, 0, 0.42));
+  z-index: 20;
+}
+
+.desk__piece:focus-visible {
+  outline: none;
+}
+
+/* A double ring, because a single one disappears against either a white sheet
+   or a dark screenshot depending on which piece has focus. */
+.desk__piece:focus-visible img {
+  outline: 3px solid #ffd24a;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px rgba(0, 0, 0, 0.55);
+}
+
+/* The title, riding with the sheet and counter-rotated so it stays level. */
+.desk__label {
+  position: absolute;
+  left: 50%;
+  bottom: -0.7cqw;
+  translate: -50% 100%;
+  transform-origin: center;
+  padding: 0.3cqw 0.6cqw;
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.86);
+  color: #f4efe9;
+  font-family: var(--font-metric), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 0.742cqw;
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 160ms ease;
+  pointer-events: none;
+}
+
+.desk__piece[data-lifted] .desk__label,
+.desk__piece:focus-visible .desk__label {
+  opacity: 1;
+}
+
+/* ── Post-its ──────────────────────────────────────────────────────────── */
+.desk__postit-group {
+  display: contents;
+}
+
+.desk__hand {
+  position: absolute;
+  margin: 0;
+  font-family: var(--font-blank-weirdos), ui-sans-serif, cursive;
+  font-size: 1.1375cqw;
+  line-height: 1.0880cqw;
+  color: #111;
+  white-space: pre;
+  pointer-events: none;
+  transform-origin: left top;
+}
+
+.desk__hand span {
+  display: block;
+}
+
+/* ── The logo scatter ───────────────────────────────────────────────────────
+   Off the mat, so not openable — the mat is where things you can open live.
+   They lift under the pointer and nothing more, until the detail copy for a
+   client exists. */
+.desk__logos {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.desk__logo {
+  position: absolute;
+  opacity: 0.9;
+  transform-origin: center;
+  transition:
+    scale 200ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 200ms ease,
+    filter 200ms ease;
+  filter: drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.2));
+}
+
+.desk__logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.desk__logo[data-lifted] {
+  scale: 1.12;
+  opacity: 1;
+  filter: drop-shadow(3px 6px 8px rgba(0, 0, 0, 0.35));
+  z-index: 10;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE DRAWER — Figma 166:20249
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.drawer-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+.drawer-scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  /* Heavy, so the desk stays a place you came from rather than a competing
+     image behind the reading. */
+  background: rgba(6, 10, 9, 0.82);
+  animation: drawer-scrim-in 320ms ease both;
+}
+
+@keyframes drawer-scrim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/*
+ * The scroller is the drawer's own. The desk behind is fixed and does not
+ * move, so scrolling here pulls the sheet up over a stationary desk.
+ */
+.drawer-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.drawer-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* What puts the top of the panel just above vertical centre at rest. */
+.drawer-spacer {
+  height: 46svh;
+}
+
+.drawer-panel {
+  position: relative;
+  width: min(800px, 92vw);
+  margin: 0 auto;
+  padding: 64px 100px 96px;
+  border-radius: 28px 28px 0 0;
+  background: var(--drawer-green);
+  color: #e8efe9;
+  animation: drawer-rise 420ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes drawer-rise {
+  from {
+    translate: 0 40svh;
+    opacity: 0;
+  }
+}
+
+.drawer-panel:focus {
+  outline: none;
+}
+
+.drawer-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  padding: 8px 16px;
+  border: 1px solid rgba(232, 239, 233, 0.35);
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font-family: var(--font-metric), ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+}
+
+.drawer-close:hover,
+.drawer-close:focus-visible {
+  background: rgba(232, 239, 233, 0.12);
+}
+
+/* Figma: 29px serif italic over a 25px sans line. */
+.drawer-title {
+  margin: 0;
+  font-family: var(--font-martina-plantijn), Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 29px;
+  line-height: 1.15;
+}
+
+.drawer-sub {
+  margin: 4px 0 0;
+  font-family: var(--font-metric), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 300;
+  font-size: 19px;
+  line-height: 1.3;
+  color: rgba(232, 239, 233, 0.86);
+}
+
+.drawer-body {
+  margin: 42px 0 0;
+  font-family: var(--font-metric), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 1.55;
+  color: rgba(232, 239, 233, 0.92);
+}
+
+.drawer-sheets {
+  margin-top: 56px;
+  display: grid;
+  gap: 0;
+  justify-items: center;
+}
+
+.drawer-sheet {
+  width: 100%;
+  max-width: 498px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.35));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desk__piece,
+  .desk__logo,
+  .desk__label {
+    transition: none;
+  }
+
+  .drawer-panel,
+  .drawer-scrim {
+    animation: none;
+  }
+}

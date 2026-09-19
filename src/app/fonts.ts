@@ -82,3 +82,22 @@ export const metric = localFont({
   /* Metric's metrics, so the fallback does not reflow the page when it swaps. */
   fallback: ["Helvetica Neue", "Arial", "sans-serif"],
 });
+
+/*
+ * The Future — Klim. Two cuts only: the mat's masthead is set in Black, the
+ * role beneath it in Bold, and nothing else on the desk uses the family.
+ *
+ * .otf rather than .woff2 because there is no woff2 tooling on this machine
+ * and the two files are 15KB each — the compression would save a rounding
+ * error. Swap them if the family ever carries more of the design.
+ *
+ * TEST fonts, same license caveat as Metric and Martina above.
+ */
+export const theFuture = localFont({
+  src: [
+    { path: "../fonts/TestTheFuture-Bold.otf", weight: "700", style: "normal" },
+    { path: "../fonts/TestTheFuture-Black.otf", weight: "900", style: "normal" },
+  ],
+  variable: "--font-the-future",
+  display: "swap",
+});
