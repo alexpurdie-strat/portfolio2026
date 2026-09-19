@@ -83,10 +83,14 @@ html.desk-locked body {
   object-fit: cover;
 }
 
-/* Figma pins these two fills to the bottom of their box rather than the
-   middle, which is what keeps the keyboard's near edge in frame. */
+/*
+ * The keyboard covers like the rest, but crops to the top of the board — the
+ * frame shows the number row down to the modifiers, not the middle. It only
+ * looked wrong before because the asset was still portrait; once rotated,
+ * cover is right and contain made it far too small.
+ */
 .desk__prop--bottom {
-  object-position: bottom;
+  object-position: top;
 }
 
 /* A wordmark, not a photograph: it must letterbox rather than crop. */

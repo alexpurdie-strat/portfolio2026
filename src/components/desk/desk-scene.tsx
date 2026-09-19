@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FURNITURE,
   LOGOS,
-  LOGO_FIELD,
   MAT,
   PIECES,
   PILE,
@@ -246,20 +245,14 @@ export function DeskScene() {
         <ul
           className="desk__logos"
           aria-label="Clients"
-          style={inStage(LOGO_FIELD.x, LOGO_FIELD.y, LOGO_FIELD.w, LOGO_FIELD.h)}
+          style={{ inset: 0 }}
         >
           {LOGOS.map((l) => (
             <li
               key={l.k}
               className="desk__logo"
               data-lifted={hovered === `logo-${l.k}` || undefined}
-              style={{
-                left: px(l.l, LOGO_FIELD.w),
-                bottom: px(l.b, LOGO_FIELD.h),
-                width: px(l.s, LOGO_FIELD.w),
-                height: px(l.s, LOGO_FIELD.h),
-                rotate: `${l.r}deg`,
-              }}
+              style={{ ...inStage(l.x, l.y, l.s, l.s), rotate: `${l.r}deg` }}
               onPointerEnter={() => setHovered(`logo-${l.k}`)}
               onPointerLeave={() => setHovered((h) => (h === `logo-${l.k}` ? null : h))}
             >

@@ -32,7 +32,7 @@ export const FURNITURE = [
   {
     src: "/desk/macbook.webp",
     x: -814,
-    y: -931,
+    y: -1245,
     w: 2286,
     h: 1818,
     alt: "",
@@ -256,29 +256,30 @@ export const POSTITS = [
 /* ── The logo scatter ──────────────────────────────────────────────────────
    Off the mat, bottom left: every client, torn out. Not openable yet — these
    respond to a pointer and nothing else until the detail copy exists.
-   Positioned from the bottom, because the scatter is anchored to the desk's
-   lower edge rather than to the top of the frame.
- */
-export const LOGO_FIELD = { x: -76, y: 516, w: 471, h: 615 };
 
+   Stage coordinates, not group coordinates. Figma's export writes several of
+   these as `calc(8.33% + Npx)`, and that percentage resolves against the frame
+   rather than the group they are nested in — read the other way it bunched the
+   whole scatter into a narrow column against the left edge.
+ */
 export const LOGOS = [
-  { k: "TS", n: "TaxSlayer", l: 150, b: 220, s: 98, r: -38.82 },
-  { k: "CFA", n: "Chick-fil-A", l: -25, b: 45, s: 98, r: -115.82 },
-  { k: "100S", n: "100 Shapes", l: 129, b: 26, s: 98, r: 32.42 },
-  { k: "MS", n: "M&S", l: 28, b: 33, s: 98, r: -133.07 },
-  { k: "ITV", n: "ITV", l: -7, b: 126, s: 98, r: -7.75 },
-  { k: "SS", n: "Self Space", l: 14, b: 372, s: 98, r: 4.39 },
-  { k: "MB", n: "Ministry Brands", l: 173, b: 117, s: 98, r: -1.03 },
-  { k: "patTED", n: "play@TED", l: 88, b: 352, s: 98, r: -50.67 },
-  { k: "NHS", n: "NHS", l: 130, b: 337, s: 98, r: -13.45 },
-  { k: "I360", n: "Impact 360 Institute", l: -18, b: 291, s: 98, r: -15.8 },
-  { k: "TED", n: "TED", l: 85, b: 306, s: 98, r: -1.87 },
-  { k: "ITVS", n: "ITV Studios", l: 120, b: 190, s: 98, r: -13.85 },
-  { k: "THD", n: "The Home Depot", l: 170, b: 271, s: 98, r: -4.1 },
-  { k: "OSL", n: "OSL", l: 70, b: 124, s: 98, r: -20.6 },
-  { k: "LEGO", n: "LEGO", l: -17, b: 226, s: 98, r: -20.85 },
-  { k: "LEGO1", n: "LEGO Foundation", l: 54, b: 231, s: 98, r: 3.49 },
-  { k: "EDSN", n: "Edisen", l: 79, b: -41, s: 98, r: -7.75 },
-  { k: "JA", n: "Junior Achievement", l: 182, b: 432, s: 98, r: 9.17 },
-  { k: "YM", n: "Your Move", l: 152, b: 39, s: 98, r: 4.03 },
+  { k: "TS", n: "TaxSlayer", x: 238.2, y: 686.1, s: 97.8, r: -38.82 },
+  { k: "CFA", n: "Chick-fil-A", x: -8.8, y: 864.6, s: 98.1, r: -115.82 },
+  { k: "100S", n: "100 Shapes", x: 147.5, y: 881.6, s: 98.1, r: 32.42 },
+  { k: "MS", n: "M&S", x: 48.6, y: 872.5, s: 98.5, r: -133.07 },
+  { k: "ITV", n: "ITV", x: -0.7, y: 793.8, s: 98.1, r: -7.75 },
+  { k: "SS", n: "Self Space", x: 17.8, y: 550.6, s: 97.8, r: 4.39 },
+  { k: "MB", n: "Ministry Brands", x: 174.1, y: 808.4, s: 98.1, r: -1.03 },
+  { k: "patTED", n: "play@TED", x: 108.4, y: 554.5, s: 97.8, r: -50.67 },
+  { k: "NHS", n: "NHS", x: 208.4, y: 578.5, s: 98.1, r: -13.45 },
+  { k: "I360", n: "Impact 360 Institute", x: -6.4, y: 623.4, s: 98.5, r: -15.8 },
+  { k: "TED", n: "TED", x: 86.3, y: 618.7, s: 98.1, r: -1.87 },
+  { k: "ITVS", n: "ITV Studios", x: 130.4, y: 726.3, s: 97.8, r: -13.85 },
+  { k: "THD", n: "The Home Depot", x: 173.1, y: 651.9, s: 98.1, r: -4.1 },
+  { k: "OSL", n: "OSL", x: 84.2, y: 786.9, s: 98.5, r: -20.6 },
+  { k: "LEGO", n: "LEGO", x: -2.6, y: 685.6, s: 97.8, r: -20.85 },
+  { k: "LEGO1", n: "LEGO Foundation", x: 57.0, y: 692.4, s: 98.1, r: 3.49 },
+  { k: "EDSN", n: "Edisen", x: 84.9, y: 960.9, s: 98.1, r: -7.75 },
+  { k: "JA", n: "Junior Achievement", x: 189.2, y: 486.2, s: 98.1, r: 9.17 },
+  { k: "YM", n: "Your Move", x: 224.1, y: 883.8, s: 97.8, r: 4.03 },
 ] as const;
