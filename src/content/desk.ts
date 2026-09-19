@@ -42,11 +42,14 @@ export const FURNITURE = [
    now sits. Everything on the board is expressed as a fraction of `src`, so
    growing the board moves the pile, the masthead and the type with it.
 
-   With the laptop and keyboard gone there is room to push it to about 1.17x
-   and most of the way up the frame, which is the point of taking them out. */
+   Centred on the green, which is not the same as centring the element: the mat
+   photograph carries uneven padding inside its own file — 9px of it on the
+   left against 48 on the right, 13 on the top against 62 on the bottom. Centre
+   the box and the mat still sits visibly high and left. These numbers put the
+   green itself in the middle, measured off the render rather than computed. */
 export const BOARD = {
-  x: 470,
-  y: 40,
+  x: 322,
+  y: 61,
   w: 1416,
   h: 950,
   src: { x: 430, y: 215, w: 1210, h: 812 },
