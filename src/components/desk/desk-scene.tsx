@@ -43,6 +43,22 @@ const onBoard = (x: number, y: number, w?: number, h?: number) => ({
 });
 
 /*
+ * What is currently on the desk.
+ *
+ * Stripped back to the surface and the mat while the composition is being
+ * reworked. Nothing is deleted — the pile, the scatter and the notes all still
+ * live in src/content/desk.ts with their coordinates, hit shapes and titles
+ * intact, and the drawer still works. Flip a flag to put one back.
+ */
+const SHOW = {
+  pile: false,
+  logos: false,
+  postits: false,
+  /* Printed on the mat rather than placed on it, so it counts as the mat. */
+  masthead: true,
+};
+
+/*
  * The desk.
  *
  * One fixed stage, 2022×1024, scaled to cover the viewport. The page itself
@@ -116,6 +132,7 @@ export function DeskScene() {
           ))}
 
           {/* The mat's printed masthead. Live text, not baked into the photo. */}
+          {SHOW.masthead ? (
           <div className="desk__masthead" style={{ color: MAT.ink }}>
             <span
               className="desk__chip"
@@ -142,8 +159,10 @@ export function DeskScene() {
               style={onBoard(MAT.arrow.x, MAT.arrow.y, MAT.arrow.w, MAT.arrow.h)}
             />
           </div>
+          ) : null}
 
           {/* ── The pile ────────────────────────────────────────────────── */}
+          {SHOW.pile ? (
           <div className="desk__pile" style={onBoard(PILE.x, PILE.y, PILE.w, PILE.h)}>
           {PIECES.map((p) => {
             const style = {
@@ -196,10 +215,11 @@ export function DeskScene() {
             );
           })}
           </div>
+          ) : null}
         </div>
 
         {/* ── Post-its ──────────────────────────────────────────────────── */}
-        {POSTITS.map((n) => {
+        {SHOW.postits ? POSTITS.map((n) => {
           /* One note is on the mat and one is on the desk, so they resolve
              against different boxes. */
           const place = "onBoard" in n && n.onBoard ? onBoard : inStage;
@@ -252,9 +272,10 @@ export function DeskScene() {
             ) : null}
           </div>
           );
-        })}
+        }) : null}
 
         {/* ── The logo scatter ──────────────────────────────────────────── */}
+        {SHOW.logos ? (
         <ul
           className="desk__logos"
           aria-label="Clients"
@@ -277,6 +298,7 @@ export function DeskScene() {
             </li>
           ))}
         </ul>
+        ) : null}
       </div>
 
       <DeskDrawer piece={open} onClose={close} />
