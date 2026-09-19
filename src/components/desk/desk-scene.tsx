@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
+  BOARD,
   FURNITURE,
   LOGOS,
   MAT,
@@ -30,6 +31,15 @@ const inStage = (x: number, y: number, w: number, h: number) => ({
   top: px(y, STAGE.h),
   width: px(w, STAGE.w),
   height: px(h, STAGE.h),
+});
+
+/* Board-space: fractions of the box Figma composed the mat against, so the
+   whole board can be resized by changing BOARD alone. */
+const onBoard = (x: number, y: number, w?: number, h?: number) => ({
+  left: px(x, BOARD.src.w),
+  top: px(y, BOARD.src.h),
+  ...(w !== undefined ? { width: px(w, BOARD.src.w) } : null),
+  ...(h !== undefined ? { height: px(h, BOARD.src.h) } : null),
 });
 
 /*
@@ -82,65 +92,59 @@ export function DeskScene() {
             key={f.src}
             alt=""
             aria-hidden
-            className={`desk__prop${"blur" in f && f.blur ? " desk__prop--bottom" : ""}`}
+            className="desk__prop"
             src={asset(f.src)}
-            style={{
-              ...inStage(f.x, f.y, f.w, f.h),
-              filter: "blur" in f && f.blur ? "blur(0.5px)" : undefined,
-              boxShadow: "shadow" in f ? f.shadow : undefined,
-            }}
+            style={inStage(f.x, f.y, f.w, f.h)}
           />
         ))}
 
-        {/* ── The mat ───────────────────────────────────────────────────── */}
-        <div
-          className="desk__mat"
-          style={inStage(MAT.x, MAT.y, MAT.w, MAT.h)}
-        >
+        {/* ── The board: mat, printing and pile, moving as one ────────── */}
+        <div className="desk__board" style={inStage(BOARD.x, BOARD.y, BOARD.w, BOARD.h)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img alt="" aria-hidden className="desk__mat-img" src={asset(MAT.src)} />
-        </div>
-        {MAT.cuts.map((c) => (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            key={c.src}
-            alt=""
-            aria-hidden
-            className="desk__prop desk__cut"
-            src={asset(c.src)}
-            style={inStage(c.x, c.y, c.w, c.h)}
-          />
-        ))}
 
-        {/* The mat's printed masthead. Live text, not baked into the photo. */}
-        <div className="desk__masthead" style={{ color: MAT.ink }}>
-          <span className="desk__chip" style={{ background: MAT.chip, ...inStage(471, 253, 210, 121) }} aria-hidden />
-          <h1 className="desk__name" style={{ left: px(476, STAGE.w), top: px(256, STAGE.h) }}>
-            Alex Purdie
-          </h1>
-          <p className="desk__role" style={{ left: px(474, STAGE.w), top: px(294, STAGE.h) }}>
-            Platform
-            <br />
-            Strategy
-          </p>
-          <p className="desk__edition" style={{ left: px(540, STAGE.w), top: px(356, STAGE.h) }}>
-            Portfolio 2026.09
-          </p>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            alt=""
-            aria-hidden
-            className="desk__prop desk__mat-arrow"
-            src={asset(MAT.arrow.src)}
-            style={inStage(MAT.arrow.x, MAT.arrow.y, MAT.arrow.w, MAT.arrow.h)}
-          />
-        </div>
+          {MAT.cuts.map((c) => (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              key={c.src}
+              alt=""
+              aria-hidden
+              className="desk__prop desk__cut"
+              src={asset(c.src)}
+              style={onBoard(c.x, c.y, c.w, c.h)}
+            />
+          ))}
 
-        {/* ── The pile ──────────────────────────────────────────────────── */}
-        <div
-          className="desk__pile"
-          style={inStage(PILE.x, PILE.y, PILE.w, PILE.h)}
-        >
+          {/* The mat's printed masthead. Live text, not baked into the photo. */}
+          <div className="desk__masthead" style={{ color: MAT.ink }}>
+            <span
+              className="desk__chip"
+              aria-hidden
+              style={{ background: MAT.chipColor, ...onBoard(MAT.chip.x, MAT.chip.y, MAT.chip.w, MAT.chip.h) }}
+            />
+            <h1 className="desk__name" style={onBoard(MAT.name.x, MAT.name.y)}>
+              Alex Purdie
+            </h1>
+            <p className="desk__role" style={onBoard(MAT.role.x, MAT.role.y)}>
+              Platform
+              <br />
+              Strategy
+            </p>
+            <p className="desk__edition" style={onBoard(MAT.edition.x, MAT.edition.y)}>
+              Portfolio 2026.09
+            </p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              alt=""
+              aria-hidden
+              className="desk__prop"
+              src={asset(MAT.arrow.src)}
+              style={onBoard(MAT.arrow.x, MAT.arrow.y, MAT.arrow.w, MAT.arrow.h)}
+            />
+          </div>
+
+          {/* ── The pile ────────────────────────────────────────────────── */}
+          <div className="desk__pile" style={onBoard(PILE.x, PILE.y, PILE.w, PILE.h)}>
           {PIECES.map((p) => {
             const style = {
               left: px(p.x, PILE.w),
@@ -191,22 +195,31 @@ export function DeskScene() {
               </button>
             );
           })}
+          </div>
         </div>
 
         {/* ── Post-its ──────────────────────────────────────────────────── */}
-        {POSTITS.map((n) => (
-          <div key={n.id} className="desk__postit-group">
+        {POSTITS.map((n) => {
+          /* One note is on the mat and one is on the desk, so they resolve
+             against different boxes. */
+          const place = "onBoard" in n && n.onBoard ? onBoard : inStage;
+          const at = (x: number, y: number) =>
+            "onBoard" in n && n.onBoard
+              ? { left: px(x, BOARD.src.w), top: px(y, BOARD.src.h) }
+              : { left: px(x, STAGE.w), top: px(y, STAGE.h) };
+          return (
+          <div key={n.id} className={`desk__postit-group${"onBoard" in n && n.onBoard ? " desk__postit-group--board" : ""}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               alt=""
               aria-hidden
               className="desk__prop desk__prop--bottom"
               src={asset(n.src)}
-              style={{ ...inStage(n.x, n.y, n.w, n.h), rotate: `${n.rotate}deg` }}
+              style={{ ...place(n.x, n.y, n.w, n.h), rotate: `${n.rotate}deg` }}
             />
             <p
               className="desk__hand"
-              style={{ left: px(n.text.x, STAGE.w), top: px(n.text.y, STAGE.h), rotate: `${n.text.rotate}deg` }}
+              style={{ ...at(n.text.x, n.text.y), rotate: `${n.text.rotate}deg` }}
             >
               {n.lines.map((l, i) => (
                 <span key={i}>{l || " "}</span>
@@ -216,8 +229,7 @@ export function DeskScene() {
               <p
                 className="desk__hand"
                 style={{
-                  left: px(n.second.x, STAGE.w),
-                  top: px(n.second.y, STAGE.h),
+                  ...at(n.second.x, n.second.y),
                   rotate: `${n.second.rotate}deg`,
                   letterSpacing: `${(n.second.tracking / STAGE.w) * 100}cqw`,
                 }}
@@ -233,13 +245,14 @@ export function DeskScene() {
                 className="desk__prop desk__logo-mark"
                 src={asset(n.logo.src)}
                 style={{
-                  ...inStage(n.logo.x, n.logo.y, n.logo.w, n.logo.h),
+                  ...place(n.logo.x, n.logo.y, n.logo.w, n.logo.h),
                   rotate: `${n.logo.rotate}deg`,
                 }}
               />
             ) : null}
           </div>
-        ))}
+          );
+        })}
 
         {/* ── The logo scatter ──────────────────────────────────────────── */}
         <ul

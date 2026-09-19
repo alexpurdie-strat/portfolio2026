@@ -20,55 +20,59 @@ import CLIPS from "./desk-clips.json";
  */
 
 export const STAGE = { w: 2022, h: 1024 };
-export const PILE = { x: 416, y: 202, w: 1224, h: 822 };
+/* Board-space. The pile overhangs the mat very slightly on every side,
+   which is what stops the cutouts looking inset in a tray. */
+export const PILE = { x: -14, y: -13, w: 1224, h: 822 };
 
 const clip = (k: keyof typeof CLIPS) => CLIPS[k];
 
 /* ── Furniture: photographed, not interactive ──────────────────────────────
-   Each bleeds past the frame, which is what stops the desk reading as a
-   picture of a desk and starts it reading as a desk. */
+   Only the desk now. The MacBook and the keyboard are out: they took a third
+   of the frame between them, pushed the mat into the lower right, and neither
+   one held anything a reader could use. Their assets are still in public/desk
+   if they come back. */
 export const FURNITURE = [
   { src: "/desk/desk.webp", x: -134, y: 0, w: 2290, h: 1024, alt: "" },
-  {
-    src: "/desk/macbook.webp",
-    x: -814,
-    y: -1245,
-    w: 2286,
-    h: 1818,
-    alt: "",
-    shadow: "5px 0 10px rgba(0,0,0,0.1), 19px 0 19px rgba(0,0,0,0.09)",
-  },
-  {
-    src: "/desk/keyboard.webp",
-    x: 1376,
-    y: 197,
-    w: 780,
-    h: 400,
-    alt: "",
-    blur: true,
-    shadow: "2px 2px 7px rgba(0,0,0,0.1), 8px 9px 12px rgba(0,0,0,0.09)",
-  },
 ] as const;
+
+/* ── The board ─────────────────────────────────────────────────────────────
+   The mat, its printing and the pile are one thing and have to move as one,
+   so they get their own coordinate space rather than sitting in the frame's.
+   `src` is the box Figma composed them against; `x/y/w/h` is where that box
+   now sits. Everything on the board is expressed as a fraction of `src`, so
+   growing the board moves the pile, the masthead and the type with it.
+
+   With the laptop and keyboard gone there is room to push it to about 1.17x
+   and most of the way up the frame, which is the point of taking them out. */
+export const BOARD = {
+  x: 470,
+  y: 40,
+  w: 1416,
+  h: 950,
+  src: { x: 430, y: 215, w: 1210, h: 812 },
+} as const;
 
 /* ── The mat ───────────────────────────────────────────────────────────────
    The canvas inside the canvas. Everything interactive sits on it; everything
    off it is context. Its green is also the drawer's green, so opening a piece
    reads as going into the mat rather than as a panel arriving from elsewhere. */
 export const MAT = {
-  x: 430,
-  y: 215,
-  w: 1210,
-  h: 812,
   src: "/desk/mat.webp",
   /* Printed on the mat, not typeset on the page — but still live text, so it
      stays selectable and can be read aloud. */
   ink: "#519378",
-  chip: "#036250",
+  chipColor: "#036250",
+  /* Board-space: measured from the mat's own top-left, not the frame's. */
   cuts: [
-    { src: "/desk/mat-v1.svg", x: 453, y: 232, w: 427, h: 734 },
-    { src: "/desk/mat-v2.svg", x: 649, y: 228, w: 931, h: 735 },
+    { src: "/desk/mat-v1.svg", x: 23, y: 17, w: 427, h: 734 },
+    { src: "/desk/mat-v2.svg", x: 219, y: 13, w: 931, h: 735 },
   ],
-  arrow: { src: "/desk/mat-arrow.svg", x: 663, y: 326, w: 25, h: 27 },
+  arrow: { src: "/desk/mat-arrow.svg", x: 233, y: 111, w: 25, h: 27 },
+  /* The printed masthead, also board-space. */
+  chip: { x: 41, y: 38, w: 210, h: 121 },
+  name: { x: 46, y: 41 },
+  role: { x: 44, y: 79 },
+  edition: { x: 110, y: 141 },
 } as const;
 
 /* ── The pile ──────────────────────────────────────────────────────────────
@@ -235,21 +239,27 @@ export const POSTITS = [
     h: 192,
     rotate: -16.81,
     lines: ["Currently AT:"],
-    /* The employer's mark, pinned to the note rather than set as type. */
-    logo: { src: "/desk/whiteboard.svg", x: 70, y: 482, w: 110, h: 43, rotate: -10.82 },
-    text: { x: 62, y: 440, rotate: -9.67 },
-    second: { text: "Whiteboard", x: 86, y: 545, rotate: -9.67, tracking: 2.07 },
+    /*
+     * The paper inside postit-currently.webp is smaller than the file, so the
+     * three things on the note are placed against the visible square rather
+     * than against the element box — anchored to the box, "Whiteboard" fell
+     * off the bottom edge onto the logos below.
+     */
+    logo: { src: "/desk/whiteboard.svg", x: 66, y: 448, w: 106, h: 40, rotate: -10.82 },
+    text: { x: 74, y: 424, rotate: -9.67 },
+    second: { text: "Whiteboard", x: 70, y: 486, rotate: -9.67, tracking: 2.07 },
   },
   {
     id: "reminder",
+    onBoard: true,
     src: "/desk/postit-reminder.webp",
-    x: 1495,
-    y: 228,
+    x: 975,
+    y: 22,
     w: 194,
     h: 192,
     rotate: 3.02,
     lines: ["Reminder:", "", "Drop it like", "     it’s hot..."],
-    text: { x: 1528, y: 262, rotate: 11.66 },
+    text: { x: 1008, y: 56, rotate: 11.66 },
   },
 ] as const;
 
