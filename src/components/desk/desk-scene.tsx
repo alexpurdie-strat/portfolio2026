@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   BOARD,
-  FURNITURE,
   LOGOS,
   MAT,
   PIECES,
@@ -101,19 +100,6 @@ export function DeskScene() {
   return (
     <div className="desk">
       <div className="desk__stage">
-        {/* ── Furniture ─────────────────────────────────────────────────── */}
-        {FURNITURE.map((f) => (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            key={f.src}
-            alt=""
-            aria-hidden
-            className="desk__prop"
-            src={asset(f.src)}
-            style={inStage(f.x, f.y, f.w, f.h)}
-          />
-        ))}
-
         {/* ── The board: mat, printing and pile, moving as one ────────── */}
         <div className="desk__board" style={inStage(BOARD.x, BOARD.y, BOARD.w, BOARD.h)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -36,21 +36,26 @@ html.desk-locked body {
 }
 
 /*
- * Contain, not cover — and this one is not a preference.
+ * Height-driven, not contain.
  *
- * The page never scrolls, so anything outside the viewport is unreachable
- * rather than merely unseen. Covering a 2022×1024 frame on a 1440-wide screen
- * cropped 290px off each side, which took the entire logo scatter and the
- * "Currently AT" note off the desk. Containing keeps every element reachable;
- * the wood behind fills whatever the stage does not.
+ * The desk is a surface the window looks at a piece of: widening the window
+ * should reveal more wood, not grow the mat. Contain made the stage
+ * width-limited on every ordinary screen, so dragging the window wider scaled
+ * the whole composition up with it.
+ *
+ * Keyed to height, the mat holds its size while the wood around it grows. The
+ * width cap is the one thing that still binds: the mat is 67% of the stage, so
+ * below about 1.32 viewport heights of width it would start running off the
+ * sides, and there the stage shrinks to keep it whole.
  */
 .desk__stage {
   position: absolute;
   left: 50%;
   top: 50%;
   translate: -50% -50%;
-  width: min(100vw, calc(100svh * 2022 / 1024));
-  height: min(100svh, calc(100vw * 1024 / 2022));
+  aspect-ratio: 2022 / 1024;
+  width: auto;
+  height: min(100svh, 66.5vw);
   /* Type inside the scene is sized in cqw off this box, so the printing on
      the mat and the handwriting on the post-its scale with the photograph
      instead of floating free of it. */

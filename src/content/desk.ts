@@ -26,14 +26,16 @@ export const PILE = { x: -14, y: -13, w: 1224, h: 822 };
 
 const clip = (k: keyof typeof CLIPS) => CLIPS[k];
 
-/* ── Furniture: photographed, not interactive ──────────────────────────────
-   Only the desk now. The MacBook and the keyboard are out: they took a third
-   of the frame between them, pushed the mat into the lower right, and neither
-   one held anything a reader could use. Their assets are still in public/desk
-   if they come back. */
-export const FURNITURE = [
-  { src: "/desk/desk.webp", x: -134, y: 0, w: 2290, h: 1024, alt: "" },
-] as const;
+/* ── Furniture ─────────────────────────────────────────────────────────────
+   Empty. The wood is no longer an element inside the stage — it is the page's
+   own background, covering the viewport, so widening the window reveals more
+   desk instead of scaling the composition. Inside the stage it would have
+   scaled with the mat, which is the opposite of what a surface does.
+
+   The MacBook and the keyboard are out too: they took a third of the frame
+   between them and neither held anything a reader could use. All three assets
+   are still in public/desk if they come back. */
+export const FURNITURE = [] as const;
 
 /* ── The board ─────────────────────────────────────────────────────────────
    The mat, its printing and the pile are one thing and have to move as one,
