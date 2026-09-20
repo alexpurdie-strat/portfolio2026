@@ -52,7 +52,13 @@ html.desk-locked body {
   position: absolute;
   left: 50%;
   top: 50%;
-  translate: -50% -50%;
+  /*
+   * Dropped below centre so the mat reads as rows three to ten of a ten-row
+   * screen: top edge on 20svh rather than the 12.5 that centring gave it, and
+   * about 4svh of padding left under it. The asymmetry is the point — the mat
+   * sits low on the desk rather than in the middle of it.
+   */
+  translate: -50% calc(-50% + 8.4svh);
   aspect-ratio: 2022 / 1024;
   width: auto;
   height: min(87.8svh, 66.5vw);
