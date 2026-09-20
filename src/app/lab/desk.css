@@ -40,6 +40,23 @@ html.desk-locked body {
   background: #2b1d12 url("/desk/desk.webp") center / cover no-repeat;
 }
 
+/* ── The laptop ─────────────────────────────────────────────────────────────
+   Hangs off the window's top-left corner. Not part of the stage: anchored
+   there it would drift inward on a wide monitor and leave a band of wood
+   between it and the screen edge, which reads as a laptop placed near the
+   corner rather than one the window is cropping. */
+.desk__laptop {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(18px 22px 26px rgba(0, 0, 0, 0.28));
+  z-index: 1;
+}
+
 /*
  * Height-driven, not contain.
  *

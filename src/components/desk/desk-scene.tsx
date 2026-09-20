@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   BOARD,
+  LAPTOP,
   LOGOS,
   MAT,
   PIECES,
@@ -99,6 +100,20 @@ export function DeskScene() {
 
   return (
     <div className="desk">
+      {/* Off the stage on purpose: it hangs off the window's own corner, not
+          the composition's. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        alt=""
+        aria-hidden
+        className="desk__laptop"
+        src={asset(LAPTOP.src)}
+        style={{
+          width: LAPTOP.width,
+          translate: `${LAPTOP.offsetX * 100}% ${LAPTOP.offsetY * 100}%`,
+        }}
+      />
+
       <div className="desk__stage">
         {/* ── The board: mat, printing and pile, moving as one ────────── */}
         <div className="desk__board" style={inStage(BOARD.x, BOARD.y, BOARD.w, BOARD.h)}>

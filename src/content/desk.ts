@@ -37,6 +37,30 @@ const clip = (k: keyof typeof CLIPS) => CLIPS[k];
    are still in public/desk if they come back. */
 export const FURNITURE = [] as const;
 
+/* ── The laptop ────────────────────────────────────────────────────────────
+   Anchored to the top-left corner of the window rather than to the stage, so
+   it stays "just on screen" at any width — in stage space it would drift
+   inward and leave a band of wood between it and the edge on a wide monitor.
+
+   Sized against viewport height so it keeps its scale relative to the mat, and
+   offset far enough that only the lower-right of the base is in frame. The
+   whole machine is there; the window is simply cropping it. */
+export const LAPTOP = {
+  src: "/desk/laptop.webp",
+  /* Fractions of the element's own width/height, applied as a translate. */
+  offsetX: -0.60,
+  offsetY: -0.62,
+  /*
+   * Width as a CSS expression rather than a number, because it has to obey the
+   * same constraint the stage does. Sized off svh alone it kept growing on a
+   * narrow window while the mat was held back by the width cap, and the laptop
+   * ended up out of scale with the desk it sits on. 1.48 x the stage height,
+   * which is big enough that the corner in frame reads as a MacBook rather
+   * than as a grey shape.
+   */
+  width: "min(130svh, 98.5vw)",
+} as const;
+
 /* ── The board ─────────────────────────────────────────────────────────────
    The mat, its printing and the pile are one thing and have to move as one,
    so they get their own coordinate space rather than sitting in the frame's.
