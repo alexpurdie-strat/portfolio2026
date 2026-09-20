@@ -37,37 +37,63 @@ const clip = (k: keyof typeof CLIPS) => CLIPS[k];
    are still in public/desk if they come back. */
 export const FURNITURE = [] as const;
 
-/* ── The laptop ────────────────────────────────────────────────────────────
-   Anchored to the top-left corner of the window rather than to the stage, so
-   it stays "just on screen" at any width — in stage space it would drift
-   inward and leave a band of wood between it and the edge on a wide monitor.
+/* ── Things the window crops ───────────────────────────────────────────────
+   Anchored to the corners of the window rather than to the stage, so each
+   stays "just on screen" at any width — in stage space they drift inward and
+   leave a band of wood between them and the edge on a wide monitor.
 
-   Sized against viewport height so it keeps its scale relative to the mat, and
-   offset far enough that only the lower-right of the base is in frame. The
-   whole machine is there; the window is simply cropping it. */
-export const LAPTOP = {
-  src: "/desk/laptop.webp",
-  /* Fractions of the element's own width/height, applied as a translate. */
-  offsetX: -0.50,
-  offsetY: -0.66,
-  /*
-   * Well past the angle the photograph was shot at. At this rotation the
-   * laptop's near edge runs as a diagonal from the top of the frame down to
-   * the left of it, so it truncates the corner rather than poking into it —
-   * a chamfer, not an object sitting near a corner. Clockwise, which turns the
-   * base toward the mat.
-   */
-  rotate: 42,
-  /*
-   * Width as a CSS expression rather than a number, because it has to obey the
-   * same constraint the stage does. Sized off svh alone it kept growing on a
-   * narrow window while the mat was held back by the width cap, and the laptop
-   * ended up out of scale with the desk it sits on. 1.48 x the stage height,
-   * which is big enough that the corner in frame reads as a MacBook rather
-   * than as a grey shape.
-   */
-  width: "min(130svh, 98.5vw)",
-} as const;
+   Each width is a CSS expression, not a number, because it has to obey the
+   same constraint the stage does. Sized off svh alone they keep growing on a
+   narrow window while the mat is held back by the width cap, and they end up
+   out of scale with the desk they sit on.
+
+   The rotations are well past the angles the photographs were shot at. At
+   these angles each object's near edge runs as a diagonal across its corner,
+   so it truncates the corner rather than poking into it — a chamfer, not an
+   object sitting near a corner. */
+export type CornerProp = {
+  id: string;
+  src: string;
+  /** Which corner it hangs off. */
+  corner: "tl" | "tr";
+  offsetX: number;
+  offsetY: number;
+  rotate: number;
+  width: string;
+};
+
+export const CORNER_PROPS: CornerProp[] = [
+  {
+    id: "laptop",
+    src: "/desk/laptop.webp",
+    corner: "tl",
+    /* Fractions of the element's own width and height, as a translate. */
+    offsetX: -0.5,
+    offsetY: -0.66,
+    /* Clockwise, which turns the base toward the mat. */
+    rotate: 42,
+    /* 1.48x the stage height — big enough that the corner in frame reads as a
+       MacBook rather than as a grey shape. */
+    width: "min(130svh, 98.5vw)",
+  },
+  {
+    id: "keyboard",
+    src: "/desk/keyboard.webp",
+    corner: "tr",
+    /* Positive X pushes it off the right edge; the laptop's negative X pushes
+       it off the left. */
+    offsetX: 0.46,
+    offsetY: -0.56,
+    /* Square to the desk, deliberately. The laptop is chamfering its corner at
+       42 degrees; matching that here would read as a pattern rather than as
+       two objects that happen to be where someone left them. The photograph
+       already carries a slight tilt of its own, which is enough. */
+    rotate: 0,
+    /* About 0.62 of the mat's width, which is roughly a 75% board against a
+       cutting mat in real life. */
+    width: "min(70svh, 53vw)",
+  },
+];
 
 /* ── The board ─────────────────────────────────────────────────────────────
    The mat, its printing and the pile are one thing and have to move as one,

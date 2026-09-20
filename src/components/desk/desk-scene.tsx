@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   BOARD,
-  LAPTOP,
+  CORNER_PROPS,
   LOGOS,
   MAT,
   PIECES,
@@ -100,20 +100,23 @@ export function DeskScene() {
 
   return (
     <div className="desk">
-      {/* Off the stage on purpose: it hangs off the window's own corner, not
-          the composition's. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        alt=""
-        aria-hidden
-        className="desk__laptop"
-        src={asset(LAPTOP.src)}
-        style={{
-          width: LAPTOP.width,
-          translate: `${LAPTOP.offsetX * 100}% ${LAPTOP.offsetY * 100}%`,
-          rotate: `${LAPTOP.rotate}deg`,
-        }}
-      />
+      {/* Off the stage on purpose: these hang off the window's own corners,
+          not the composition's. */}
+      {CORNER_PROPS.map((c) => (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          key={c.id}
+          alt=""
+          aria-hidden
+          className={`desk__corner desk__corner--${c.corner}`}
+          src={asset(c.src)}
+          style={{
+            width: c.width,
+            translate: `${c.offsetX * 100}% ${c.offsetY * 100}%`,
+            rotate: `${c.rotate}deg`,
+          }}
+        />
+      ))}
 
       <div className="desk__stage">
         {/* ── The board: mat, printing and pile, moving as one ────────── */}
