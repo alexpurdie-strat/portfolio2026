@@ -55,7 +55,7 @@ html.desk-locked body {
   translate: -50% -50%;
   aspect-ratio: 2022 / 1024;
   width: auto;
-  height: min(100svh, 66.5vw);
+  height: min(87.8svh, 66.5vw);
   /* Type inside the scene is sized in cqw off this box, so the printing on
      the mat and the handwriting on the post-its scale with the photograph
      instead of floating free of it. */
