@@ -93,7 +93,6 @@ html.desk-locked body {
 .desk__stage > *,
 .desk__board > *,
 .desk__pile > *,
-.desk__masthead > *,
 .desk__logos > * {
   position: absolute;
 }
@@ -149,74 +148,18 @@ html.desk-locked body {
   object-fit: contain;
 }
 
-.desk__cut {
-  /* The mat's printed cut lines sit over the mat but under everything on it. */
-  opacity: 0.85;
-}
-
+/*
+ * One SVG: the mat photograph, the green chip and the masthead as outlines,
+ * exactly as Figma draws them. Nothing here reconstructs the printing any
+ * more, so it cannot drift from the frame.
+ */
 .desk__mat-img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: fill;
   display: block;
-  border-radius: 6px;
-}
-
-.desk__masthead {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.desk__chip {
-  position: absolute;
-  border-radius: 2px;
-  /* The green block the name is knocked out of, printed on the mat. */
-  opacity: 0.92;
-}
-
-/* Figma: The Future Black 36 / Bold 24 / Martina Light 18, all in --mat-ink.
-   The stencil weight is what makes it read as printed on the mat rather than
-   typeset on the page. */
-.desk__name {
-  margin: 0;
-  font-family: var(--font-the-future), ui-sans-serif, system-ui, sans-serif;
-  font-weight: 900;
-  font-size: 2.9752cqw;
-  line-height: 2.9752cqw;
-  letter-spacing: -0.01em;
-}
-
-/*
- * Leading set in em, not copied from Figma.
- *
- * The frame specifies 24px type on 15px leading — 0.625em. The Future's caps
- * stand about 0.73em tall, so every line's capitals punch a tenth of an em up
- * through the line above it and "Strategy" lands inside "Platform". Figma
- * renders the same collision; it is just small enough there to read as tight
- * rather than as broken.
- *
- * 0.82em is the least that clears the caps with a hair of air, so the stack
- * stays as tight as it was drawn without the words sitting on top of each
- * other.
- */
-.desk__role {
-  margin: 0;
-  font-family: var(--font-the-future), ui-sans-serif, system-ui, sans-serif;
-  font-weight: 700;
-  font-size: 1.9835cqw;
-  line-height: 0.82em;
-  letter-spacing: -0.01em;
-}
-
-.desk__edition {
-  margin: 0;
-  font-family: var(--font-martina-plantijn), Georgia, serif;
-  font-weight: 300;
-  font-size: 1.4876cqw;
-  line-height: 1.2397cqw;
 }
 
 /* ── The pile ───────────────────────────────────────────────────────────────

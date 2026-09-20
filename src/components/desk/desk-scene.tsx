@@ -121,47 +121,9 @@ export function DeskScene() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img alt="" aria-hidden className="desk__mat-img" src={asset(MAT.src)} />
 
-          {MAT.cuts.map((c) => (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              key={c.src}
-              alt=""
-              aria-hidden
-              className="desk__prop desk__cut"
-              src={asset(c.src)}
-              style={onBoard(c.x, c.y, c.w, c.h)}
-            />
-          ))}
-
-          {/* The mat's printed masthead. Live text, not baked into the photo. */}
-          {SHOW.masthead ? (
-          <div className="desk__masthead" style={{ color: MAT.ink }}>
-            <span
-              className="desk__chip"
-              aria-hidden
-              style={{ background: MAT.chipColor, ...onBoard(MAT.chip.x, MAT.chip.y, MAT.chip.w, MAT.chip.h) }}
-            />
-            <h1 className="desk__name" style={onBoard(MAT.name.x, MAT.name.y)}>
-              Alex Purdie
-            </h1>
-            <p className="desk__role" style={onBoard(MAT.role.x, MAT.role.y)}>
-              Platform
-              <br />
-              Strategy
-            </p>
-            <p className="desk__edition" style={onBoard(MAT.edition.x, MAT.edition.y)}>
-              Portfolio 2026.09
-            </p>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              alt=""
-              aria-hidden
-              className="desk__prop"
-              src={asset(MAT.arrow.src)}
-              style={onBoard(MAT.arrow.x, MAT.arrow.y, MAT.arrow.w, MAT.arrow.h)}
-            />
-          </div>
-          ) : null}
+          {/* The masthead is drawn into mat.svg. A screen reader still needs
+              the name, so it is here and nowhere on screen. */}
+          {SHOW.masthead ? <h1 className="sr-only">Alex Purdie — Platform Strategy, Portfolio 2026.09</h1> : null}
 
           {/* ── The pile ────────────────────────────────────────────────── */}
           {SHOW.pile ? (

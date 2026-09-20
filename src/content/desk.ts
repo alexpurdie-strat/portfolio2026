@@ -94,22 +94,16 @@ export const BOARD = {
    off it is context. Its green is also the drawer's green, so opening a piece
    reads as going into the mat rather than as a panel arriving from elsewhere. */
 export const MAT = {
-  src: "/desk/mat.webp",
-  /* Printed on the mat, not typeset on the page — but still live text, so it
-     stays selectable and can be read aloud. */
+  src: "/desk/mat.svg",
+  /*
+   * The masthead is now inside mat.svg as outlines, drawn by Figma rather than
+   * reconstructed from its export — which is what stops the leading, the
+   * tracking and the chip drifting from the frame every time one of them is
+   * touched. The trade is that the name is no longer live text, so the scene
+   * carries a visually-hidden heading instead and nothing is lost to a screen
+   * reader.
+   */
   ink: "#519378",
-  chipColor: "#036250",
-  /* Board-space: measured from the mat's own top-left, not the frame's. */
-  cuts: [
-    { src: "/desk/mat-v1.svg", x: 23, y: 17, w: 427, h: 734 },
-    { src: "/desk/mat-v2.svg", x: 219, y: 13, w: 931, h: 735 },
-  ],
-  arrow: { src: "/desk/mat-arrow.svg", x: 233, y: 111, w: 25, h: 27 },
-  /* The printed masthead, also board-space. */
-  chip: { x: 41, y: 38, w: 210, h: 121 },
-  name: { x: 46, y: 41 },
-  role: { x: 44, y: 79 },
-  edition: { x: 110, y: 141 },
 } as const;
 
 /* ── The pile ──────────────────────────────────────────────────────────────
