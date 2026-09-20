@@ -121,6 +121,16 @@ export function DeskScene() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img alt="" aria-hidden className="desk__mat-img" src={asset(MAT.src)} />
 
+          {/* The green itself, inset from the asset's baked-in shadow. Anything
+              that sits on the mat goes in here, not in the board — against the
+              board it would be pushed down and right by the shadow. */}
+          <div
+            className="desk__green"
+            style={{
+              inset: `${BOARD.inset.y * 100}% ${BOARD.inset.x * 100}%`,
+            }}
+          >
+
           {/* The masthead is drawn into mat.svg. A screen reader still needs
               the name, so it is here and nowhere on screen. */}
           {SHOW.masthead ? <h1 className="sr-only">Alex Purdie — Platform Strategy, Portfolio 2026.09</h1> : null}
@@ -180,6 +190,7 @@ export function DeskScene() {
           })}
           </div>
           ) : null}
+          </div>
         </div>
 
         {/* ── Post-its ──────────────────────────────────────────────────── */}

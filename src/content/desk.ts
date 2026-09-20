@@ -76,23 +76,27 @@ export const LAPTOP = {
    now sits. Everything on the board is expressed as a fraction of `src`, so
    growing the board moves the pile, the masthead and the type with it.
 
-   Honestly centred, at last. Every earlier mat carried uneven transparent
-   padding inside its own file, so the box had to be nudged off true centre to
-   put the green in the middle — a correction that then had to be re-derived
-   every time the asset changed, and that silently became wrong when it did.
-   This asset is edge to edge, so (2022 - 1341) / 2 and (1024 - 875) / 2 are
-   simply right.
+   This asset carries its own drop shadow, so the file is bigger than the mat:
+   1362x888 around a green of exactly 1162x758 — the Figma node, to the pixel.
+   The padding is symmetric, 100 either side and 65 top and bottom, so
+   centring the box centres the green and no hand-measured correction is
+   needed. Every previous asset had lopsided padding, which is what kept going
+   wrong.
 
-   875 tall is what puts the mat on 75svh: it is 0.8545 of the stage, and the
-   stage is 87.8svh. The width follows from the asset's own 1.533 aspect. */
+   The element is sized so the green lands at 875 of the stage's 1024, which
+   is 75svh; the shadow is what pushes the box past the stage's own height. */
 export const BOARD = {
-  x: 340,
-  y: 74,
-  w: 1341,
-  h: 875,
-  /* The mat box in the frame this asset was cut from — 189:20353. The pile's
-     coordinates below are still in the previous frame's 1210x812 mat and will
-     need rebasing when it comes back on. */
+  x: 225,
+  y: 0,
+  w: 1572,
+  h: 1025,
+  /* Where the green sits inside the asset, as fractions of it. Anything placed
+     on the mat is positioned against the green, not against the file, or the
+     shadow's padding pushes it all down and right. */
+  inset: { x: 0.0734, y: 0.0732 },
+  /* The mat box in the frame this asset was cut from — 189:20353, which is the
+     same 1162x758. The pile's coordinates below are still in the previous
+     frame's 1210x812 mat and will need rebasing when it comes back on. */
   src: { x: 139, y: 207, w: 1162, h: 758 },
 } as const;
 

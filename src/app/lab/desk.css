@@ -91,7 +91,7 @@ html.desk-locked body {
 }
 
 .desk__stage > *,
-.desk__board > *,
+.desk__green > *,
 .desk__pile > *,
 .desk__logos > * {
   position: absolute;
@@ -104,8 +104,16 @@ html.desk-locked body {
  * moved by changing one box.
  */
 .desk__board {
+  /* No radius and no shadow: this asset carries both. */
+  position: absolute;
+}
+
+/* The green area of the mat, inset from the asset's own drop shadow. This is
+   the box everything on the mat is measured against, and the container the
+   type on it scales from. */
+.desk__green {
+  position: absolute;
   container-type: inline-size;
-  border-radius: 6px;
 }
 
 /* The on-mat note is a grandchild of the board, and `display: contents` on its
