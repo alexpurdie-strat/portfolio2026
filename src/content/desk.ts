@@ -299,7 +299,7 @@ export const PIECES: Piece[] = [
    Four colours of empty post-it, cut out with their own shadows. Board-space:
    x and y are measured from the top-left of the green, not of the asset, and
    the size is in the same units — a real note is about 76mm against a 600mm
-   mat, which is the 150 below.
+   mat, and 98mm notes are just as standard — which is the 172 below.
 
    These carry no text yet. When they do, the copy goes on top of them the way
    the "Currently AT" note works, not baked into the image. */
@@ -312,12 +312,54 @@ export type Note = {
   y: number;
   size: number;
   rotate: number;
+  /* Written on the note, one entry per line, the way someone actually breaks
+     a line on paper — by running out of room, not by wrapping. An empty
+     string is a blank line. */
+  lines?: string[];
+};
+
+/*
+ * The paper inside the note asset — not its bounding box, the sheet itself.
+ *
+ * The cutout is a square of paper already turned about ten degrees inside its
+ * own file, with a drop shadow around it. Measured off the alpha, its corners
+ * sit at (76,8) (390,62) (340,386) (6,326) in a 420x435 file, which is a
+ * 318x325 sheet rotated +9.76.
+ *
+ * Writing placed against the file instead of against this lands off the paper
+ * and sits level while the paper leans — which is exactly what it did.
+ */
+export const NOTE_PAPER = {
+  /* Top-left corner of the sheet, as fractions of the file. */
+  x: 0.181,
+  y: 0.0184,
+  /* The sheet's own width and height, same units. */
+  w: 0.7586,
+  h: 0.7485,
+  /* How far the sheet is turned inside the file. */
+  rotate: 9.76,
 };
 
 export const NOTES: Note[] = [
   /* Low on the mat and well clear of the masthead. */
-  { id: "test", color: "amber", x: 96, y: 520, size: 150, rotate: -7 },
-  { id: "test-2", color: "lime", x: 872, y: 118, size: 150, rotate: 5 },
+  {
+    id: "test",
+    color: "amber",
+    x: 96,
+    y: 520,
+    size: 172,
+    rotate: -7,
+    lines: ["Update:", "", "- MB case study", "- Imagery on JAFP"],
+  },
+  {
+    id: "test-2",
+    color: "lime",
+    x: 872,
+    y: 118,
+    size: 172,
+    rotate: 5,
+    lines: ["Call mom back", "about saturday"],
+  },
 ];
 
 /*
@@ -341,6 +383,36 @@ function hash(seed: string, salt: number): number {
   }
   /* -1..1 */
   return ((h >>> 0) % 2000) / 1000 - 1;
+}
+
+/*
+ * Per-character variation, so the writing does not look typed.
+ *
+ * The Blank Weirdos ships as four separate cuts of the same hand — the base
+ * plus three alternates — which is exactly what a real hand does: the same
+ * letter drawn twice is never quite the same shape. Rotating through them per
+ * character is what stops "case study" and "saturday" sharing an identical a.
+ *
+ * On top of that each character gets a hair of tracking and a hair of
+ * baseline, both deterministic from the character and its position, so the
+ * spacing breathes the way a marker does instead of sitting on a grid.
+ */
+export const HAND_CUTS = [
+  "var(--font-blank-weirdos)",
+  "var(--font-blank-weirdos-alt1)",
+  "var(--font-blank-weirdos-alt2)",
+  "var(--font-blank-weirdos-alt3)",
+] as const;
+
+export function handChar(noteId: string, line: number, index: number, ch: string) {
+  const seed = `${noteId}:${line}:${index}:${ch}`;
+  return {
+    font: HAND_CUTS[Math.abs(Math.round(hash(seed, 7) * 1000)) % HAND_CUTS.length],
+    /* Kept under a twentieth of an em each way — enough to break the grid,
+       not enough to read as broken spacing. */
+    tracking: (hash(seed, 11) * 0.045).toFixed(4),
+    lift: (hash(seed, 13) * 0.035).toFixed(4),
+  };
 }
 
 export function noteWobble(note: Note) {

@@ -258,14 +258,57 @@ html.desk-locked body {
   opacity: 1;
 }
 
-/* A blank note. Height follows from the asset so the paper keeps its own
-   proportion — it is very slightly taller than it is wide. */
+/* A note. Height follows from the asset so the paper keeps its own proportion
+   — it is very slightly taller than it is wide. A container, so the writing on
+   it is sized as a fraction of the paper and scales with it. */
 .desk__note {
   position: absolute;
-  height: auto;
-  max-width: none;
+  container-type: inline-size;
   pointer-events: none;
   user-select: none;
+}
+
+.desk__note-paper {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+}
+
+/*
+ * Sharpie on paper.
+ *
+ * The Blank Weirdos at its natural weight draws like a fineliner. The stroke
+ * is what turns it into a marker: it fattens every letter from the outside, so
+ * the line reads as laid down by a felt tip rather than a pen. 0.035em is
+ * about a quarter of a point at the size these notes render, and it is in em
+ * rather than pt so it thickens with the note instead of going spidery when
+ * the desk scales up.
+ *
+ * paint-order puts the stroke behind the fill; without it the stroke eats into
+ * the counters of the a and the o and the writing turns to mud.
+ */
+.desk__note-ink {
+  position: absolute;
+  margin: 0;
+  /* The box is the sheet, so it turns about the sheet's own corner. */
+  transform-origin: top left;
+  /* Written from the top-left in, the way a hand starts on paper. */
+  padding: 13% 10% 0 11%;
+  box-sizing: border-box;
+  font-family: var(--font-blank-weirdos), ui-sans-serif, cursive;
+  font-size: 8.5cqw;
+  line-height: 1.5;
+  color: #1c1c1e;
+  -webkit-text-stroke: 0.035em #1c1c1e;
+  paint-order: stroke fill;
+}
+
+/* Each authored line is a line — it breaks where the writer ran out of room,
+   not where a wrapping algorithm would put it. */
+.desk__note-line {
+  display: block;
+  white-space: nowrap;
 }
 
 /* ── Post-its ──────────────────────────────────────────────────────────── */

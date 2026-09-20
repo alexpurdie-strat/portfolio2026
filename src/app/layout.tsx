@@ -1,6 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { blankWeirdos, martinaPlantijn, metric, theFuture } from "./fonts";
+import {
+  blankWeirdos,
+  blankWeirdosAlt1,
+  blankWeirdosAlt2,
+  blankWeirdosAlt3,
+  martinaPlantijn,
+  metric,
+  theFuture,
+} from "./fonts";
 import { PageTransition } from "@/components/page-transition";
 import "./globals.css";
 
@@ -40,7 +48,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${martinaPlantijn.variable} ${metric.variable} ${blankWeirdos.variable} ${theFuture.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${martinaPlantijn.variable} ${metric.variable} ${blankWeirdos.variable} ${blankWeirdosAlt1.variable} ${blankWeirdosAlt2.variable} ${blankWeirdosAlt3.variable} ${theFuture.variable}`}
     >
       <body>
         {/* First thing in the tab order, invisible until focused. */}

@@ -8,6 +8,8 @@ import {
   LOGOS,
   MAT,
   NOTES,
+  NOTE_PAPER,
+  handChar,
   noteWobble,
   PIECES,
   PILE,
@@ -144,13 +146,9 @@ export function DeskScene() {
           {NOTES.map((n) => {
             const w = noteWobble(n);
             return (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
+              <div
                 key={n.id}
-                alt=""
-                aria-hidden
                 className="desk__note"
-                src={asset(`/desk/note-${n.color}.webp`)}
                 style={{
                   left: px(n.x, BOARD.src.w),
                   top: px(n.y, BOARD.src.h),
@@ -161,7 +159,53 @@ export function DeskScene() {
                      Individual rotate/scale still apply on top of it. */
                   transform: `skew(${w.skew.toFixed(2)}deg)`,
                 }}
-              />
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  alt=""
+                  aria-hidden
+                  className="desk__note-paper"
+                  src={asset(`/desk/note-${n.color}.webp`)}
+                />
+                {n.lines ? (
+                  /* A box laid exactly over the sheet — same corner, same size,
+                     same tilt — so the writing sits on the paper and leans with
+                     it. Real text, not baked in: it stays editable, it scales
+                     with the note, and it reaches a screen reader. */
+                  <p
+                    className="desk__note-ink"
+                    style={{
+                      left: `${NOTE_PAPER.x * 100}%`,
+                      top: `${NOTE_PAPER.y * 100}%`,
+                      width: `${NOTE_PAPER.w * 100}%`,
+                      height: `${NOTE_PAPER.h * 100}%`,
+                      rotate: `${NOTE_PAPER.rotate}deg`,
+                    }}
+                  >
+                    {n.lines.map((l, i) => (
+                      <span key={i} className="desk__note-line">
+                        {l
+                          ? [...l].map((ch, j) => {
+                              const h = handChar(n.id, i, j, ch);
+                              return (
+                                <span
+                                  key={j}
+                                  style={{
+                                    fontFamily: h.font,
+                                    letterSpacing: `${h.tracking}em`,
+                                    verticalAlign: `${h.lift}em`,
+                                  }}
+                                >
+                                  {ch === " " ? "\u00a0" : ch}
+                                </span>
+                              );
+                            })
+                          : "\u00a0"}
+                      </span>
+                    ))}
+                  </p>
+                ) : null}
+              </div>
             );
           })}
 
