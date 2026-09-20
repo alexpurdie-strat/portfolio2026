@@ -76,17 +76,24 @@ export const LAPTOP = {
    now sits. Everything on the board is expressed as a fraction of `src`, so
    growing the board moves the pile, the masthead and the type with it.
 
-   Centred on the green, which is not the same as centring the element: the mat
-   photograph carries uneven padding inside its own file — 9px of it on the
-   left against 48 on the right, 13 on the top against 62 on the bottom. Centre
-   the box and the mat still sits visibly high and left. These numbers put the
-   green itself in the middle, measured off the render rather than computed. */
+   Honestly centred, at last. Every earlier mat carried uneven transparent
+   padding inside its own file, so the box had to be nudged off true centre to
+   put the green in the middle — a correction that then had to be re-derived
+   every time the asset changed, and that silently became wrong when it did.
+   This asset is edge to edge, so (2022 - 1341) / 2 and (1024 - 875) / 2 are
+   simply right.
+
+   875 tall is what puts the mat on 75svh: it is 0.8545 of the stage, and the
+   stage is 87.8svh. The width follows from the asset's own 1.533 aspect. */
 export const BOARD = {
-  x: 322,
-  y: 61,
-  w: 1416,
-  h: 950,
-  src: { x: 430, y: 215, w: 1210, h: 812 },
+  x: 340,
+  y: 74,
+  w: 1341,
+  h: 875,
+  /* The mat box in the frame this asset was cut from — 189:20353. The pile's
+     coordinates below are still in the previous frame's 1210x812 mat and will
+     need rebasing when it comes back on. */
+  src: { x: 139, y: 207, w: 1162, h: 758 },
 } as const;
 
 /* ── The mat ───────────────────────────────────────────────────────────────
@@ -94,7 +101,7 @@ export const BOARD = {
    off it is context. Its green is also the drawer's green, so opening a piece
    reads as going into the mat rather than as a panel arriving from elsewhere. */
 export const MAT = {
-  src: "/desk/mat.svg",
+  src: "/desk/mat.webp",
   /*
    * The masthead is now inside mat.svg as outlines, drawn by Figma rather than
    * reconstructed from its export — which is what stops the leading, the

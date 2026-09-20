@@ -80,7 +80,7 @@ html.desk-locked body {
    * about 4svh of padding left under it. The asymmetry is the point — the mat
    * sits low on the desk rather than in the middle of it.
    */
-  translate: -50% calc(-50% + 8.4svh);
+  translate: -50% calc(-50% + 7.6svh);
   aspect-ratio: 2022 / 1024;
   width: auto;
   height: min(87.8svh, 66.5vw);
