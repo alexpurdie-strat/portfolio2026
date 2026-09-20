@@ -30,8 +30,17 @@ html.desk-locked body {
   position: fixed;
   inset: 0;
   overflow: hidden;
-  /* The same wood, covering the viewport, so the letterbox the stage leaves
-     on a squarer screen is still desk rather than a bar. */
+  /*
+   * The wood, covering the viewport, so it runs past every edge on its own
+   * and widening the window reveals more of it.
+   *
+   * UNLICENSED. desk.webp is the Unsplash+ preview of
+   * premium_photo-1756717262701-17032ad7a128, and the "Unsplash+" watermark is
+   * tiled across the whole frame — not a band, the whole thing. It is here so
+   * the composition can be judged against the right wood; it cannot ship.
+   * Replace with the licensed download, which has no watermark and needs no
+   * other change.
+   */
   background: #2b1d12 url("/desk/desk.webp") center / cover no-repeat;
 }
 
