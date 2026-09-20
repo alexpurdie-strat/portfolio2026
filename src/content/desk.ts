@@ -315,9 +315,46 @@ export type Note = {
 };
 
 export const NOTES: Note[] = [
-  /* One, as a test. Low on the mat and well clear of the masthead. */
+  /* Low on the mat and well clear of the masthead. */
   { id: "test", color: "amber", x: 96, y: 520, size: 150, rotate: -7 },
+  { id: "test-2", color: "lime", x: 872, y: 118, size: 150, rotate: 5 },
 ];
+
+/*
+ * A stable wobble, so no two notes are the same stamp.
+ *
+ * Deterministic on purpose. Math.random() would re-roll on every render, which
+ * means the server and the client would disagree and React would throw a
+ * hydration mismatch — and every reload would shuffle the desk. Hashing the
+ * note's own id gives each one a tilt that is arbitrary-looking but fixed:
+ * same note, same angle, forever.
+ *
+ * Kept small. Paper on a desk is a degree or two off square and a hair off
+ * size; more than that stops reading as "dropped there" and starts reading as
+ * a bug. The authored `rotate` is the intent and this only nudges it.
+ */
+function hash(seed: string, salt: number): number {
+  let h = 2166136261 ^ salt;
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  /* -1..1 */
+  return ((h >>> 0) % 2000) / 1000 - 1;
+}
+
+export function noteWobble(note: Note) {
+  return {
+    /* Up to 2.5 degrees either side of the authored angle. */
+    rotate: note.rotate + hash(note.id, 1) * 2.5,
+    /* Up to 2.5% bigger or smaller. */
+    scale: 1 + hash(note.id, 2) * 0.025,
+    /* Under a degree of skew — just enough that the paper is not a perfect
+       rectangle, which is what makes two notes of one colour read as two
+       pieces of paper rather than one image used twice. */
+    skew: hash(note.id, 3) * 0.8,
+  };
+}
 
 /* ── Post-its ──────────────────────────────────────────────────────────────
    Clarity, emphasis, decor — in that order. Both are stage-space. */
