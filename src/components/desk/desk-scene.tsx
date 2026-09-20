@@ -7,6 +7,7 @@ import {
   CORNER_PROPS,
   LOGOS,
   MAT,
+  NOTES,
   PIECES,
   PILE,
   POSTITS,
@@ -137,6 +138,24 @@ export function DeskScene() {
           {/* The masthead is drawn into mat.svg. A screen reader still needs
               the name, so it is here and nowhere on screen. */}
           {SHOW.masthead ? <h1 className="sr-only">Alex Purdie — Platform Strategy, Portfolio 2026.09</h1> : null}
+
+          {/* Blank notes, on the mat. */}
+          {NOTES.map((n) => (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              key={n.id}
+              alt=""
+              aria-hidden
+              className="desk__note"
+              src={asset(`/desk/note-${n.color}.webp`)}
+              style={{
+                left: px(n.x, BOARD.src.w),
+                top: px(n.y, BOARD.src.h),
+                width: px(n.size, BOARD.src.w),
+                rotate: `${n.rotate}deg`,
+              }}
+            />
+          ))}
 
           {/* ── The pile ────────────────────────────────────────────────── */}
           {SHOW.pile ? (

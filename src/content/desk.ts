@@ -295,6 +295,30 @@ export const PIECES: Piece[] = [
   },
 ];
 
+/* ── Blank notes ───────────────────────────────────────────────────────────
+   Four colours of empty post-it, cut out with their own shadows. Board-space:
+   x and y are measured from the top-left of the green, not of the asset, and
+   the size is in the same units — a real note is about 76mm against a 600mm
+   mat, which is the 150 below.
+
+   These carry no text yet. When they do, the copy goes on top of them the way
+   the "Currently AT" note works, not baked into the image. */
+export const NOTE_COLORS = ["green", "white", "amber", "lime"] as const;
+
+export type Note = {
+  id: string;
+  color: (typeof NOTE_COLORS)[number];
+  x: number;
+  y: number;
+  size: number;
+  rotate: number;
+};
+
+export const NOTES: Note[] = [
+  /* One, as a test. Low on the mat and well clear of the masthead. */
+  { id: "test", color: "amber", x: 96, y: 520, size: 150, rotate: -7 },
+];
+
 /* ── Post-its ──────────────────────────────────────────────────────────────
    Clarity, emphasis, decor — in that order. Both are stage-space. */
 export const POSTITS = [

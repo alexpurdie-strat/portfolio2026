@@ -258,6 +258,16 @@ html.desk-locked body {
   opacity: 1;
 }
 
+/* A blank note. Height follows from the asset so the paper keeps its own
+   proportion — it is very slightly taller than it is wide. */
+.desk__note {
+  position: absolute;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+}
+
 /* ── Post-its ──────────────────────────────────────────────────────────── */
 .desk__postit-group {
   display: contents;
