@@ -189,12 +189,25 @@ html.desk-locked body {
   letter-spacing: -0.01em;
 }
 
+/*
+ * Leading set in em, not copied from Figma.
+ *
+ * The frame specifies 24px type on 15px leading — 0.625em. The Future's caps
+ * stand about 0.73em tall, so every line's capitals punch a tenth of an em up
+ * through the line above it and "Strategy" lands inside "Platform". Figma
+ * renders the same collision; it is just small enough there to read as tight
+ * rather than as broken.
+ *
+ * 0.82em is the least that clears the caps with a hair of air, so the stack
+ * stays as tight as it was drawn without the words sitting on top of each
+ * other.
+ */
 .desk__role {
   margin: 0;
   font-family: var(--font-the-future), ui-sans-serif, system-ui, sans-serif;
   font-weight: 700;
   font-size: 1.9835cqw;
-  line-height: 1.2397cqw;
+  line-height: 0.82em;
   letter-spacing: -0.01em;
 }
 
