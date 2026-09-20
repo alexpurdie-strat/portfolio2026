@@ -34,12 +34,8 @@ html.desk-locked body {
    * The wood, covering the viewport, so it runs past every edge on its own
    * and widening the window reveals more of it.
    *
-   * UNLICENSED. desk.webp is the Unsplash+ preview of
-   * premium_photo-1756717262701-17032ad7a128, and the "Unsplash+" watermark is
-   * tiled across the whole frame — not a band, the whole thing. It is here so
-   * the composition can be judged against the right wood; it cannot ship.
-   * Replace with the licensed download, which has no watermark and needs no
-   * other change.
+   * texture-wooden-surface, 5379px at source and unwatermarked — the first
+   * desk here that is neither a stock comp nor scaled past what it has.
    */
   background: #2b1d12 url("/desk/desk.webp") center / cover no-repeat;
 }
