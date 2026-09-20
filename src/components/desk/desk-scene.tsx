@@ -111,6 +111,7 @@ export function DeskScene() {
         style={{
           width: LAPTOP.width,
           translate: `${LAPTOP.offsetX * 100}% ${LAPTOP.offsetY * 100}%`,
+          rotate: `${LAPTOP.rotate}deg`,
         }}
       />
 

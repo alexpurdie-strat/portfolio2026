@@ -48,8 +48,16 @@ export const FURNITURE = [] as const;
 export const LAPTOP = {
   src: "/desk/laptop.webp",
   /* Fractions of the element's own width/height, applied as a translate. */
-  offsetX: -0.60,
-  offsetY: -0.62,
+  offsetX: -0.50,
+  offsetY: -0.66,
+  /*
+   * Well past the angle the photograph was shot at. At this rotation the
+   * laptop's near edge runs as a diagonal from the top of the frame down to
+   * the left of it, so it truncates the corner rather than poking into it —
+   * a chamfer, not an object sitting near a corner. Clockwise, which turns the
+   * base toward the mat.
+   */
+  rotate: 42,
   /*
    * Width as a CSS expression rather than a number, because it has to obey the
    * same constraint the stage does. Sized off svh alone it kept growing on a
