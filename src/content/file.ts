@@ -28,6 +28,15 @@ export type Section = {
   /* A line of summary. This is the whole content of the section at this size —
      if it needs more than this, it needs the desktop. */
   blurb: string;
+  /* Which stock the folder is cut from. */
+  stock: keyof typeof STOCKS;
+  /*
+   * What is already in the folder, visible before anything is opened. This is
+   * the whole read of the design and the thing the first pass left out: a file
+   * full of work, not a stack of empty card. Assets are the desktop's, so
+   * nothing new ships for mobile.
+   */
+  peek: { src: string; w: number; x: number; rotate: number }[];
 };
 
 export const SECTIONS: Section[] = [
@@ -37,6 +46,8 @@ export const SECTIONS: Section[] = [
     kind: "note",
     tab: 0.62,
     blurb: "Text or call. Email if it is long.",
+    stock: "manila",
+    peek: [{ src: "/desk/note-amber.webp", w: 36, x: 16, rotate: -6 }],
   },
   {
     id: "work",
@@ -44,6 +55,11 @@ export const SECTIONS: Section[] = [
     kind: "cards",
     tab: 0.3,
     blurb: "Five case studies, shuffled. Swipe or use the arrows.",
+    stock: "rust",
+    peek: [
+      { src: "/desk/piece-jafp.webp", w: 70, x: 6, rotate: -3 },
+      { src: "/desk/piece-itvs-a.webp", w: 58, x: 46, rotate: 4 },
+    ],
   },
   {
     id: "resume",
@@ -51,6 +67,11 @@ export const SECTIONS: Section[] = [
     kind: "sheet",
     tab: 0.68,
     blurb: "Fifteen years, one page.",
+    stock: "slate",
+    peek: [
+      { src: "/desk/piece-mb-a.webp", w: 74, x: 10, rotate: 2 },
+      { src: "/desk/piece-100s.webp", w: 52, x: 52, rotate: -5 },
+    ],
   },
   {
     id: "about",
@@ -58,33 +79,30 @@ export const SECTIONS: Section[] = [
     kind: "about",
     tab: 0.26,
     blurb: "The short version, and a photograph.",
+    stock: "sage",
+    peek: [
+      { src: "/desk/piece-about.webp", w: 30, x: 14, rotate: -7 },
+      { src: "/desk/note-white.webp", w: 32, x: 48, rotate: 5 },
+    ],
   },
 ];
 
-/* ── Kraft ─────────────────────────────────────────────────────────────────
-   A manila expanding file is one color with fibre in it and darker creases.
-   Nothing here is a photograph: the panel is a shape, the tone is a token, and
-   the fibre is noise — which is the whole reason this material was worth
-   synthesizing rather than exporting. Tone is standard manila for now and is
-   one value to change. */
-export const KRAFT = {
-  face: "#b07844",
-  faceLit: "#c08a52",
-  edge: "#8a5a30",
-  crease: "#7a4e28",
-  shadow: "rgba(60, 32, 12, 0.45)",
-  ink: "#3b2412",
-} as const;
+/* ── Stock ─────────────────────────────────────────────────────────────────
+   A drawer of folders: manila, and three muted colors of the kind that come in
+   the same box. Each one is a face, a lit top edge where the card bends over,
+   and a darker cut edge.
 
-/* ── The gusset ────────────────────────────────────────────────────────────
-   The concertina down the side. Figma draws it as nine 20px strips stacked
-   down the left edge — it is the one element that says "expanding file"
-   rather than "stack of cards", and the one that has to stretch when a
-   section opens. That is why it is generated rather than exported: a
-   photograph of a fold cannot extend. */
-export const GUSSET = {
-  width: 22,
-  /* How far the folds pull apart between closed and open. */
-  closed: 10,
-  open: 26,
+   The first pass drew these in two flat gradients and they came out as
+   plastic. Card has a long tonal range and visible fibre, so the face runs
+   through four stops and the grain is coarse enough to see. */
+export type Stock = { face: string; lit: string; deep: string; edge: string };
+
+export const STOCKS: Record<string, Stock> = {
+  manila: { face: "#c89a5e", lit: "#dcb47b", deep: "#9d7038", edge: "#865c2c" },
+  rust: { face: "#b06b4b", lit: "#c88a68", deep: "#8a4e33", edge: "#73402a" },
+  sage: { face: "#94a078", lit: "#b0bb95", deep: "#6f7c57", edge: "#5c6848" },
+  slate: { face: "#8a97a8", lit: "#a7b3c1", deep: "#667385", edge: "#55606f" },
 };
+
+export const INK = "#3b2412";
+

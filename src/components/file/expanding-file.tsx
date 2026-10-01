@@ -3,8 +3,8 @@
 import { useId, useState } from "react";
 
 import { Divider } from "@/components/file/divider";
-import { Gusset } from "@/components/file/gusset";
 import { SECTIONS, type Section } from "@/content/file";
+import { asset } from "@/lib/asset";
 import { handChar } from "@/content/desk";
 
 /*
@@ -106,9 +106,6 @@ export function ExpandingFile() {
   return (
     <div className="file">
       <div className="file__body">
-        {/* The concertina, stretching as a pocket takes something. */}
-        <Gusset className="file__gusset" open={open ? 1 : 0} />
-
         <ul className="file__sections">
           {SECTIONS.map((s, i) => {
             const isOpen = open === s.id;
@@ -118,9 +115,31 @@ export function ExpandingFile() {
                 key={s.id}
                 className="file__section"
                 data-open={isOpen || undefined}
-                /* Later dividers sit in front, the way they stack in the box. */
-                style={{ zIndex: i + 1 }}
+                /*
+                 * Reversed on purpose. Folders higher up the stack are nearer
+                 * the front, so the first one has to cover the work sticking
+                 * out of the second — not the other way round.
+                 */
+                style={{ zIndex: SECTIONS.length - i }}
               >
+                {/* Already in the folder, before anything is opened. This is
+                    the read of the whole thing: a file full of work. */}
+                <div className="file__peek" aria-hidden>
+                  {s.peek.map((pk) => (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      key={pk.src}
+                      alt=""
+                      src={asset(pk.src)}
+                      style={{
+                        width: `${pk.w}%`,
+                        left: `${pk.x}%`,
+                        rotate: `${pk.rotate}deg`,
+                      }}
+                    />
+                  ))}
+                </div>
+
                 {/* The contents rise from behind the divider in front of them,
                     so the paper is always between two panels. */}
                 <div
@@ -141,7 +160,7 @@ export function ExpandingFile() {
                   aria-controls={panelId}
                   onClick={() => setOpen(isOpen ? null : s.id)}
                 >
-                  <Divider tab={s.tab} className="file__divider">
+                  <Divider tab={s.tab} stock={s.stock} className="file__divider">
                     <span
                       className="file__label"
                       style={{ left: `${s.tab * 70}%` }}

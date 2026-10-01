@@ -1,44 +1,41 @@
-import { KRAFT } from "@/content/file";
+import { STOCKS, type Stock } from "@/content/file";
 
 /*
- * One divider of the expanding file: a kraft panel with a cut tab along its
- * top edge.
+ * One file folder: a card panel with a cut tab along its top edge.
  *
- * Drawn rather than exported. The panel is the same shape five times over —
- * Figma repeats one 449x714 vector at stepping offsets — so there is nothing
- * for a photograph to contribute that a path does not, and a path can take its
+ * Drawn rather than exported, and the first attempt at that was wrong. Two
+ * gradients and a whisper of noise gave plastic — card has a long tonal range,
+ * a lit roll where it bends over the top edge, and fibre coarse enough to see.
+ * All three are here now.
+ *
+ * What is still true: the shape is one panel repeated, and a path can put its
  * tab anywhere along the edge without a new asset being cut.
- *
- * The fibre is noise and the lighting is two gradients. That is enough for
- * manila, which is near-flat by nature; it would not be enough for wood, which
- * has directional figure that has to agree between adjacent pieces.
  */
 export function Divider({
   /* 0 at the left edge, 1 at the right. */
   tab,
-  /* Shown on the tab. */
+  stock,
   children,
   className,
 }: {
   tab: number;
+  stock: keyof typeof STOCKS;
   children?: React.ReactNode;
   className?: string;
 }) {
-  /* The panel is drawn in its own 1000-wide space and scaled by CSS, so one
-     set of numbers describes it at every size. */
+  const s: Stock = STOCKS[stock];
+
+  /* Drawn in its own 1000-wide space and scaled by CSS, so one set of numbers
+     describes the folder at every size. */
   const W = 1000;
-  const H = 300;
-  /* Height of the cut tab above the panel's shoulder. */
-  const TAB_H = 64;
+  const H = 340;
+  const TAB_H = 60;
   const TAB_W = 300;
-  /* Radius on the tab's corners — a die-cut tab is rounded, not mitred. */
-  const R = 26;
+  const R = 22;
 
   const x = Math.round((W - TAB_W) * tab);
   const top = TAB_H;
 
-  /* Left shoulder, up and over the tab, down to the right shoulder, then the
-     body of the panel. */
   const d = [
     `M 0 ${H}`,
     `L 0 ${top + R}`,
@@ -57,7 +54,7 @@ export function Divider({
     "Z",
   ].join(" ");
 
-  const uid = `d${Math.round(tab * 1000)}`;
+  const uid = `f${stock}${Math.round(tab * 1000)}`;
 
   return (
     <div className={className}>
@@ -68,40 +65,62 @@ export function Divider({
         aria-hidden
       >
         <defs>
-          {/* Light falls from the top: the tab catches it, the body sits in
-              the shade of the panel in front. */}
+          {/*
+            Four stops, not two. The top edge is the roll where the card folds
+            over and catches the light; under it the face falls away into the
+            shade of whatever sits in front.
+          */}
           <linearGradient id={`${uid}-face`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor={KRAFT.faceLit} />
-            <stop offset="0.28" stopColor={KRAFT.face} />
-            <stop offset="1" stopColor={KRAFT.edge} />
+            <stop offset="0" stopColor={s.lit} />
+            <stop offset="0.06" stopColor={s.face} />
+            <stop offset="0.55" stopColor={s.face} />
+            <stop offset="1" stopColor={s.deep} />
           </linearGradient>
-          {/* Paper fibre. Coarse and faint — manila is felt more than seen. */}
+
+          {/* Fibre. Coarse across the grain, fine along it, the way card is
+              actually made — and strong enough to read at phone size. */}
           <filter id={`${uid}-fibre`} x="0" y="0" width="100%" height="100%">
             <feTurbulence
               type="fractalNoise"
-              baseFrequency="0.9 0.04"
-              numOctaves="3"
-              seed={Math.round(tab * 97)}
+              baseFrequency="0.04 1.4"
+              numOctaves="4"
+              seed={Math.round(tab * 997)}
               result="n"
             />
             <feColorMatrix
               in="n"
               type="matrix"
-              values="0 0 0 0 0.28 0 0 0 0 0.17 0 0 0 0 0.07 0 0 0 0.12 0"
+              values="0 0 0 0 0.16 0 0 0 0 0.1 0 0 0 0 0.04 0 0 0 0.3 0"
             />
           </filter>
-        </defs>
 
-        <path d={d} fill={`url(#${uid}-face)`} />
-        {/* Fibre, clipped to the panel so it cannot bleed past the die cut. */}
-        <g clipPath={`url(#${uid}-clip)`}>
           <clipPath id={`${uid}-clip`}>
             <path d={d} />
           </clipPath>
+        </defs>
+
+        <path d={d} fill={`url(#${uid}-face)`} />
+
+        <g clipPath={`url(#${uid}-clip)`}>
           <rect width={W} height={H} filter={`url(#${uid}-fibre)`} />
+          {/* The crease a folder keeps from being folded, a little below the
+              top edge. */}
+          <rect y={top + 10} width={W} height="2" fill={s.deep} opacity="0.45" />
+          {/* And the shadow the folder in front casts down its face. */}
+          <rect
+            width={W}
+            height={H}
+            fill={`url(#${uid}-cast)`}
+            opacity="0.5"
+          />
         </g>
-        {/* The cut edge itself, a shade darker than the face. */}
-        <path d={d} fill="none" stroke={KRAFT.edge} strokeWidth="2.5" />
+
+        <linearGradient id={`${uid}-cast`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#2a1708" stopOpacity="0.5" />
+          <stop offset="0.3" stopColor="#2a1708" stopOpacity="0" />
+        </linearGradient>
+
+        <path d={d} fill="none" stroke={s.edge} strokeWidth="2" />
       </svg>
 
       {children}

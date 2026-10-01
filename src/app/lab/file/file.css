@@ -21,7 +21,7 @@
   min-height: 100svh;
   /* The table the file is lying on. */
   background: radial-gradient(120% 90% at 50% 0%, #1d6b57 0%, #11503f 70%, #0d3f32 100%);
-  padding: 7svh 0 14svh;
+  padding: 4svh 0 12svh;
   font-family: var(--font-metric), ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -29,24 +29,7 @@
   position: relative;
   width: min(430px, 100%);
   margin-inline: auto;
-  /* Room down the left for the concertina. */
-  padding-left: 22px;
-}
 
-/* ── The gusset ───────────────────────────────────────────────────────────── */
-.file__gusset {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 22px;
-  height: 100%;
-  /* It is the side of the box, so it sits behind every divider. */
-  z-index: 0;
-  /* Rounded where the fold wraps around the corner of the file. */
-  border-radius: 7px 0 0 7px;
-  overflow: hidden;
-  box-shadow: inset -6px 0 10px rgba(60, 32, 12, 0.4);
-  transition: opacity 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 /* ── Sections ─────────────────────────────────────────────────────────────── */
@@ -56,15 +39,29 @@
   list-style: none;
 }
 
+/*
+ * A band per section: the folder's tab and a strip of its face, then a gap
+ * above the next one where that folder's contents show through.
+ *
+ * The first pass overlapped the folders by 82px, which buried every tab but
+ * the first and stacked all the work at the top of the screen. Folders in a
+ * drawer are not flush — you see what is in them between the tabs, and that
+ * gap is where the design lives.
+ */
 .file__section {
   position: relative;
-  /* Dividers overlap: each one sits over the body of the one behind it, which
-     is what makes a stack rather than a ladder. */
-  margin-top: -44px;
+  margin-top: 74px;
 }
 
 .file__section:first-child {
   margin-top: 0;
+}
+
+/* The last folder shows its whole face, the way the back of a file does —
+   and it is what stops the stack ending halfway down the screen with nothing
+   under it. */
+.file__section:last-child .file__divider-svg {
+  height: 300px;
 }
 
 /* ── The tab ───────────────────────────────────────────────────────────────
@@ -87,15 +84,19 @@
   border-radius: 10px;
 }
 
+/* Each folder throws a real shadow onto the one behind it. Without this they
+   are coloured rectangles touching, which is what the first pass was. */
 .file__divider {
   position: relative;
-  filter: drop-shadow(0 -2px 10px rgba(50, 26, 8, 0.35));
+  filter:
+    drop-shadow(0 -3px 5px rgba(40, 20, 6, 0.4))
+    drop-shadow(0 -10px 22px rgba(40, 20, 6, 0.3));
 }
 
 .file__divider-svg {
   display: block;
   width: 100%;
-  height: 132px;
+  height: 88px;
 }
 
 /* ── Writing on the tab ───────────────────────────────────────────────────── */
@@ -119,6 +120,33 @@
 
 .file__hand-line {
   display: block;
+}
+
+/* ── What is already in the folder ─────────────────────────────────────────
+   Work sticking up out of the pocket, overlapped by the folder in front of it.
+   Sits under its own folder's front panel but over the one behind. */
+.file__peek {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Sits in the gap above its own folder, with its foot tucked behind that
+     folder's top edge so the paper reads as coming out of the pocket. */
+  bottom: calc(100% - 22px);
+  height: 96px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.file__peek img {
+  position: absolute;
+  bottom: 0;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: bottom;
+  height: auto;
+  max-width: none;
+  transform-origin: bottom center;
+  filter: drop-shadow(0 3px 6px rgba(30, 16, 4, 0.45));
 }
 
 /* ── The pocket ───────────────────────────────────────────────────────────
@@ -164,7 +192,7 @@
   display: grid;
   place-items: center;
   width: 150px;
-  height: 150px;
+  height: 88px;
   background: #e9a92b;
   rotate: -3deg;
   box-shadow: 2px 8px 14px rgba(0, 0, 0, 0.3);
