@@ -163,7 +163,7 @@ export function ExpandingFile() {
                   <Divider tab={s.tab} stock={s.stock} className="file__divider">
                     <span
                       className="file__label"
-                      style={{ left: `${s.tab * 70}%` }}
+                      style={{ left: `${s.tab * 66.7}%` }}
                     >
                       <Hand id={s.id} lines={s.label} />
                     </span>

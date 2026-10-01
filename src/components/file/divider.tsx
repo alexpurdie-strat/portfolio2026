@@ -1,27 +1,47 @@
 import { STOCKS, type Stock } from "@/content/file";
 
 /*
- * One file folder: a sheet of card folded once, with a tab die-cut into the
- * front leaf's top edge.
+ * A manila folder, drawn from the reference photograph.
  *
- * Two earlier attempts at this read as plastic and then as brushed metal. The
- * things that were wrong, because they are the things that make card:
+ * Three things in that photograph I had wrong, and they are the whole
+ * difference between this and a coloured rectangle with a bump on it:
  *
- *   The grain ran one way. `baseFrequency 0.04 1.4` is low across and high
- *   down, which is vertical streaking — metal, not paper. Card fibre is fine
- *   in both directions with only a slight bias, and it is a mottle rather than
- *   a stripe.
+ *   The stock is pale. Near ivory, not tan — a real manila folder is much
+ *   lighter than the idea of one.
  *
- *   The face was a long ramp from light to dark. Manila is close to even; what
- *   little range it has comes from the fold catching light at the top, not
- *   from a gradient down the whole sheet.
+ *   The tab is a third of the width and sits flush to an edge. Folders are cut
+ *   left, centre or right in thirds; the tab does not float in the middle with
+ *   air either side of it.
  *
- *   The edges were all one treatment. A folder has two kinds: the top is a
- *   fold, soft and lit, and the sides and tab are cut, showing the pale core
- *   of the board. Drawing both as a dark outline is what made it look printed.
+ *   The run from tab down to shoulder is a diagonal, not a curve. That short
+ *   angled cut is what the die leaves, and it reads as a folder immediately.
  */
+
+/* The top profile of a folder is a handful of straight runs and the turns
+   between them, every turn carrying the same small radius the die leaves. */
+function rounded(pts: [number, number][], r: number): string {
+  const out: string[] = [`M ${pts[0][0]} ${pts[0][1]}`];
+  for (let i = 1; i < pts.length - 1; i++) {
+    const [px, py] = pts[i - 1];
+    const [cx, cy] = pts[i];
+    const [nx, ny] = pts[i + 1];
+    const d1 = Math.hypot(cx - px, cy - py) || 1;
+    const d2 = Math.hypot(nx - cx, ny - cy) || 1;
+    const r1 = Math.min(r, d1 / 2);
+    const r2 = Math.min(r, d2 / 2);
+    out.push(`L ${cx + ((px - cx) / d1) * r1} ${cy + ((py - cy) / d1) * r1}`);
+    out.push(
+      `Q ${cx} ${cy} ${cx + ((nx - cx) / d2) * r2} ${cy + ((ny - cy) / d2) * r2}`,
+    );
+  }
+  const last = pts[pts.length - 1];
+  out.push(`L ${last[0]} ${last[1]}`);
+  return out.join(" ");
+}
+
 export function Divider({
-  /* 0 at the left edge, 1 at the right. */
+  /* 0 cuts the tab flush left, 0.5 centre, 1 flush right — the three
+     positions a box of folders actually comes in. */
   tab,
   stock,
   children,
@@ -36,34 +56,28 @@ export function Divider({
 
   const W = 1000;
   const H = 340;
-  /* Deep enough to write on. At 58 the tab was 15px on screen against 16px
-     type, so every label straddled the fold score below it — you would not
-     write across the crease of a real folder either. */
-  const TAB_H = 100;
-  const TAB_W = 300;
-  const R = 14;
-  /* The die taper: a folder tab is narrower at the top than at its shoulder,
-     so the cut sides lean in. Square sides are the giveaway of a drawn one. */
-  const TAPER = 16;
+  /* A third cut, as in the photograph. */
+  const TAB_W = Math.round(W / 3);
+  /* How far the tab stands above the shoulder. */
+  const TAB_H = 96;
+  /* The angled run of the die cut. */
+  const DIAG = 34;
+  const R = 9;
 
   const x = Math.round((W - TAB_W) * tab);
-  const top = TAB_H;
+  const flushLeft = x <= 1;
+  const flushRight = x + TAB_W >= W - 1;
 
-  const d = [
-    `M 0 ${H}`,
-    `L 0 ${top}`,
-    `L ${x - 2} ${top}`,
-    /* up the leaning cut, rounded where the die turns */
-    `L ${x + TAPER - R * 0.4} ${R}`,
-    `Q ${x + TAPER} 0 ${x + TAPER + R} 0`,
-    `L ${x + TAB_W - TAPER - R} 0`,
-    `Q ${x + TAB_W - TAPER} 0 ${x + TAB_W - TAPER + R * 0.4} ${R}`,
-    `L ${x + TAB_W + 2} ${top}`,
-    `L ${W} ${top}`,
-    `L ${W} ${H}`,
-    "Z",
-  ].join(" ");
+  const top: [number, number][] = [];
+  if (flushLeft) {
+    top.push([0, 0], [TAB_W, 0], [TAB_W + DIAG, TAB_H]);
+  } else {
+    top.push([0, TAB_H], [x - DIAG, TAB_H], [x, 0], [x + TAB_W, 0]);
+    if (!flushRight) top.push([x + TAB_W + DIAG, TAB_H]);
+  }
+  top.push(flushRight ? [W, 0] : [W, TAB_H]);
 
+  const d = `${rounded(top, R)} L ${W} ${H} L 0 ${H} Z`;
   const uid = `f${stock}${Math.round(tab * 1000)}`;
 
   return (
@@ -75,20 +89,21 @@ export function Divider({
         aria-hidden
       >
         <defs>
-          {/* Nearly flat. The only real move is the fold at the top catching
-              light, and it happens in the first few percent. */}
+          {/* Almost nothing. The photograph is flat card with a touch more
+              light at the fold and a shade of fall-off at the foot. */}
           <linearGradient id={`${uid}-face`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor={s.lit} />
-            <stop offset="0.04" stopColor={s.face} />
-            <stop offset="0.85" stopColor={s.face} />
+            <stop offset="0.1" stopColor={s.face} />
+            <stop offset="0.9" stopColor={s.face} />
             <stop offset="1" stopColor={s.deep} />
           </linearGradient>
 
-          {/* Fibre: fine, near-isotropic, barely there. */}
+          {/* Fibre, fine and even. At phone size it is felt rather than seen,
+              which is exactly how much of it the photograph shows. */}
           <filter id={`${uid}-fibre`} x="0" y="0" width="100%" height="100%">
             <feTurbulence
               type="fractalNoise"
-              baseFrequency="0.9 1.1"
+              baseFrequency="0.85 0.95"
               numOctaves="2"
               seed={Math.round(tab * 997)}
               result="n"
@@ -96,24 +111,7 @@ export function Divider({
             <feColorMatrix
               in="n"
               type="matrix"
-              values="0 0 0 0 0.18 0 0 0 0 0.12 0 0 0 0 0.05 0 0 0 0.07 0"
-            />
-          </filter>
-
-          {/* Mottle: the broad unevenness of pulp board, an order of magnitude
-              coarser than the fibre and just as faint. */}
-          <filter id={`${uid}-mottle`} x="0" y="0" width="100%" height="100%">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.05 0.08"
-              numOctaves="3"
-              seed={Math.round(tab * 131) + 7}
-              result="m"
-            />
-            <feColorMatrix
-              in="m"
-              type="matrix"
-              values="0 0 0 0 0.2 0 0 0 0 0.14 0 0 0 0 0.06 0 0 0 0.055 0"
+              values="0 0 0 0 0.2 0 0 0 0 0.16 0 0 0 0 0.1 0 0 0 0.055 0"
             />
           </filter>
 
@@ -125,34 +123,21 @@ export function Divider({
         <path d={d} fill={`url(#${uid}-face)`} />
 
         <g clipPath={`url(#${uid}-clip)`}>
-          <rect width={W} height={H} filter={`url(#${uid}-mottle)`} />
           <rect width={W} height={H} filter={`url(#${uid}-fibre)`} />
-
-          {/* The score the folder is folded along, a little under the lip. */}
-          <rect y={top + 7} width={W} height="1.5" fill={s.deep} opacity="0.3" />
-          <rect y={top + 8.5} width={W} height="1" fill={s.lit} opacity="0.3" />
+          {/* The score the front leaf is folded on, just under the shoulder. */}
+          <rect y={TAB_H + 9} width={W} height="1.2" fill={s.deep} opacity="0.5" />
         </g>
 
-        {/* The cut edge: the pale core of the board, not a dark outline — the
-            single detail that says this was guillotined rather than printed.
-            Only along the top, where the cut actually shows. The bottom is
-            buried in the folder behind and a bright line there reads as a
-            sticker outline. */}
+        {/* The cut edge, the pale core of the board. Along the top only — a cut
+            shows where the die went, not round the buried foot. */}
         <path
-          d={`M 0 ${top} L ${x - 2} ${top} L ${x + TAPER - R * 0.4} ${R} Q ${x + TAPER} 0 ${x + TAPER + R} 0 L ${x + TAB_W - TAPER - R} 0 Q ${x + TAB_W - TAPER} 0 ${x + TAB_W - TAPER + R * 0.4} ${R} L ${x + TAB_W + 2} ${top} L ${W} ${top}`}
+          d={rounded(top, R)}
           fill="none"
           stroke={s.lit}
-          strokeWidth="1.6"
-          strokeOpacity="0.8"
+          strokeWidth="1.8"
+          strokeOpacity="0.9"
           strokeLinejoin="round"
-        />
-        {/* And the shoulder line where the front leaf meets what is behind. */}
-        <path
-          d={`M 0 ${H} L 0 ${top} L ${x - 2} ${top} M ${x + TAB_W + 2} ${top} L ${W} ${top} L ${W} ${H}`}
-          fill="none"
-          stroke={s.edge}
-          strokeWidth="1"
-          strokeOpacity="0.5"
+          strokeLinecap="round"
         />
       </svg>
 

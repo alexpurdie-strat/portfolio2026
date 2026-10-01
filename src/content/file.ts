@@ -44,7 +44,7 @@ export const SECTIONS: Section[] = [
     id: "contact",
     label: ["Contact me"],
     kind: "note",
-    tab: 0.62,
+    tab: 0,
     blurb: "Text or call. Email if it is long.",
     stock: "manila",
     peek: [{ src: "/desk/note-amber.webp", w: 36, x: 16, rotate: -6 }],
@@ -53,7 +53,7 @@ export const SECTIONS: Section[] = [
     id: "work",
     label: ["Work", "examples"],
     kind: "cards",
-    tab: 0.3,
+    tab: 0.5,
     blurb: "Five case studies, shuffled. Swipe or use the arrows.",
     stock: "rust",
     peek: [
@@ -65,7 +65,7 @@ export const SECTIONS: Section[] = [
     id: "resume",
     label: ["Experience", "/resume"],
     kind: "sheet",
-    tab: 0.68,
+    tab: 1,
     blurb: "Fifteen years, one page.",
     stock: "slate",
     peek: [
@@ -77,7 +77,7 @@ export const SECTIONS: Section[] = [
     id: "about",
     label: ["About Me"],
     kind: "about",
-    tab: 0.26,
+    tab: 0,
     blurb: "The short version, and a photograph.",
     stock: "sage",
     peek: [
@@ -103,10 +103,12 @@ export type Stock = { face: string; lit: string; deep: string; edge: string };
  * badly, which is why a drawer of coloured folders is always a little grey.
  */
 export const STOCKS: Record<string, Stock> = {
-  manila: { face: "#c9ad80", lit: "#e0c9a2", deep: "#a98d63", edge: "#8d7149" },
-  rust: { face: "#b58571", lit: "#cfa795", deep: "#956755", edge: "#7d5244" },
-  sage: { face: "#9fa88c", lit: "#bcc3aa", deep: "#808a6d", edge: "#687258" },
-  slate: { face: "#96a0ab", lit: "#b4bdc7", deep: "#78828e", edge: "#616b76" },
+  /* Sampled off the reference photograph. Far paler than I had it — a real
+     manila folder is close to ivory, and every tan guess read as cardboard. */
+  manila: { face: "#ecdfc0", lit: "#f7f0dd", deep: "#d8c8a2", edge: "#c3b088" },
+  rust: { face: "#e0c3b4", lit: "#f0dcd1", deep: "#c7a494", edge: "#b08f80" },
+  sage: { face: "#d3d6bf", lit: "#e7e9d8", deep: "#b7bb9f", edge: "#a0a489" },
+  slate: { face: "#ccd3d9", lit: "#e2e7eb", deep: "#aeb7bf", edge: "#97a1aa" },
 };
 
 export const INK = "#3b2412";
