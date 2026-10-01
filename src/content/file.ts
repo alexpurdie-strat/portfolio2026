@@ -97,11 +97,16 @@ export const SECTIONS: Section[] = [
    through four stops and the grain is coarse enough to see. */
 export type Stock = { face: string; lit: string; deep: string; edge: string };
 
+/*
+ * Tones are muted on purpose. The first set was a shade too saturated and
+ * read as plastic toys; real file stock is dusty — pulp board takes dye
+ * badly, which is why a drawer of coloured folders is always a little grey.
+ */
 export const STOCKS: Record<string, Stock> = {
-  manila: { face: "#c89a5e", lit: "#dcb47b", deep: "#9d7038", edge: "#865c2c" },
-  rust: { face: "#b06b4b", lit: "#c88a68", deep: "#8a4e33", edge: "#73402a" },
-  sage: { face: "#94a078", lit: "#b0bb95", deep: "#6f7c57", edge: "#5c6848" },
-  slate: { face: "#8a97a8", lit: "#a7b3c1", deep: "#667385", edge: "#55606f" },
+  manila: { face: "#c9ad80", lit: "#e0c9a2", deep: "#a98d63", edge: "#8d7149" },
+  rust: { face: "#b58571", lit: "#cfa795", deep: "#956755", edge: "#7d5244" },
+  sage: { face: "#9fa88c", lit: "#bcc3aa", deep: "#808a6d", edge: "#687258" },
+  slate: { face: "#96a0ab", lit: "#b4bdc7", deep: "#78828e", edge: "#616b76" },
 };
 
 export const INK = "#3b2412";

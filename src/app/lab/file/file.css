@@ -50,7 +50,7 @@
  */
 .file__section {
   position: relative;
-  margin-top: 74px;
+  margin-top: 62px;
 }
 
 .file__section:first-child {
@@ -86,17 +86,20 @@
 
 /* Each folder throws a real shadow onto the one behind it. Without this they
    are coloured rectangles touching, which is what the first pass was. */
+/* Two shadows: a tight contact one where the card meets what is behind it,
+   and a wide soft one for the gap it is held off by. One shadow alone reads as
+   a sticker. */
 .file__divider {
   position: relative;
   filter:
-    drop-shadow(0 -3px 5px rgba(40, 20, 6, 0.4))
-    drop-shadow(0 -10px 22px rgba(40, 20, 6, 0.3));
+    drop-shadow(0 1px 1px rgba(30, 18, 6, 0.38))
+    drop-shadow(0 6px 14px rgba(30, 18, 6, 0.3));
 }
 
 .file__divider-svg {
   display: block;
   width: 100%;
-  height: 88px;
+  height: 106px;
 }
 
 /* ── Writing on the tab ───────────────────────────────────────────────────── */
@@ -104,17 +107,18 @@
    writing is given exactly that 30% and centred in it. */
 .file__label {
   position: absolute;
-  top: 8px;
+  /* Centred in the tab's own height rather than hung from its top. */
+  top: 5px;
   width: 30%;
   text-align: center;
   color: var(--kraft-ink);
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.12;
   /* Same marker weight as the desk's post-its: the stroke is what turns a
      fineliner into a sharpie, in em so it thickens with the type. */
   -webkit-text-stroke: 0.03em var(--kraft-ink);
   paint-order: stroke fill;
-  rotate: -1.5deg;
+  rotate: -1deg;
   pointer-events: none;
 }
 
@@ -192,7 +196,7 @@
   display: grid;
   place-items: center;
   width: 150px;
-  height: 88px;
+  height: 106px;
   background: #e9a92b;
   rotate: -3deg;
   box-shadow: 2px 8px 14px rgba(0, 0, 0, 0.3);
@@ -279,7 +283,7 @@
   border-radius: 50%;
   background: none;
   color: #f2ece1;
-  font-size: 17px;
+  font-size: 16px;
   cursor: pointer;
 }
 
