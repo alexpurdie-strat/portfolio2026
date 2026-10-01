@@ -422,7 +422,7 @@ export function noteWobble(note: Note) {
     /* Up to 2.5% bigger or smaller. */
     scale: 1 + hash(note.id, 2) * 0.025,
     /* Under a degree of skew — just enough that the paper is not a perfect
-       rectangle, which is what makes two notes of one colour read as two
+       rectangle, which is what makes two notes of one color read as two
        pieces of paper rather than one image used twice. */
     skew: hash(note.id, 3) * 0.8,
   };
