@@ -6,6 +6,8 @@
   position: relative;
   min-height: 100svh;
   overflow: hidden;
+  display: grid;
+  place-items: center;
   /* The table the folder lies on: lit from above, falling away at the edges. */
   background: radial-gradient(
     120% 90% at 50% 0%,
@@ -15,16 +17,87 @@
   );
 }
 
-/* The photograph at its own 1.402 ratio — height follows width, nothing is
-   stretched to fit a box. */
+/*
+ * The folder. Its own 1.402 ratio, never stretched — height follows width, and
+ * the leaves stack inside it.
+ */
 .file__folder {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  translate: -50% -50%;
+  position: relative;
   width: min(392px, 90vw);
-  height: auto;
-  /* The folder carries its own soft shadow from the shot; this is the contact
-     it needs against a darker surface than the one it was photographed on. */
+  aspect-ratio: 998 / 712;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  /* The hinge needs somewhere to lean into. */
+  perspective: 1100px;
   filter: drop-shadow(0 10px 18px rgba(8, 28, 22, 0.45));
+}
+
+.file__folder:focus-visible {
+  outline: 3px solid #ffd24a;
+  outline-offset: 8px;
+  border-radius: 4px;
+}
+
+.file__leaf {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.file__leaf--back {
+  z-index: 0;
+}
+
+/*
+ * The front leaf hinges on its foot, the way a cover does when you lift it —
+ * tipping toward the reader and foreshortening as it goes. Its own cast
+ * shadow deepens across the papers as it lifts off them.
+ */
+.file__leaf--front {
+  z-index: 2;
+  transform-origin: 50% 100%;
+  transition: transform 460ms cubic-bezier(0.3, 0.8, 0.35, 1);
+}
+
+.file__folder[aria-expanded="true"] .file__leaf--front {
+  transform: rotateX(-38deg) translateY(2%);
+}
+
+/* ── What is inside ───────────────────────────────────────────────────────
+   Above the back leaf and below the front one, which is the only reason this
+   reads as inside the folder rather than lying on it. */
+.file__papers {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+}
+
+.file__papers img {
+  position: absolute;
+  height: auto;
+  max-width: none;
+  /* Tucked down in the folder until it is opened. */
+  translate: 0 7%;
+  opacity: 0;
+  transition:
+    translate 460ms cubic-bezier(0.3, 0.8, 0.35, 1),
+    opacity 240ms ease;
+  filter: drop-shadow(0 2px 5px rgba(20, 40, 30, 0.4));
+}
+
+.file__folder[aria-expanded="true"] .file__papers img {
+  translate: 0 0;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .file__leaf--front,
+  .file__papers img {
+    transition: none;
+  }
 }
