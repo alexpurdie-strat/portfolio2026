@@ -21,9 +21,19 @@
  * The folder. Its own 1.402 ratio, never stretched — height follows width, and
  * the leaves stack inside it.
  */
-.file__folder {
+/* The stack holds the folders' shared footprint; each one is absolute inside
+   it and offset down the page, so they overlap the way a drawer does. */
+.file__stack {
   position: relative;
   width: min(392px, 90vw);
+  aspect-ratio: 998 / 712;
+  /* Room for the three behind to show below the one in front. */
+  margin-bottom: 138px;
+}
+
+.file__folder {
+  position: absolute;
+  inset-inline: 0;
   aspect-ratio: 998 / 712;
   padding: 0;
   border: 0;

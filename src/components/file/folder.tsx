@@ -5,107 +5,105 @@ import { useState } from "react";
 import { asset } from "@/lib/asset";
 
 /*
- * A folder that opens, cut from one photograph of a closed one.
+ * A stack of folders, cut from one photograph of a single closed one.
  *
- * Two halves, both cut from the same picture.
+ * Each folder is two halves. The back is the whole thing, tab included — on a
+ * real folder the tab belongs to the back, which is why it stands above the
+ * front when the thing is shut. The front is cut AWAY under the tab, so its
+ * top edge is the tab's inverse: 14.9% of the height beneath it and 9.4%
+ * beside it, both traced off the photograph column by column. Cutting that
+ * edge flat leaves a band of back leaf on the front half, and that band
+ * carries the tab's outline, so the flap tips forward with a tab printed on
+ * its face.
  *
- * The back half is the whole folder, tab included — on a real folder the tab
- * belongs to the back, which is exactly why it stands above the front when the
- * thing is shut. The front half is the body only: a straight top edge at the
- * shoulder and no tab at all, hinged on its foot. Papers go between them.
- *
- * Giving the tab to the front half is what produced the glitch: it swung away
- * with the leaf and the back's own tab appeared behind it, so the folder
- * opened to show a tab that was never the one you had been looking at.
- *
- * Both were cut at 4x and brought back down so the die and the keyed ground
- * land with sub-pixel edges. A CSS clip-path did this before and the diagonal
- * came out ragged; and the first key thresholded every pixel independently,
- * which punched holes in the pale patches inside the card. The ground is
- * flooded in from the corners now, so nothing enclosed by the folder is ever
- * touched.
- *
- * The front half's top edge is not a straight line. The front is cut AWAY
- * where the tab is — that is how a tab on the back stays visible with the
- * folder shut — so its profile is the inverse of the tab: low under it, high
- * beside it. Traced off the photograph column by column, that is 14.9% of the
- * height under the tab and 9.4% to the right of it, stepping between 34% and
- * 36.5% of the width.
- *
- * Two earlier cuts were flat lines straight across, at 5.3% and then at 9.7%.
- * This folder has no such edge, which is why a tab outline stayed printed on
- * the flap however far I moved the line.
+ * The three tab positions are composited, not photographed. The tab is lifted
+ * off the original as a patch, the folder beneath it is rebuilt with no tab at
+ * all, and the patch goes back down wherever it is wanted. Its left side is
+ * the folder's own edge so it carries only one diagonal; mirroring it supplies
+ * the other, which is what makes a centre cut possible from a left-cut
+ * photograph.
  */
 
-/*
- * What is in it: the desk's own work, guillotined rather than torn.
- *
- * The desk's cutouts have ragged edges because they were ripped out of
- * something. Paper that has been filed has a cut edge, and the torn rim read
- * as damage once it was sitting inside a crisp folder.
- *
- * The ITV one is the untorn original rather than a trimmed cutout — its tear
- * runs through the middle of the image, so no crop was going to fix it.
- */
+type Leaf = "left" | "center" | "right";
+
+const STACK: { id: string; cut: Leaf; label: string }[] = [
+  /* Back to front. There are only three cuts in a box, so with four folders
+     one position repeats — but never on neighbours, or the two tabs sit in a
+     column and read as one piece of card. */
+  { id: "about", cut: "right", label: "About" },
+  { id: "resume", cut: "center", label: "Experience" },
+  { id: "work", cut: "left", label: "Work" },
+  { id: "contact", cut: "center", label: "Contact" },
+];
+
+/* The desk's own work, guillotined rather than torn — paper that has been
+   filed has a cut edge. */
 const PAPERS = [
   { src: "/file/sheet-jafp.webp", w: 84, x: 8, y: 7, rotate: -2 },
   { src: "/file/sheet-itvs.webp", w: 80, x: 13, y: 16, rotate: 1.6 },
 ];
 
 export function Folder() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<string | null>(null);
 
   return (
-    <button
-      type="button"
-      className="file__folder"
-      aria-expanded={open}
-      onClick={() => setOpen((o) => !o)}
-    >
-      <span className="sr-only">
-        {open ? "Close the folder" : "Open the folder"}
-      </span>
+    <div className="file__stack">
+      {STACK.map((f, i) => {
+        const isOpen = open === f.id;
+        return (
+          <button
+            key={f.id}
+            type="button"
+            className="file__folder"
+            data-open={isOpen || undefined}
+            aria-expanded={isOpen}
+            /* Later folders are nearer the front and sit lower in the stack. */
+            style={{ zIndex: i + 1, top: `${i * 46}px` }}
+            onClick={() => setOpen(isOpen ? null : f.id)}
+          >
+            <span className="sr-only">{f.label}</span>
 
-      {/* The back leaf: the whole photograph, never moving. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        alt=""
-        aria-hidden
-        className="file__leaf file__leaf--back"
-        src={asset("/file/folder-back.webp")}
-        width={998}
-        height={712}
-      />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              alt=""
+              aria-hidden
+              className="file__leaf file__leaf--back"
+              src={asset(`/file/folder-${f.cut}-back.webp`)}
+              width={998}
+              height={712}
+            />
 
-      {/* Between the leaves. Sits above the back and below the front, which is
-          the only reason this reads as inside rather than on top. */}
-      <span className="file__papers" aria-hidden>
-        {PAPERS.map((p) => (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            key={p.src}
-            alt=""
-            src={asset(p.src)}
-            style={{
-              width: `${p.w}%`,
-              left: `${p.x}%`,
-              top: `${p.y}%`,
-              rotate: `${p.rotate}deg`,
-            }}
-          />
-        ))}
-      </span>
+            {/* Between the halves, which is the only reason it reads as inside
+                the folder rather than lying on it. */}
+            <span className="file__papers" aria-hidden>
+              {PAPERS.map((p) => (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  key={p.src}
+                  alt=""
+                  src={asset(p.src)}
+                  style={{
+                    width: `${p.w}%`,
+                    left: `${p.x}%`,
+                    top: `${p.y}%`,
+                    rotate: `${p.rotate}deg`,
+                  }}
+                />
+              ))}
+            </span>
 
-      {/* The front leaf: the same photograph, clipped, hinged on its foot. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        alt=""
-        aria-hidden
-        className="file__leaf file__leaf--front"
-        src={asset("/file/folder-front.webp")}
-        width={998}
-        height={712}
-      />
-    </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              alt=""
+              aria-hidden
+              className="file__leaf file__leaf--front"
+              src={asset(`/file/folder-${f.cut}-front.webp`)}
+              width={998}
+              height={712}
+            />
+          </button>
+        );
+      })}
+    </div>
   );
 }
