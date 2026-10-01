@@ -25,8 +25,16 @@ import { asset } from "@/lib/asset";
  * flooded in from the corners now, so nothing enclosed by the folder is ever
  * touched.
  *
- * The shoulder is measured, not guessed: it reads at 5.3% of the height. The
- * 9.7% used before was the fold score, a different line further down.
+ * The front half's top edge is not a straight line. The front is cut AWAY
+ * where the tab is — that is how a tab on the back stays visible with the
+ * folder shut — so its profile is the inverse of the tab: low under it, high
+ * beside it. Traced off the photograph column by column, that is 14.9% of the
+ * height under the tab and 9.4% to the right of it, stepping between 34% and
+ * 36.5% of the width.
+ *
+ * Two earlier cuts were flat lines straight across, at 5.3% and then at 9.7%.
+ * This folder has no such edge, which is why a tab outline stayed printed on
+ * the flap however far I moved the line.
  */
 
 /*
