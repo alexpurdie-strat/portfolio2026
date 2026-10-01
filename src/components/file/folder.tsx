@@ -7,9 +7,16 @@ import { asset } from "@/lib/asset";
 /*
  * A folder that opens, cut from one photograph of a closed one.
  *
- * Two assets, both from the same picture: the whole folder as the back leaf,
- * and the tab-plus-body as the front leaf, which hinges forward on its foot.
- * Papers go between the two.
+ * Two halves, both cut from the same picture.
+ *
+ * The back half is the whole folder, tab included — on a real folder the tab
+ * belongs to the back, which is exactly why it stands above the front when the
+ * thing is shut. The front half is the body only: a straight top edge at the
+ * shoulder and no tab at all, hinged on its foot. Papers go between them.
+ *
+ * Giving the tab to the front half is what produced the glitch: it swung away
+ * with the leaf and the back's own tab appeared behind it, so the folder
+ * opened to show a tab that was never the one you had been looking at.
  *
  * Both were cut at 4x and brought back down so the die and the keyed ground
  * land with sub-pixel edges. A CSS clip-path did this before and the diagonal
@@ -18,9 +25,8 @@ import { asset } from "@/lib/asset";
  * flooded in from the corners now, so nothing enclosed by the folder is ever
  * touched.
  *
- * The cut is measured, not guessed: the shoulder reads at 5.3% of the height
- * and the tab runs to 33.7% of the width. The 9.7% used before was the fold
- * score, which is a different line further down.
+ * The shoulder is measured, not guessed: it reads at 5.3% of the height. The
+ * 9.7% used before was the fold score, a different line further down.
  */
 
 /*
