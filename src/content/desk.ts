@@ -296,7 +296,7 @@ export const PIECES: Piece[] = [
 ];
 
 /* ── Blank notes ───────────────────────────────────────────────────────────
-   Four colours of empty post-it, cut out with their own shadows. Board-space:
+   Four colors of empty post-it, cut out with their own shadows. Board-space:
    x and y are measured from the top-left of the green, not of the asset, and
    the size is in the same units — a real note is about 76mm against a 600mm
    mat, and 98mm notes are just as standard — which is the 172 below.
