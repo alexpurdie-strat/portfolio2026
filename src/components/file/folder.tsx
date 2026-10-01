@@ -5,24 +5,37 @@ import { useState } from "react";
 import { asset } from "@/lib/asset";
 
 /*
- * A folder that opens, made from one photograph of a closed one.
+ * A folder that opens, cut from one photograph of a closed one.
  *
- * The trick is that the picture is used twice. Underneath it sits whole, which
- * is the back leaf. On top sits the same picture clipped to the front leaf
- * only — the tab and everything below the fold — and that copy hinges forward
- * on its bottom edge. Papers go between the two.
+ * Two assets, both from the same picture: the whole folder as the back leaf,
+ * and the tab-plus-body as the front leaf, which hinges forward on its foot.
+ * Papers go between the two.
  *
- * The clip is measured off the asset rather than guessed: the front leaf's top
- * edge reads at 9.7% of the height, and the tab runs from 2.8% to 34.4% of the
- * width, which is a left third cut. The short diagonal between them is the die.
+ * Both were cut at 4x and brought back down so the die and the keyed ground
+ * land with sub-pixel edges. A CSS clip-path did this before and the diagonal
+ * came out ragged; and the first key thresholded every pixel independently,
+ * which punched holes in the pale patches inside the card. The ground is
+ * flooded in from the corners now, so nothing enclosed by the folder is ever
+ * touched.
+ *
+ * The cut is measured, not guessed: the shoulder reads at 5.3% of the height
+ * and the tab runs to 33.7% of the width. The 9.7% used before was the fold
+ * score, which is a different line further down.
  */
-const FRONT_LEAF =
-  "polygon(0% 0%, 34.4% 0%, 37.7% 9.7%, 100% 9.7%, 100% 100%, 0% 100%)";
 
-/* What is in it. Real work from the desk build, so nothing new is cut. */
+/*
+ * What is in it: the desk's own work, guillotined rather than torn.
+ *
+ * The desk's cutouts have ragged edges because they were ripped out of
+ * something. Paper that has been filed has a cut edge, and the torn rim read
+ * as damage once it was sitting inside a crisp folder.
+ *
+ * The ITV one is the untorn original rather than a trimmed cutout — its tear
+ * runs through the middle of the image, so no crop was going to fix it.
+ */
 const PAPERS = [
-  { src: "/desk/piece-jafp.webp", w: 86, x: 7, y: 6, rotate: -2.5 },
-  { src: "/desk/piece-itvs-a.webp", w: 76, x: 17, y: 15, rotate: 2 },
+  { src: "/file/sheet-jafp.webp", w: 84, x: 8, y: 7, rotate: -2 },
+  { src: "/file/sheet-itvs.webp", w: 80, x: 13, y: 16, rotate: 1.6 },
 ];
 
 export function Folder() {
@@ -45,7 +58,7 @@ export function Folder() {
         alt=""
         aria-hidden
         className="file__leaf file__leaf--back"
-        src={asset("/file/folder-manila.webp")}
+        src={asset("/file/folder-back.webp")}
         width={998}
         height={712}
       />
@@ -75,8 +88,7 @@ export function Folder() {
         alt=""
         aria-hidden
         className="file__leaf file__leaf--front"
-        src={asset("/file/folder-manila.webp")}
-        style={{ clipPath: FRONT_LEAF }}
+        src={asset("/file/folder-front.webp")}
         width={998}
         height={712}
       />
