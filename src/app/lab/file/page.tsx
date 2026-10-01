@@ -1,20 +1,35 @@
 import type { Metadata } from "next";
 
+import { asset } from "@/lib/asset";
+
 import "./file.css";
 
 export const metadata: Metadata = {
   title: "Lab — the file",
-  description: "Mobile variant, back to the surface it sits on.",
+  description: "Mobile variant: a manila folder on the table.",
   robots: { index: false, follow: false },
 };
 
 /*
- * Stripped to the ground it stands on.
+ * The folder is the photograph, at its own ratio.
  *
- * The folders, the tabs, the handwriting and the contents are all gone from
- * here — and all of them are in git, through d2ebb55, if any of it is worth
- * pulling back. Figma 229:1828 is still the design of record.
+ * It was drawn three times before this — plastic, then brushed metal, then a
+ * decent likeness — and every pass cost more than using the picture would
+ * have. 499 x 356 in the original, cropped to its own bounds, white ground
+ * keyed out, 12KB.
  */
 export default function FilePage() {
-  return <div className="file" />;
+  return (
+    <div className="file">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        alt=""
+        aria-hidden
+        className="file__folder"
+        src={asset("/file/folder-manila.webp")}
+        width={998}
+        height={712}
+      />
+    </div>
+  );
 }

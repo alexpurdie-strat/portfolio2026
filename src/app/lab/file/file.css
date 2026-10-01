@@ -1,17 +1,30 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    THE FILE — mobile variant
-
-   Stripped to the surface. Everything that stood on it has been scrapped;
-   what is left is the ground, which was never the problem.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .file {
+  position: relative;
   min-height: 100svh;
-  /* The table the file lies on: lit from above, falling away at the edges. */
+  overflow: hidden;
+  /* The table the folder lies on: lit from above, falling away at the edges. */
   background: radial-gradient(
     120% 90% at 50% 0%,
     #1d6b57 0%,
     #11503f 70%,
     #0d3f32 100%
   );
+}
+
+/* The photograph at its own 1.402 ratio — height follows width, nothing is
+   stretched to fit a box. */
+.file__folder {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  width: min(392px, 90vw);
+  height: auto;
+  /* The folder carries its own soft shadow from the shot; this is the contact
+     it needs against a darker surface than the one it was photographed on. */
+  filter: drop-shadow(0 10px 18px rgba(8, 28, 22, 0.45));
 }
