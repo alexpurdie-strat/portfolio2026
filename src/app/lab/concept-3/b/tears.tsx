@@ -63,7 +63,7 @@ export type TearSpec = {
 const DECODE = "01<>/_{}[]=+*#:;";
 const EDGE = "01#@%*+=<>/{}[];:$&";
 const POINTS = 72;
-const PARTICLES = 3600;
+const PARTICLES = 3000;
 const OUT = 36; // px, sigma of the feather outward: ~110px, a few further
 const IN = 13.5; // px, sigma inward: shorter, so the image stays clearer
 const CORE = 16; // px, the near-solid white band on the lip
@@ -81,10 +81,14 @@ const PALETTE = [WHITE, ...COOL];
  */
 const sprites: HTMLCanvasElement[] = [];
 let spriteFamily = "";
-const spriteAt = (ch: number, size: number, color: number, family: string) => {
-  if (family !== spriteFamily) {
+let spriteScale = 1;
+/* Glyphs are drawn at the screen's pixel density (up to 2x), so they stay
+   crisp on a retina display; a 1x stamp scaled up reads as blur. */
+const spriteAt = (ch: number, size: number, color: number, family: string, scale: number) => {
+  if (family !== spriteFamily || scale !== spriteScale) {
     sprites.length = 0;
     spriteFamily = family;
+    spriteScale = scale;
   }
   const i = (ch * SIZES.length + size) * PALETTE.length + color;
   let c = sprites[i];
@@ -92,9 +96,10 @@ const spriteAt = (ch: number, size: number, color: number, family: string) => {
     const px = SIZES[size];
     const box = Math.ceil(px * 1.4);
     c = document.createElement("canvas");
-    c.width = box;
-    c.height = box;
+    c.width = Math.ceil(box * scale);
+    c.height = Math.ceil(box * scale);
     const g = c.getContext("2d")!;
+    g.scale(scale, scale);
     g.font = `500 ${px}px ${family}`;
     g.textAlign = "center";
     g.textBaseline = "middle";
@@ -303,12 +308,17 @@ export function Tear({
       const tail = Math.random() < 0.11;
       const g = tail ? 1.6 + Math.random() * 1.4 : Math.min(gauss(), 3);
       const d = (out ? 1 : -1) * g * sigma;
+      // Thin the lip itself by about a third, so the middle is light through
+      // fewer glyphs rather than fainter ones.
+      if (!tail && g < 0.5 && Math.random() < 0.3) continue;
       // Near the lip, nearly full; far out, faint, with some glyphs much
       // fainter than their neighbours, so the falloff is never a clean ramp.
       // Glyphs right on the lip are dimmed a little, so the middle of the
       // edge is not a solid mass.
-      const lip = 0.75 + 0.25 * Math.min(1, (g * sigma) / CORE);
-      const a = (tail ? 0.15 + Math.random() * 0.25 : Math.pow(Math.exp(-(g * g) / 2), 0.55) * lip) * (0.45 + Math.random() * 0.55);
+      // Crisp, not faded: every glyph is near full strength, and the feather
+      // thins by how few glyphs there are further out, not by how faint
+      // they are. Faint glyphs read as blur on a high-contrast page.
+      const a = tail ? 0.65 + Math.random() * 0.2 : 0.8 + Math.random() * 0.2;
       const near = Math.abs(d) < CORE;
       const roll = Math.random();
       const size = near ? (roll < 0.27 ? 2 : roll < 0.7 ? 1 : 0) : roll < 0.11 ? 2 : roll < 0.5 ? 1 : 0;
@@ -354,7 +364,7 @@ export function Tear({
           s: sAt,
           d: (Math.random() < 0.5 ? -1 : 1) * g,
           ch: (Math.random() * EDGE.length) | 0,
-          a: Math.pow(Math.exp(-(g * g) / 2), 0.65) * (0.45 + Math.random() * 0.55),
+          a: 0.8 + Math.random() * 0.2,
           c: pickColor(far * 0.6 + sAt * 0.35),
           size: Math.random() < 0.3 * (1 - sAt) ? 2 : Math.random() < 0.5 ? 1 : 0,
         };
@@ -403,12 +413,16 @@ export function Tear({
     const ctx = canvas?.getContext("2d") ?? null;
     const coreCanvas = coreRef.current;
     const cctx = coreCanvas?.getContext("2d") ?? null;
-    for (const c of [canvas, coreCanvas]) {
-      if (!c) continue;
-      c.width = w + PAD * 2;
-      c.height = h + PAD * 2;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (canvas) {
+      canvas.width = Math.round((w + PAD * 2) * dpr);
+      canvas.height = Math.round((h + PAD * 2) * dpr);
     }
-    ctx?.setTransform(1, 0, 0, 1, PAD, PAD);
+    if (coreCanvas) {
+      coreCanvas.width = w + PAD * 2;
+      coreCanvas.height = h + PAD * 2;
+    }
+    ctx?.setTransform(dpr, 0, 0, dpr, PAD * dpr, PAD * dpr);
     cctx?.setTransform(1, 0, 0, 1, PAD, PAD);
     if (canvas) {
       family = getComputedStyle(canvas).getPropertyValue("--font-martian").trim() || "monospace";
@@ -598,7 +612,8 @@ export function Tear({
 
         // The glyphs, a size at a time, each walk round the outline once.
         buckets.forEach((bucket, bi) => {
-          const half = Math.ceil(SIZES[bi] * 1.4) / 2;
+          const box = Math.ceil(SIZES[bi] * 1.4);
+          const half = box / 2;
           let seg = 0;
           for (const p of bucket) {
             const at = p.u * total;
@@ -622,9 +637,11 @@ export function Tear({
             const drift = open * (1 + heal * 0.9);
             ctx.globalAlpha = p.a * open * (1 - heal * 0.6);
             ctx.drawImage(
-              spriteAt(p.ch, bi, p.c, family),
+              spriteAt(p.ch, bi, p.c, family, dpr),
               px + nx * p.d * drift - half,
               py + ny * p.d * drift - half,
+              box,
+              box,
             );
           }
         });
@@ -632,7 +649,8 @@ export function Tear({
 
         // The tendrils' feather: their glyphs, around each line, by size.
         SIZES.forEach((size, si) => {
-          const half = Math.ceil(size * 1.4) / 2;
+          const box = Math.ceil(size * 1.4);
+          const half = box / 2;
           for (const p of paths) {
             const last = p.pts.length - 1;
             for (const g of p.crack.glyphs) {
@@ -646,11 +664,13 @@ export function Tear({
               const dy = y1 - y0;
               const dl = Math.hypot(dx, dy) || 1;
               const width = p.w0 * 2 * (1 - g.s * 0.7);
-              ctx.globalAlpha = g.a * (1 - g.s * 0.85) * p.grow * open;
+              ctx.globalAlpha = g.a * (1 - g.s * 0.3) * p.grow * open;
               ctx.drawImage(
-                spriteAt(g.ch, si, g.c, family),
+                spriteAt(g.ch, si, g.c, family, dpr),
                 x0 + dx * f + (-dy / dl) * g.d * width - half,
                 y0 + dy * f + (dx / dl) * g.d * width - half,
+                box,
+                box,
               );
             }
           }
