@@ -63,9 +63,9 @@ export type TearSpec = {
 const DECODE = "01<>/_{}[]=+*#:;";
 const EDGE = "01#@%*+=<>/{}[];:$&";
 const POINTS = 72;
-const PARTICLES = 3400;
+const PARTICLES = 4000;
 const OUT = 36; // px, sigma of the feather outward: ~110px, a few further
-const IN = 13.5; // px, sigma inward: shorter, so the image stays clearer
+const IN = 16; // px, sigma inward: shorter, so the image stays clearer
 const CORE = 16; // px, the near-solid white band on the lip
 const SIZES = [8, 10, 13];
 /* The edge's light: white at the lip, cooling into greens and blues out in
@@ -308,9 +308,6 @@ export function Tear({
       const tail = Math.random() < 0.11;
       const g = tail ? 1.6 + Math.random() * 1.4 : Math.min(gauss(), 3);
       const d = (out ? 1 : -1) * g * sigma;
-      // Thin the lip itself by about a third, so the middle is light through
-      // fewer glyphs rather than fainter ones.
-      if (!tail && g < 0.5 && Math.random() < 0.15) continue;
       // Near the lip, nearly full; far out, faint, with some glyphs much
       // fainter than their neighbours, so the falloff is never a clean ramp.
       // Glyphs right on the lip are dimmed a little, so the middle of the
@@ -325,7 +322,7 @@ export function Tear({
         : (0.5 + 0.5 * fall) * (0.7 + Math.random() * 0.3);
       const near = Math.abs(d) < CORE;
       const roll = Math.random();
-      const size = near ? (roll < 0.27 ? 2 : roll < 0.7 ? 1 : 0) : roll < 0.11 ? 2 : roll < 0.5 ? 1 : 0;
+      const size = near ? (roll < 0.35 ? 2 : roll < 0.75 ? 1 : 0) : roll < 0.11 ? 2 : roll < 0.5 ? 1 : 0;
       // The further out, the likelier a glyph is coloured: the core stays
       // white, the outer feather is about half green and blue.
       const c = pickColor(Math.min(0.55, (Math.abs(d) / (OUT * 2.2)) * 0.8 + (out ? 0.06 : 0)));
@@ -511,6 +508,19 @@ export function Tear({
         outer.push([px, py]);
       }
 
+      // Just barely round the corners: one light pass that pulls each point
+      // a fifth of the way toward its neighbours. Straight runs stay
+      // straight; only the sharpest tips soften.
+      const raw = outer.map((p) => [p[0], p[1]] as [number, number]);
+      for (let i = 0; i < POINTS; i++) {
+        const [ax, ay] = raw[(i - 1 + POINTS) % POINTS];
+        const [bx, by] = raw[(i + 1) % POINTS];
+        outer[i] = [
+          raw[i][0] * 0.6 + (ax + bx) * 0.2,
+          raw[i][1] * 0.6 + (ay + by) * 0.2,
+        ];
+      }
+
       const fmt = (p: [number, number][]) =>
         p.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
       const poly = fmt(outer);
@@ -582,8 +592,8 @@ export function Tear({
           cctx.lineCap = "round";
           cctx.strokeStyle = WHITE;
           const passes: [number, number][] = [
-            [0.32, 1.45],
-            [0.48, 0.52],
+            [0.45, 2],
+            [0.65, 0.8],
           ];
           for (const [alpha, widthK] of passes) {
             cctx.globalAlpha = alpha * open;
