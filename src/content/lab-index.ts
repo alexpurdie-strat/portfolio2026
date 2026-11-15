@@ -129,21 +129,21 @@ const PREVIEWS: Record<string, Preview[]> = {
 };
 
 /*
- * Brand colours for the rows that link out, each sampled from that client's
- * own coloured logo in public/logos/colored (the fill it is drawn in).
+ * A hue for each row that links out: six clear primaries, none repeated, in
+ * spectrum order down the list.
  */
-const BRAND: Record<string, string> = {
-  "ja-finance-park": "#285F74",
-  "itv-studios-portal": "#0F72EC",
-  "home-depot": "#FF6600",
-  "100-shapes": "#4676FE",
-  "your-move": "#244DA0",
-  taxslayer: "#D82532",
+const HUE: Record<string, string> = {
+  "ja-finance-park": "#E5383B",
+  "itv-studios-portal": "#F28C28",
+  "home-depot": "#F2D024",
+  "100-shapes": "#3DB46D",
+  "your-move": "#2F7DF6",
+  taxslayer: "#8B45E0",
 };
 
 export type ListRow = {
   id: string;
-  brand?: string;
+  hue?: string;
   title: string;
   meta: string[];
   src: string[];
@@ -172,7 +172,7 @@ export const LIST: ListRow[] = [
     href: `/work/${r.slug}/`,
     run: r.outcomes,
     previews: PREVIEWS[r.slug] ?? [SAMPLE],
-    brand: BRAND[r.slug],
+    hue: HUE[r.slug],
   })),
   ...ARCHIVE.filter((a) => !INDEX.some((r) => r.slug === a.id)).map((a) => ({
     id: a.id,
