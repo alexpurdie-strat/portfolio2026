@@ -281,9 +281,9 @@ export function Tear({
     let lastDecode = 0;
     let lastShimmer = 0;
 
-    // Flares: now and then a short streak of glyphs shoots out from the edge,
-    // well past the feather, and fades. Rare, so they read as sparks off the
-    // burn and carry its light a little further into the page.
+    // Outliers: now and then a single stray glyph, occasionally two, shows
+    // far out past the feather, drifts a little and fades. Sparse, so the
+    // edge's light seems to scatter thinly into the page.
     type Flare = {
       u: number;
       born: number;
@@ -677,20 +677,20 @@ export function Tear({
 
         // Flares, spawned only while the tear is fully open.
         if (!still && open > 0.98 && heal === 0 && now > nextFlare) {
-          nextFlare = now + 500 + Math.random() * 1000;
-          const n = 4 + ((Math.random() * 6) | 0);
+          nextFlare = now + 220 + Math.random() * 520;
+          const n = Math.random() < 0.2 ? 2 : 1;
           flares.push({
             u: Math.random(),
             born: now,
-            life: 600 + Math.random() * 400,
-            reach: 80 + Math.random() * 150,
-            tilt: (Math.random() - 0.5) * 0.5,
+            life: 900 + Math.random() * 900,
+            reach: 100 + Math.random() * 180,
+            tilt: (Math.random() - 0.5) * 0.9,
             glyphs: Array.from({ length: n }, (_, k) => ({
               ch: (Math.random() * EDGE.length) | 0,
-              c: pickColor(0.75),
-              size: Math.random() < 0.25 ? 1 : 0,
-              at: (k + Math.random() * 0.6) / n,
-              jit: (Math.random() - 0.5) * 8,
+              c: pickColor(0.6),
+              size: Math.random() < 0.3 ? 1 : 0,
+              at: k * (0.06 + Math.random() * 0.08),
+              jit: (Math.random() - 0.5) * 14,
             })),
           });
         }
@@ -723,12 +723,11 @@ export function Tear({
           const sin = Math.sin(fl.tilt);
           const dx = nx * cos - ny * sin;
           const dy = nx * sin + ny * cos;
-          // Shoots out fast and eases, then fades.
-          const travel = 1 - Math.pow(1 - ft, 3);
+          // Sits far out, drifts a few pixels further, and fades in and out.
           for (const g of fl.glyphs) {
             const box = Math.ceil(SIZES[g.size] * 1.4);
-            const d = OUT * 0.8 + g.at * fl.reach * travel;
-            ctx.globalAlpha = Math.pow(1 - ft, 1.3) * (1 - g.at * 0.4) * 0.9;
+            const d = fl.reach * (1 + g.at) + ft * 8;
+            ctx.globalAlpha = Math.sin(Math.PI * ft) * 0.85;
             ctx.drawImage(
               spriteAt(g.ch, g.size, g.c, family, dpr),
               px + dx * d - dy * g.jit - box / 2,
