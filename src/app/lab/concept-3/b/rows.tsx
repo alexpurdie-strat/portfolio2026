@@ -218,14 +218,14 @@ export function Rows({ rows }: { rows: ListRow[] }) {
         let el: ReactNode;
         if (row.href && !row.external) {
           el = (
-            <Link className="cb-row" href={row.href} data-active={on || undefined} {...handlers}>
+            <Link className="cb-row cb-row--linked" href={row.href} data-active={on || undefined} {...handlers}>
               {body}
             </Link>
           );
         } else if (row.href) {
           el = (
             <a
-              className="cb-row"
+              className="cb-row cb-row--linked"
               href={row.href}
               target="_blank"
               rel="noopener"
