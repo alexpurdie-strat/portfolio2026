@@ -63,7 +63,7 @@ export type TearSpec = {
 const DECODE = "01<>/_{}[]=+*#:;";
 const EDGE = "01#@%*+=<>/{}[];:$&";
 const POINTS = 72;
-const PARTICLES = 3000;
+const PARTICLES = 3400;
 const OUT = 36; // px, sigma of the feather outward: ~110px, a few further
 const IN = 13.5; // px, sigma inward: shorter, so the image stays clearer
 const CORE = 16; // px, the near-solid white band on the lip
@@ -310,15 +310,19 @@ export function Tear({
       const d = (out ? 1 : -1) * g * sigma;
       // Thin the lip itself by about a third, so the middle is light through
       // fewer glyphs rather than fainter ones.
-      if (!tail && g < 0.5 && Math.random() < 0.3) continue;
+      if (!tail && g < 0.5 && Math.random() < 0.15) continue;
       // Near the lip, nearly full; far out, faint, with some glyphs much
       // fainter than their neighbours, so the falloff is never a clean ramp.
       // Glyphs right on the lip are dimmed a little, so the middle of the
       // edge is not a solid mass.
-      // Crisp, not faded: every glyph is near full strength, and the feather
-      // thins by how few glyphs there are further out, not by how faint
-      // they are. Faint glyphs read as blur on a high-contrast page.
-      const a = tail ? 0.65 + Math.random() * 0.2 : 0.8 + Math.random() * 0.2;
+      // Fades with distance, but only so far: near the lip 70-100%, the
+      // outer feather no fainter than about 35%. The feather thins mostly by
+      // how few glyphs there are; faint grey glyphs read as blur on a
+      // high-contrast page.
+      const fall = Math.exp(-(g * g) / 2);
+      const a = tail
+        ? 0.4 + Math.random() * 0.2
+        : (0.5 + 0.5 * fall) * (0.7 + Math.random() * 0.3);
       const near = Math.abs(d) < CORE;
       const roll = Math.random();
       const size = near ? (roll < 0.27 ? 2 : roll < 0.7 ? 1 : 0) : roll < 0.11 ? 2 : roll < 0.5 ? 1 : 0;
@@ -364,7 +368,7 @@ export function Tear({
           s: sAt,
           d: (Math.random() < 0.5 ? -1 : 1) * g,
           ch: (Math.random() * EDGE.length) | 0,
-          a: 0.8 + Math.random() * 0.2,
+          a: 0.65 + Math.random() * 0.35,
           c: pickColor(far * 0.6 + sAt * 0.35),
           size: Math.random() < 0.3 * (1 - sAt) ? 2 : Math.random() < 0.5 ? 1 : 0,
         };
@@ -664,7 +668,7 @@ export function Tear({
               const dy = y1 - y0;
               const dl = Math.hypot(dx, dy) || 1;
               const width = p.w0 * 2 * (1 - g.s * 0.7);
-              ctx.globalAlpha = g.a * (1 - g.s * 0.3) * p.grow * open;
+              ctx.globalAlpha = g.a * (1 - g.s * 0.55) * p.grow * open;
               ctx.drawImage(
                 spriteAt(g.ch, si, g.c, family, dpr),
                 x0 + dx * f + (-dy / dl) * g.d * width - half,
