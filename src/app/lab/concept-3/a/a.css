@@ -1,0 +1,397 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CONCEPT 3A — THE INDEX
+   Style sheet, locked:
+   · Surface white; one ink band, the footer. Nothing else takes a fill.
+   · Ink #111, secondary #6b6b6b (5.3:1 on white).
+   · Edges: 1px hairlines between index rows only. Radius 0 everywhere.
+   · Depth: flat. No shadows.
+   · Type: Familjen Grotesk alone. 86 / 26 / 14.
+   · Accent: none. Inversion is the only emphasis, for hover and focus.
+   · Motion: 200ms ease-out on fill, color and opacity; the marquee is linear.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ca {
+  --ca-paper: #ffffff;
+  --ca-ink: #111111;
+  --ca-muted: #6b6b6b;
+  --ca-rule: rgb(17 17 17 / 0.14);
+  --ca-margin: 40px;
+  --ca-display: clamp(2.5rem, 6vw, 5.4rem); /* 86px at 1440 */
+  --ca-text: clamp(1.125rem, 1.8vw, 1.625rem); /* 26px at 1440 */
+  --ca-micro: 0.875rem;
+  --ca-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  min-height: 100dvh;
+  background: var(--ca-paper);
+  color: var(--ca-ink);
+  font-family: var(--font-familjen), sans-serif;
+  font-size: var(--ca-text);
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.ca *,
+.ca *::before,
+.ca *::after {
+  box-sizing: border-box;
+}
+
+/* Zero specificity, so every class below wins over the reset. */
+:where(.ca) :where(h1, h2, p, ul, dl, dd) {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+}
+
+:where(.ca) ul {
+  list-style: none;
+}
+
+/* Four equal columns on the margin, as measured on the lead. */
+.ca-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding-inline: var(--ca-margin);
+}
+
+.ca-grid > * {
+  padding-right: 20px;
+}
+
+.ca-muted {
+  color: var(--ca-muted);
+}
+
+.ca-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 200ms var(--ca-ease);
+}
+
+@media (hover: hover) {
+  .ca-link:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+.ca a:focus-visible {
+  outline: 2px solid var(--ca-ink);
+  outline-offset: 2px;
+}
+
+/* ── Strip ─────────────────────────────────────────────────────────────── */
+
+.ca-strip {
+  padding-top: 32px;
+}
+
+/* ── Index ─────────────────────────────────────────────────────────────── */
+
+.ca-index {
+  padding-top: clamp(96px, 22vh, 220px);
+}
+
+.ca-lede {
+  padding-inline: var(--ca-margin);
+  margin-left: 25%;
+  max-width: 28ch;
+  margin-bottom: 64px;
+  text-wrap: balance;
+}
+
+.ca-rows {
+  border-top: 1px solid var(--ca-rule);
+}
+
+.ca-rows li {
+  border-bottom: 1px solid var(--ca-rule);
+}
+
+.ca-row {
+  position: relative;
+  align-items: baseline;
+  padding-block: 10px 14px;
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+  transition:
+    background-color 200ms var(--ca-ease),
+    color 200ms var(--ca-ease);
+}
+
+.ca-row__years {
+  grid-column: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.ca-row__title {
+  grid-column: 2 / span 2;
+  font-size: var(--ca-display);
+  line-height: 1.05;
+  letter-spacing: -0.033em;
+  text-wrap: balance;
+}
+
+.ca-row__meta {
+  grid-column: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--ca-micro);
+  line-height: 1.3;
+}
+
+.ca-row__outcomes {
+  display: none;
+}
+
+.ca-row__years,
+.ca-row__title,
+.ca-row__meta {
+  transition: opacity 200ms var(--ca-ease);
+}
+
+/* The run: the row's outcomes, set at display size, over columns two to
+   four. Hidden until the row is pointed at or focused. */
+.ca-row__run {
+  position: absolute;
+  inset: 0 0 0 25%;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms var(--ca-ease);
+}
+
+.ca-marquee {
+  width: 100%;
+  --duration: 16s;
+  --gap: 0px;
+}
+
+.ca-marquee__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding-right: 0.6em;
+  font-size: var(--ca-display);
+  line-height: 1.05;
+  letter-spacing: -0.033em;
+  white-space: nowrap;
+}
+
+.ca-marquee__arrow {
+  width: 0.42em;
+  height: 0.42em;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+
+.ca-row:focus-visible {
+  outline-offset: -2px;
+}
+
+@media (hover: hover) {
+  .ca-row:hover,
+  .ca-row:focus-visible {
+    background-color: var(--ca-ink);
+    color: var(--ca-paper);
+  }
+
+  .ca-row:hover .ca-muted,
+  .ca-row:focus-visible .ca-muted {
+    color: rgb(255 255 255 / 0.6);
+  }
+
+  .ca-row:hover .ca-row__title,
+  .ca-row:hover .ca-row__meta,
+  .ca-row:focus-visible .ca-row__title,
+  .ca-row:focus-visible .ca-row__meta {
+    opacity: 0;
+  }
+
+  .ca-row:hover .ca-row__run,
+  .ca-row:focus-visible .ca-row__run {
+    opacity: 1;
+  }
+}
+
+/* No pointer to hover with: the outcomes are simply written under the title. */
+@media (hover: none) {
+  .ca-row__run {
+    display: none;
+  }
+
+  .ca-row__outcomes {
+    display: block;
+    grid-column: 2 / -1;
+    margin-top: 8px;
+    font-size: var(--ca-micro);
+    line-height: 1.3;
+    color: var(--ca-muted);
+  }
+}
+
+/* ── Numbers and about ─────────────────────────────────────────────────── */
+
+.ca-section {
+  padding-top: 128px;
+}
+
+.ca-tally {
+  grid-column: 2 / -1;
+}
+
+.ca-tally__row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+}
+
+.ca-tally__row dd {
+  font-variant-numeric: tabular-nums;
+}
+
+.ca-about {
+  grid-column: 2 / span 2;
+  max-width: 34ch;
+  text-wrap: pretty;
+}
+
+/* ── Footer: the one ink band ──────────────────────────────────────────── */
+
+.ca-foot {
+  margin-top: 160px;
+  padding-block: 64px 32px;
+  background: var(--ca-ink);
+  color: var(--ca-paper);
+}
+
+.ca-foot__label {
+  color: rgb(255 255 255 / 0.6);
+}
+
+.ca-foot__mail {
+  grid-column: 2 / -1;
+  font-size: clamp(1.75rem, 4.4vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.033em;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.12em;
+  text-decoration-thickness: 2px;
+  overflow-wrap: anywhere;
+  transition: text-decoration-color 200ms var(--ca-ease);
+}
+
+@media (hover: hover) {
+  .ca-foot__mail:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+.ca-foot a:focus-visible {
+  outline-color: var(--ca-paper);
+}
+
+.ca-foot__base {
+  margin-top: 128px;
+  font-size: var(--ca-micro);
+}
+
+.ca-foot__base > :first-child {
+  grid-column: 2;
+}
+
+/* ── Below 768: two columns, the index stacks ──────────────────────────── */
+
+@media (max-width: 767px) {
+  .ca {
+    --ca-margin: 16px;
+  }
+
+  .ca-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 4px;
+  }
+
+  .ca-grid > * {
+    padding-right: 12px;
+  }
+
+  .ca-strip {
+    padding-top: 16px;
+    font-size: var(--ca-micro);
+  }
+
+  .ca-lede {
+    margin-left: 0;
+    margin-bottom: 40px;
+  }
+
+  .ca-row {
+    padding-block: 12px 16px;
+  }
+
+  .ca-row__years {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: var(--ca-micro);
+  }
+
+  .ca-row__meta {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .ca-row__meta .ca-muted {
+    display: none;
+  }
+
+  .ca-row__title,
+  .ca-row__outcomes {
+    grid-column: 1 / -1;
+  }
+
+  .ca-section {
+    padding-top: 80px;
+  }
+
+  .ca-tally,
+  .ca-about {
+    grid-column: 1 / -1;
+  }
+
+  .ca-section h2 {
+    grid-column: 1 / -1;
+    margin-bottom: 12px;
+  }
+
+  .ca-foot__mail {
+    grid-column: 1 / -1;
+    margin-top: 12px;
+  }
+
+  .ca-foot__base > :first-child {
+    grid-column: 1;
+  }
+}

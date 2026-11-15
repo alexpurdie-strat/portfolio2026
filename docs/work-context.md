@@ -10,7 +10,7 @@ be rewritten, not text to be reused.
 
 ## Person
 
-- Alex Purdie — Product Designer, London, UK.
+- Alex Purdie — Product Designer, Chattanooga, TN (previously London, UK).
 - Stated specialisms: strategic problem-solving, user research, and a define →
   ideate → prototype → test & iterate process.
 - Disciplines listed across the site: UX, UI, research, strategy, service
