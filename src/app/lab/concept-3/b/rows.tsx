@@ -38,6 +38,10 @@ const runDuration = (run: string[]) => {
  */
 type Live = TearSpec & { closing: boolean };
 
+/* A linked row's own brand colour, for its tinted background. */
+const brandStyle = (row: ListRow) =>
+  (row.brand ? { "--brand": row.brand } : undefined) as CSSProperties | undefined;
+
 export function Rows({ rows }: { rows: ListRow[] }) {
   const [active, setActive] = useState<string | null>(null);
   const [tears, setTears] = useState<Live[]>([]);
@@ -218,7 +222,7 @@ export function Rows({ rows }: { rows: ListRow[] }) {
         let el: ReactNode;
         if (row.href && !row.external) {
           el = (
-            <Link className="cb-row cb-row--linked" href={row.href} data-active={on || undefined} {...handlers}>
+            <Link className="cb-row cb-row--linked" style={brandStyle(row)} href={row.href} data-active={on || undefined} {...handlers}>
               {body}
             </Link>
           );
@@ -226,6 +230,7 @@ export function Rows({ rows }: { rows: ListRow[] }) {
           el = (
             <a
               className="cb-row cb-row--linked"
+              style={brandStyle(row)}
               href={row.href}
               target="_blank"
               rel="noopener"

@@ -265,10 +265,12 @@
     color 200ms var(--cb-ease);
 }
 
-/* The rows that go somewhere: one step lighter than the page, so the six
-   you can open read as a group without a new colour. */
+/* The rows that go somewhere carry their client's brand colour, sampled
+   from its logo, at about a sixth of its strength over the charcoal: a
+   clear hue that stays dark enough for the row's text. */
 .cb-row--linked {
-  background-color: rgb(236 230 218 / 0.05);
+  /* Translucent, so the source still shows through behind the hue. */
+  background-color: color-mix(in oklab, var(--brand, var(--cb-ink)) 18%, transparent);
 }
 
 .cb-row__src {

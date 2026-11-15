@@ -128,8 +128,22 @@ const PREVIEWS: Record<string, Preview[]> = {
   ],
 };
 
+/*
+ * Brand colours for the rows that link out, each sampled from that client's
+ * own coloured logo in public/logos/colored (the fill it is drawn in).
+ */
+const BRAND: Record<string, string> = {
+  "ja-finance-park": "#285F74",
+  "itv-studios-portal": "#0F72EC",
+  "home-depot": "#FF6600",
+  "100-shapes": "#4676FE",
+  "your-move": "#244DA0",
+  taxslayer: "#D82532",
+};
+
 export type ListRow = {
   id: string;
+  brand?: string;
   title: string;
   meta: string[];
   src: string[];
@@ -158,6 +172,7 @@ export const LIST: ListRow[] = [
     href: `/work/${r.slug}/`,
     run: r.outcomes,
     previews: PREVIEWS[r.slug] ?? [SAMPLE],
+    brand: BRAND[r.slug],
   })),
   ...ARCHIVE.filter((a) => !INDEX.some((r) => r.slug === a.id)).map((a) => ({
     id: a.id,
@@ -168,5 +183,6 @@ export const LIST: ListRow[] = [
     external: a.external,
     run: LIBRARY_RUN[a.id] ?? a.disciplines,
     previews: PREVIEWS[a.id] ?? [SAMPLE],
+    brand: a.href ? BRAND[a.id] : undefined,
   })),
 ];
