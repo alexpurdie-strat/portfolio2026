@@ -183,6 +183,6 @@ export const LIST: ListRow[] = [
     external: a.external,
     run: LIBRARY_RUN[a.id] ?? a.disciplines,
     previews: PREVIEWS[a.id] ?? [SAMPLE],
-    brand: a.href ? BRAND[a.id] : undefined,
+    hue: a.href ? HUE[a.id] : undefined,
   })),
 ];
