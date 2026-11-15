@@ -94,8 +94,9 @@ export default function ConceptB() {
               duration={900}
             />
             <p className="cb-statement">
-              I design platforms where software meets people doing real work,
-              and the <em>systems</em> that keep them coherent.
+              A design generalist first, and still hands-on: I design platforms
+              where software meets people doing real work, and the{" "}
+              <em>systems</em> that keep them coherent.
             </p>
           </div>
         </section>
@@ -114,7 +115,9 @@ export default function ConceptB() {
           <p className="cb-statement">
             Lead platform strategist at Whiteboard. Before that, Head of Product
             Design at 100 Shapes, where I led the design system behind ITV
-            Studios Portal.
+            Studios Portal. Underneath the strategy is a generalist&rsquo;s
+            hand: brand, visual and interface work for clients from TED to
+            Chick-fil-A, made, not just directed.
           </p>
         </section>
       </main>

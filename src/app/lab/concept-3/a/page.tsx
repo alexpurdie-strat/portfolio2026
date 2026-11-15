@@ -39,8 +39,9 @@ export default function ConceptA() {
       <main id="main">
         <section className="ca-index" aria-labelledby="ca-title">
           <h1 id="ca-title" className="ca-lede">
-            I design platforms where software meets people doing real work, and
-            the systems that keep them coherent.
+            A design generalist first, and still hands-on: I design platforms
+            where software meets people doing real work, and the systems that
+            keep them coherent.
           </h1>
 
           <ul className="ca-rows">
@@ -94,7 +95,10 @@ export default function ConceptA() {
           <p className="ca-about">
             Lead platform strategist at Whiteboard. Before that, Head of Product
             Design at 100 Shapes, where I led the design system behind ITV
-            Studios Portal. Based in Chattanooga, Tennessee.
+            Studios Portal. Underneath the strategy is a generalist&rsquo;s
+            hand: brand, visual and interface work for clients from TED to
+            Chick-fil-A, made, not just directed. Based in Chattanooga,
+            Tennessee.
           </p>
         </section>
       </main>
