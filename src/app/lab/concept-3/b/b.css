@@ -553,61 +553,7 @@
     0 0 14px rgb(143 200 255 / 0.3);
 }
 
-/* On, the switch carries a little of the tear's edge: a few glyphs that
-   flicker round the track, and now and then a split-second glitch. */
-.cb-switch::before,
-.cb-switch::after {
-  position: absolute;
-  font-family: var(--font-martian), monospace;
-  font-size: 8px;
-  line-height: 1;
-  letter-spacing: 1px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 220ms var(--cb-ease);
-}
 
-.cb-switch::before {
-  content: "0#:{";
-  top: -9px;
-  left: 2px;
-  color: #fffcf4;
-}
-
-.cb-switch::after {
-  content: "1;]*";
-  bottom: -9px;
-  right: 0;
-  color: #8fc8ff;
-}
-
-.cb-previews[aria-checked="true"] .cb-switch::before {
-  animation: cb-flicker 1.7s steps(1) infinite;
-}
-
-.cb-previews[aria-checked="true"] .cb-switch::after {
-  animation: cb-flicker 2.3s steps(1) infinite reverse;
-}
-
-.cb-previews[aria-checked="true"] .cb-switch__knob {
-  animation: cb-knob-glitch 4.3s steps(1) infinite;
-}
-
-@keyframes cb-flicker {
-  0% { opacity: 0.75; transform: translateX(0); }
-  18% { opacity: 0.25; }
-  31% { opacity: 0.9; transform: translateX(1px); }
-  47% { opacity: 0.4; }
-  64% { opacity: 0.8; transform: translateX(-1px); }
-  82% { opacity: 0.15; }
-}
-
-@keyframes cb-knob-glitch {
-  0%, 93% { box-shadow: none; }
-  94% { box-shadow: -2px 0 0 rgb(255 80 80 / 0.7), 2px 0 0 rgb(111 224 176 / 0.7); }
-  96% { box-shadow: 2px 0 0 rgb(255 80 80 / 0.7), -1px 0 0 rgb(143 200 255 / 0.7); }
-  98% { box-shadow: none; }
-}
 
 .cb-previews[aria-checked="true"] .cb-switch__knob {
   transform: translateX(20px);
@@ -616,6 +562,36 @@
 
 .cb-previews[aria-checked="false"] {
   color: var(--cb-muted);
+}
+
+/* On, the pill's own stroke burns like the tear's lip: a soft white glow on
+   the line, and glyphs bleeding off it (switch-bleed.tsx). Off, a plain
+   thin stroke and nothing else. */
+.cb-previews {
+  transition:
+    background-color 200ms var(--cb-ease),
+    box-shadow 260ms var(--cb-ease);
+}
+
+.cb-previews[aria-checked="true"] {
+  box-shadow:
+    inset 0 0 0 1px rgb(255 252 244 / 0.85),
+    0 0 0 1px rgb(255 252 244 / 0.25),
+    0 0 8px rgb(255 252 244 / 0.45),
+    0 0 18px rgb(143 200 255 / 0.25);
+}
+
+.cb-previews__bleed {
+  position: absolute;
+  top: -26px;
+  left: -26px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 320ms var(--cb-ease);
+}
+
+.cb-previews[aria-checked="true"] .cb-previews__bleed {
+  opacity: 1;
 }
 
 @media (hover: hover) {
@@ -645,19 +621,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cb-switch,
-  .cb-switch__knob {
+  .cb-switch__knob,
+  .cb-previews,
+  .cb-previews__bleed {
     transition: none;
-  }
-
-  .cb-previews[aria-checked="true"] .cb-switch::before,
-  .cb-previews[aria-checked="true"] .cb-switch::after,
-  .cb-previews[aria-checked="true"] .cb-switch__knob {
-    animation: none;
-  }
-
-  .cb-previews[aria-checked="true"] .cb-switch::before,
-  .cb-previews[aria-checked="true"] .cb-switch::after {
-    opacity: 0.6;
   }
 }
 

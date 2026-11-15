@@ -8,6 +8,7 @@ import { Decode } from "@/components/lab/decode";
 import { Marquee } from "@/components/ui/marquee";
 import type { ListRow } from "@/content/lab-index";
 
+import { SwitchBleed } from "./switch-bleed";
 import { planTears, Tear, type TearSpec } from "./tears";
 
 /* How long the outcomes take to resolve before they start to run. */
@@ -145,6 +146,7 @@ export function Rows({ rows }: { rows: ListRow[] }) {
       className="cb-previews cb-mono"
       onClick={togglePreviews}
     >
+      <SwitchBleed on={previews} />
       Previews
       <span className="cb-switch" aria-hidden="true">
         <span className="cb-switch__knob" />
