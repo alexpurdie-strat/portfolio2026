@@ -280,6 +280,20 @@ export function Tear({
     let nextGlitch = start + introMs + 400 + Math.random() * 900;
     let lastDecode = 0;
     let lastShimmer = 0;
+
+    // Flares: now and then a short streak of glyphs shoots out from the edge,
+    // well past the feather, and fades. Rare, so they read as sparks off the
+    // burn and carry its light a little further into the page.
+    type Flare = {
+      u: number;
+      born: number;
+      life: number;
+      reach: number;
+      tilt: number;
+      glyphs: { ch: number; c: number; size: number; at: number; jit: number }[];
+    };
+    const flares: Flare[] = [];
+    let nextFlare = start + openMs + 400 + Math.random() * 800;
     let done = false;
 
     // The edge's glyphs. Each has a place round the perimeter (u, 0..1), a
@@ -659,6 +673,71 @@ export function Tear({
             );
           }
         });
+        ctx.globalAlpha = 1;
+
+        // Flares, spawned only while the tear is fully open.
+        if (!still && open > 0.98 && heal === 0 && now > nextFlare) {
+          nextFlare = now + 500 + Math.random() * 1000;
+          const n = 4 + ((Math.random() * 6) | 0);
+          flares.push({
+            u: Math.random(),
+            born: now,
+            life: 600 + Math.random() * 400,
+            reach: 80 + Math.random() * 150,
+            tilt: (Math.random() - 0.5) * 0.5,
+            glyphs: Array.from({ length: n }, (_, k) => ({
+              ch: (Math.random() * EDGE.length) | 0,
+              c: pickColor(0.75),
+              size: Math.random() < 0.25 ? 1 : 0,
+              at: (k + Math.random() * 0.6) / n,
+              jit: (Math.random() - 0.5) * 8,
+            })),
+          });
+        }
+        for (let fi = flares.length - 1; fi >= 0; fi--) {
+          const fl = flares[fi];
+          const ft = (now - fl.born) / fl.life;
+          if (ft >= 1) {
+            flares.splice(fi, 1);
+            continue;
+          }
+          // The point on the outline, and its outward normal, turned a little.
+          const at = fl.u * total;
+          let seg = 0;
+          while (seg < POINTS - 1 && lens[seg + 1] < at) seg++;
+          const [ax, ay] = outer[seg];
+          const [bx, by] = outer[(seg + 1) % POINTS];
+          const f = (at - lens[seg]) / (lens[seg + 1] - lens[seg] || 1);
+          const px = ax + (bx - ax) * f;
+          const py = ay + (by - ay) * f;
+          let nx = by - ay;
+          let ny = -(bx - ax);
+          const nl = Math.hypot(nx, ny) || 1;
+          nx /= nl;
+          ny /= nl;
+          if (nx * (px - ox) + ny * (py - oy) < 0) {
+            nx = -nx;
+            ny = -ny;
+          }
+          const cos = Math.cos(fl.tilt);
+          const sin = Math.sin(fl.tilt);
+          const dx = nx * cos - ny * sin;
+          const dy = nx * sin + ny * cos;
+          // Shoots out fast and eases, then fades.
+          const travel = 1 - Math.pow(1 - ft, 3);
+          for (const g of fl.glyphs) {
+            const box = Math.ceil(SIZES[g.size] * 1.4);
+            const d = OUT * 0.8 + g.at * fl.reach * travel;
+            ctx.globalAlpha = Math.pow(1 - ft, 1.3) * (1 - g.at * 0.4) * 0.9;
+            ctx.drawImage(
+              spriteAt(g.ch, g.size, g.c, family, dpr),
+              px + dx * d - dy * g.jit - box / 2,
+              py + dy * d + dx * g.jit - box / 2,
+              box,
+              box,
+            );
+          }
+        }
         ctx.globalAlpha = 1;
 
         // The tendrils' feather: their glyphs, around each line, by size.
