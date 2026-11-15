@@ -227,6 +227,11 @@
   text-wrap: pretty;
 }
 
+.cb-source-line {
+  display: flex;
+  flex-direction: column;
+}
+
 /* ── Sections ──────────────────────────────────────────────────────────── */
 
 .cb-section {

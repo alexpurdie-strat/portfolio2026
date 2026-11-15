@@ -88,15 +88,14 @@ export default function ConceptB() {
         <section className="cb-hero">
           <h1 className="cb-name">Alex Purdie</h1>
           <div className="cb-split">
-            <Decode
-              className="cb-mono cb-muted"
-              text={`role: "${ROLE.toLowerCase()}"`}
-              duration={900}
-            />
+            <span className="cb-source-line cb-mono cb-muted">
+              <Decode text={`role: "${ROLE.toLowerCase()}"`} duration={900} />
+              {/* An afterthought, set where afterthoughts go in code. */}
+              <Decode text="// previously: design generalist" duration={1100} />
+            </span>
             <p className="cb-statement">
-              A design generalist first, and still hands-on: I design platforms
-              where software meets people doing real work, and the{" "}
-              <em>systems</em> that keep them coherent.
+              I design platforms where software meets people doing real work,
+              and the <em>systems</em> that keep them coherent.
             </p>
           </div>
         </section>

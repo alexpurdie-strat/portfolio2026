@@ -39,9 +39,8 @@ export default function ConceptA() {
       <main id="main">
         <section className="ca-index" aria-labelledby="ca-title">
           <h1 id="ca-title" className="ca-lede">
-            A design generalist first, and still hands-on: I design platforms
-            where software meets people doing real work, and the systems that
-            keep them coherent.
+            I design platforms where software meets people doing real work, and
+            the systems that keep them coherent.
           </h1>
 
           <ul className="ca-rows">
