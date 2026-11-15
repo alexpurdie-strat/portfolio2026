@@ -806,9 +806,11 @@ export function Tear({
         splitRef.current?.setAttribute("x", ((Math.random() - 0.5) * reach * 0.6).toFixed(1));
       }
       if (svgRef.current) {
+        // Settled, the image sits at 90% brightness, a step below the edge's
+        // white so the lip reads as the brightest thing in the tear.
         svgRef.current.style.filter = burnIn > 0
-          ? `brightness(${(1 + 2.4 * burnIn ** 1.5).toFixed(2)}) contrast(${(1 + 0.5 * burnIn).toFixed(2)}) saturate(${(1 - 0.7 * burnIn).toFixed(2)})`
-          : "";
+          ? `brightness(${(0.9 + 2.4 * burnIn ** 1.5).toFixed(2)}) contrast(${(1 + 0.5 * burnIn).toFixed(2)}) saturate(${(1 - 0.7 * burnIn).toFixed(2)})`
+          : "brightness(0.9)";
       }
 
       // Once settled, the occasional glitch: slices slip and the red channel
